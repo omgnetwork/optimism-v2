@@ -1,5 +1,11 @@
 # @eth-optimism/gas-oracle
 
+## 0.1.0
+
+### Minor Changes
+
+- 7941e9a3: Add L1 base fee, add breaking config options
+
 ## 0.0.3
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @eth-optimism/core-utils
 
+## 0.6.0
+
+### Minor Changes
+
+- bdb7ccaa: Parse optimistic ethereum specific fields on transaction receipts
+
+### Patch Changes
+
+- 6ce0c2f2: Expose lower level API for tx fees
+
 ## 0.5.5
 
 ### Patch Changes

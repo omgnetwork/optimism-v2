@@ -1,5 +1,23 @@
 # @eth-optimism/integration-tests
 
+## 0.3.0
+
+### Minor Changes
+
+- e39de05d: Start refactor to new version of the OVM
+- 8560326d: Remove the "OVM" Prefix from contract names
+- e7fd4d4c: Removes various unused OVM contracts
+- baaeb215: Opcode tweaks. Coinbase returns SequencerFeeVault address. Difficulty returns zero.
+- c691d487: Refactors and simplifies OVM_ETH usage
+- d60af5e7: Removes ERC20 and WETH9 features from OVM_ETH
+- 487b3687: Adds refactored support for the L1MESSAGESENDER opcode
+
+### Patch Changes
+
+- 46b7b992: Introduces a new opcode L1BLOCKNUMBER to replace old functionality where blocknumber would return the L1 block number and the L2 block number was inaccessible.
+- 95363705: Add tests for optimistic ethereum related fields to the receipt
+- 82d18ac2: Add updated fee scheme integration tests
+
 ## 0.2.3
 
 ### Patch Changes

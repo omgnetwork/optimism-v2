@@ -1,6 +1,6 @@
 {
   "name": "@eth-optimism/integration-tests",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "[Optimism] Integration Tests",
   "private": true,
   "author": "Optimism PBC",
@@ -16,9 +16,9 @@
     "clean": "rimraf cache artifacts"
   },
   "devDependencies": {
-    "@eth-optimism/contracts": "^0.4.10",
-    "@eth-optimism/core-utils": "^0.5.2",
-    "@eth-optimism/message-relayer": "^0.1.11",
+    "@eth-optimism/contracts": "^0.5.0",
+    "@eth-optimism/core-utils": "^0.6.0",
+    "@eth-optimism/message-relayer": "^0.2.0",
     "@ethersproject/providers": "^5.4.4",
     "@ethersproject/transactions": "^5.4.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",

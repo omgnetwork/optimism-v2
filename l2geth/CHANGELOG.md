@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.0
+
+### Minor Changes
+
+- e39de05d: Start refactor to new version of the OVM
+- 46b7b992: Introduces a new opcode L1BLOCKNUMBER to replace old functionality where blocknumber would return the L1 block number and the L2 block number was inaccessible.
+- e7fd4d4c: Removes various unused OVM contracts
+- 7844ce4e: Add optimistic ethereum specific fields to the receipt. These fields are related to the L1 portion of the fee. Note that this is a consensus change as it will impact the blockhash through the receipts root
+- baaeb215: Opcode tweaks. Coinbase returns SequencerFeeVault address. Difficulty returns zero.
+- c691d487: Refactors and simplifies OVM_ETH usage
+- c67d3f40: Reintroduces the whitelist into the v2 system
+- d60af5e7: Removes ERC20 and WETH9 features from OVM_ETH
+- 487b3687: Adds refactored support for the L1MESSAGESENDER opcode
+- a2697452: Removes all custom genesis initialization
+
+### Patch Changes
+
+- 41f28c44: Refactor to simplify the process of generating the genesis json file
+- 23237593: Remove calls to `syncBatchesToTip` in the main `sequence()` loop
+- 7bdd241e: Use `OVM_GasPriceOracle` based L1 base fee instead of fetching it from remote
+- dfaa8fc2: Handle race condition in L2 geth for fee logic
+
 ## 0.4.14
 
 ### Patch Changes
