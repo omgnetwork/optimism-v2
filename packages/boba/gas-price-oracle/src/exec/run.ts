@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv'
 import Config from 'bcfg'
 
 import { GasPriceOracleService } from '../service';
+import { Logger, LoggerOptions } from '@eth-optimism/common-ts'
 
 dotenv.config()
 
@@ -104,7 +105,16 @@ const main = async () => {
     throw new Error('Must pass FAST_RELAYER_ADDRESS or FAST_RELAYER_PRIVATE_KEY')
   }
 
+  const loggerOptions: LoggerOptions = {
+    name: 'GasPriceOracle',
+  }
+  const logger = new Logger(loggerOptions)
   const l1Provider = new providers.StaticJsonRpcProvider(L1_NODE_WEB3_URL)
+  l1Provider.on('debug', (info) => {
+    if (info.action === 'request') {
+      logger.info('ethers', info.request)
+    }
+  })
   const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
 
   const gasPriceOracleOwnerWallet = new Wallet(GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY, l2Provider)

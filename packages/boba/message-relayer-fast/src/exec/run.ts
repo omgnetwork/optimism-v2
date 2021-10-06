@@ -1,6 +1,7 @@
 import { Wallet, providers } from 'ethers'
 import { MessageRelayerService } from '../service'
 import { Bcfg } from '@eth-optimism/core-utils'
+import { Logger, LoggerOptions } from '@eth-optimism/common-ts'
 import * as dotenv from 'dotenv'
 import Config from 'bcfg'
 
@@ -76,8 +77,17 @@ const main = async () => {
     throw new Error('Must pass L2_NODE_WEB3_URL')
   }
 
-  const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
+  const loggerOptions: LoggerOptions = {
+    name: 'GasPriceOracle',
+  }
+  const logger = new Logger(loggerOptions)
   const l1Provider = new providers.StaticJsonRpcProvider(L1_NODE_WEB3_URL)
+  l1Provider.on('debug', (info) => {
+    if (info.action === 'request') {
+      logger.info('ethers', info.request)
+    }
+  })
+  const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
 
   let wallet: Wallet
   if (FAST_RELAYER_PRIVATE_KEY) {
