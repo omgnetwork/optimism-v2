@@ -83,6 +83,11 @@ const main = async () => {
 
   const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
   const l1Provider = new providers.StaticJsonRpcProvider(L1_NODE_WEB3_URL)
+  l1Provider.on('debug', (info) => {
+    if (info.action === 'request') {
+      logger.info('ethers', info.request)
+    }
+  })
 
   let wallet: Wallet
   if (L1_WALLET_KEY) {
