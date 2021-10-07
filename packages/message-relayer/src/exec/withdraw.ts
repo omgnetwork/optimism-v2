@@ -8,17 +8,12 @@
 import { ethers } from 'ethers'
 import { predeploys, getContractInterface } from '@eth-optimism/contracts'
 import { sleep } from '@eth-optimism/core-utils'
-import { Logger, LoggerOptions } from '@eth-optimism/common-ts'
 import dotenv from 'dotenv'
 
 /* Imports: Internal */
 import { getMessagesAndProofsForL2Transaction } from '../relay-tx'
 
 dotenv.config()
-const loggerOptions: LoggerOptions = {
-  name: 'Message_Relayer',
-}
-const logger = new Logger(loggerOptions)
 const l1RpcProviderUrl = process.env.WITHDRAW__L1_RPC_URL
 const l2RpcProviderUrl = process.env.WITHDRAW__L2_RPC_URL
 const l1PrivateKey = process.env.WITHDRAW__L1_PRIVATE_KEY
@@ -34,11 +29,6 @@ const main = async () => {
   }
 
   const l1RpcProvider = new ethers.providers.JsonRpcProvider(l1RpcProviderUrl)
-  l1RpcProvider.on('debug', (info) => {
-    if (info.action === 'request') {
-      logger.info('ethers', info.request)
-    }
-  })
   const l1Wallet = new ethers.Wallet(l1PrivateKey, l1RpcProvider)
   const l1WalletBalance = await l1Wallet.getBalance()
   console.log(`relayer address: ${l1Wallet.address}`)

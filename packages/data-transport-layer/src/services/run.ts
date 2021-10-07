@@ -1,12 +1,10 @@
 /* Imports: External */
 import * as dotenv from 'dotenv'
 import { Bcfg } from '@eth-optimism/core-utils'
-import { StaticJsonRpcProvider } from '@ethersproject/providers'
 import Config from 'bcfg'
 
 /* Imports: Internal */
 import { L1DataTransportService } from './main/service'
-import { Logger } from "../../../common-ts/src";
 
 type ethNetwork = 'mainnet' | 'kovan' | 'goerli'
 ;(async () => {
@@ -17,14 +15,6 @@ type ethNetwork = 'mainnet' | 'kovan' | 'goerli'
     config.load({
       env: true,
       argv: true,
-    })
-
-    const logger = new Logger({ name: 'L1_Data_Transport_Service' })
-    const l1RpcProvidernew = new StaticJsonRpcProvider(config.str('l1-rpc-endpoint'))
-    l1RpcProvidernew.on('debug', (info) => {
-      if (info.action === 'request'){
-        logger.info('ethers', info.request)
-      }
     })
 
     const service = new L1DataTransportService({
