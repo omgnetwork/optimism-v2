@@ -95,7 +95,7 @@ export class L1TransportServer extends BaseService<L1TransportServerOptions> {
         : this.options.l1RpcProvider
 
     this.state.l1RpcProvider.on('debug', (info) => {
-      if (info.action === 'request'){
+      if (info.action === 'request') {
         this.logger.info('ethers', info.request)
       }
     })
