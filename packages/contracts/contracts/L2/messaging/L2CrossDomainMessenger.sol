@@ -32,7 +32,6 @@ contract L2CrossDomainMessenger is
     address internal xDomainMsgSender = Lib_DefaultValues.DEFAULT_XDOMAIN_SENDER;
     address public l1CrossDomainMessenger;
 
-
     /***************
      * Constructor *
      ***************/

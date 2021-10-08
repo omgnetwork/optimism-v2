@@ -82,6 +82,7 @@ type Message interface {
 
 	L1Timestamp() uint64
 	L1BlockNumber() *big.Int
+	L1MessageSender() *common.Address
 	QueueOrigin() types.QueueOrigin
 }
 

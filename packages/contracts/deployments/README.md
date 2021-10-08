@@ -100,10 +100,10 @@ Network : __goerli (chain id: 5)__
 Implementation addresses. DO NOT use these addresses directly.
 Use their proxied counterparts seen above.
 
-L1CrossDomainMessenger: 
+L1CrossDomainMessenger:
  - 0xd32718Fdb54e482C5Aa8eb7007cC898d798B3185
  - https://goerli.etherscan.io/address/0xd32718Fdb54e482C5Aa8eb7007cC898d798B3185)
-Proxy__L1StandardBridge: 
+Proxy__L1StandardBridge:
  - 0x73298186A143a54c20ae98EEE5a025bD5979De02
  - https://goerli.etherscan.io/address/0x73298186A143a54c20ae98EEE5a025bD5979De02)
 -->
