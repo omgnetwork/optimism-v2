@@ -3,54 +3,63 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-import { Contract, ContractFactory, utils } from 'ethers'
+import { Contract, ContractFactory, utils, Wallet } from 'ethers'
 import chalk from 'chalk'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { Direction } from './shared/watcher-utils'
 
-import L1ERC20Json from '../artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
+import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 import { OptimismEnv } from './shared/env'
-import { promises as fs } from 'fs'
 
 describe('System setup', async () => {
   let L1ERC20: Contract
   let L2ERC20: Contract
   let Factory__L2ERC20: ContractFactory
-  let L1StandardBridgeAddress: string
-  let L2StandardBridgeAddress: string
-  let L1StandardBridge: Contract
 
   let env: OptimismEnv
 
+  const depositERC20ToL2 = async (toWallet: Wallet) => {
+    const depositL2ERC20Amount = utils.parseEther('12345')
+
+    const approveL1ERC20TX = await L1ERC20.approve(
+      env.l1Bridge.address,
+      depositL2ERC20Amount
+    )
+    await approveL1ERC20TX.wait()
+
+    const deposit = env.l1Bridge.depositERC20To(
+      L1ERC20.address,
+      L2ERC20.address,
+      toWallet.address,
+      depositL2ERC20Amount,
+      9999999,
+      utils.formatBytes32String(new Date().getTime().toString())
+    )
+    await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
+  }
+
   before(async () => {
     env = await OptimismEnv.new()
-    L1StandardBridgeAddress = await env.addressManager.getAddress(
-      'Proxy__L1StandardBridge'
-    )
-    L1StandardBridge = getContractFactory(
-      'L1StandardBridge',
-      env.bobl1Wallet
-    ).attach(L1StandardBridgeAddress)
-    L2StandardBridgeAddress = await L1StandardBridge.l2TokenBridge()
+
     //let's tap into the contract we just deployed
     L1ERC20 = new Contract(
       env.addressesBOBA.TOKENS.TEST.L1,
       L1ERC20Json.abi,
-      env.bobl1Wallet
+      env.l1Wallet
     )
-    Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.bobl2Wallet)
+    Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.l2Wallet)
     //let's tap into the contract we just deployed
     L2ERC20 = new Contract(
       env.addressesBOBA.TOKENS.TEST.L2,
       Factory__L2ERC20.interface,
-      env.bobl2Wallet
+      env.l2Wallet
     )
   })
 
-  it.only('should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
-     const preL1ERC20Balance = await L1ERC20.balanceOf(env.bobl1Wallet.address)
-    const preL2ERC20Balance = await L2ERC20.balanceOf(env.bobl2Wallet.address)
+  it('should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
+    const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
+    const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
     console.log(
       `🌕 ${chalk.red(
         'L1ERC20 TEST token balance for Deployer PK:'
@@ -65,23 +74,21 @@ describe('System setup', async () => {
     const depositL2ERC20Amount = utils.parseEther('12345')
 
     const approveL1ERC20TX = await L1ERC20.approve(
-      L1StandardBridgeAddress,
+      env.l1Bridge.address,
       depositL2ERC20Amount
     )
     await approveL1ERC20TX.wait()
 
-    const deposit = L1StandardBridge.depositERC20(
+    const deposit = env.l1Bridge.depositERC20(
       L1ERC20.address,
       L2ERC20.address,
       depositL2ERC20Amount,
       9999999,
       utils.formatBytes32String(new Date().getTime().toString())
     )
-      console.log('4444')
     await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
-    console.log('5555')
-    const postL1ERC20Balance = await L1ERC20.balanceOf(env.bobl1Wallet.address)
-    const postL2ERC20Balance = await L2ERC20.balanceOf(env.bobl2Wallet.address)
+    const postL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
+    const postL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 
     console.log(
       `🌕 ${chalk.red(
@@ -104,49 +111,24 @@ describe('System setup', async () => {
   })
 
   it('should transfer ERC20 TEST token to Kate', async () => {
-    const transferL2ERC20Amount = utils.parseEther('999')
-
+    const transferL2ERC20Amount = utils.parseEther('9')
+    await depositERC20ToL2(env.l2Wallet)
     const preKateL2ERC20Balance = await L2ERC20.balanceOf(
-      env.katel2Wallet.address
+      env.l2Wallet_2.address
     )
-
     const transferToKateTX = await L2ERC20.transfer(
-      env.katel2Wallet.address,
-      transferL2ERC20Amount
+      env.l2Wallet_2.address,
+      transferL2ERC20Amount,
+      { gasLimit: 9440000 }
     )
     await transferToKateTX.wait()
 
     const postKateL2ERC20Balance = await L2ERC20.balanceOf(
-      env.katel2Wallet.address
+      env.l2Wallet_2.address
     )
 
     expect(postKateL2ERC20Balance).to.deep.eq(
       preKateL2ERC20Balance.add(transferL2ERC20Amount)
-    )
-  })
-
-  it('should transfer ERC20 TEST token to Alice', async () => {
-    const transferL2ERC20Amount = utils.parseEther('1111')
-
-    const preBobL2ERC20Balance = await L2ERC20.balanceOf(
-      env.bobl2Wallet.address
-    )
-    const preAliceL2ERC20Balance = await L2ERC20.balanceOf(
-      env.alicel2Wallet.address
-    )
-
-    const tranferToAliceTX = await L2ERC20.transfer(
-      env.alicel2Wallet.address,
-      transferL2ERC20Amount
-    )
-    await tranferToAliceTX.wait()
-
-    const postBobL2ERC20Balance = await L2ERC20.balanceOf(
-      env.bobl2Wallet.address
-    )
-
-    expect(postBobL2ERC20Balance).to.deep.eq(
-      preBobL2ERC20Balance.sub(transferL2ERC20Amount)
     )
   })
 })

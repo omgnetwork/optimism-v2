@@ -6,8 +6,8 @@ import chalk from 'chalk'
 
 import { Contract, ContractFactory, BigNumber } from 'ethers'
 
-import L2ERC721Json from '../artifacts/contracts/ERC721Genesis.sol/ERC721Genesis.json'
-import L2ERC721RegJson from '../artifacts/contracts/ERC721Registry.sol/ERC721Registry.json'
+import L2ERC721Json from '@boba/contracts/artifacts/contracts/ERC721Genesis.sol/ERC721Genesis.json'
+import L2ERC721RegJson from '@boba/contracts/artifacts/contracts/ERC721Registry.sol/ERC721Registry.json'
 
 import { OptimismEnv } from './shared/env'
 
@@ -31,20 +31,20 @@ describe('NFT Test\n', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    a1a = env.bobl2Wallet.address
-    a2a = env.alicel2Wallet.address
-    a3a = env.katel2Wallet.address
+    a1a = env.l2Wallet.address
+    a2a = env.l2Wallet_2.address
+    a3a = env.l2Wallet_3.address
 
     ERC721 = new Contract(
       env.addressesBOBA.L2ERC721,
       L2ERC721Json.abi,
-      env.bobl2Wallet
+      env.l2Wallet
     )
 
     ERC721Reg = new Contract(
       env.addressesBOBA.L2ERC721Reg,
       L2ERC721RegJson.abi,
-      env.bobl2Wallet
+      env.l2Wallet
     )
 
     const balanceOwner = await ERC721.balanceOf(a1a)
@@ -93,7 +93,7 @@ describe('NFT Test\n', async () => {
     console.log(`balanceAlice: ${balanceAlice.toString()}`)
 
     //Get the URL
-    const nftURL = await ERC721.getTokenURI(BigNumber.from(String(0)))
+    const nftURL = await ERC721.tokenURI(BigNumber.from(String(0)))
     console.log(`nftURL: ${nftURL}`)
 
     //Should be 1
@@ -109,7 +109,6 @@ describe('NFT Test\n', async () => {
       'https://www.atcc.org/products/all/CCL-185.aspx'
     nft = await ERC721.mintNFT(a3a, meta)
     await nft.wait()
-
     //mint a third NFT, this time for account2 aka recipient
     meta =
       ownerName +
@@ -124,9 +123,7 @@ describe('NFT Test\n', async () => {
     TID = await ERC721.getLastTID()
     console.log(`TID:${TID.toString()}`)
 
-    //it('returns the amount of tokens owned by the given address', async function () {
     expect(await ERC721.balanceOf(a1a)).to.deep.eq(BigNumber.from(String(0)))
-    //});
 
     // Alice (a1a) should have two NFTs, and the tokenID of the first one should be zero, and the second one
     // should be 2
@@ -142,8 +139,7 @@ describe('NFT Test\n', async () => {
 
   it('should derive an NFT Factory from a genesis NFT', async () => {
     //Alice (a2a) Account #2 wishes to create a derivative NFT factory from a genesis NFT
-    const tokenID = await ERC721.tokenOfOwnerByIndex(a2a, 1)
-
+    const tokenID = await ERC721.tokenOfOwnerByIndex(a2a, 0)
     //determine the UUID
     const UUID =
       ERC721.address.substring(1, 6) +
@@ -157,7 +153,7 @@ describe('NFT Test\n', async () => {
     Factory__ERC721 = new ContractFactory(
       L2ERC721Json.abi,
       L2ERC721Json.bytecode,
-      env.bobl2Wallet
+      env.l2Wallet
     )
 
     ERC721_D = await Factory__ERC721.deploy(
@@ -189,15 +185,13 @@ describe('NFT Test\n', async () => {
 
   it('should register the NFTs address in users wallet', async () => {
     await ERC721Reg.registerAddress(a2a, ERC721.address)
-
     //but, a3a should have two flavors of NFT...
     await ERC721Reg.registerAddress(a3a, ERC721.address)
-
     await ERC721Reg.registerAddress(a3a, ERC721_D.address)
 
-    const addresses_a2a = await ERC721Reg.lookupAddress()
+    const addresses_a2a = await ERC721Reg.lookupAddress(a2a)
 
-    const addresses_a3a = await ERC721Reg.lookupAddress()
+    const addresses_a3a = await ERC721Reg.lookupAddress(a3a)
 
     console.log(`Addresses a2a: ${addresses_a2a}`)
     console.log(`Addresses a3a: ${addresses_a3a}`)
