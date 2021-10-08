@@ -3,6 +3,7 @@ pragma solidity >0.7.5;
 pragma experimental ABIEncoderV2;
 
 /* Library Imports */
+import { AddressAliasHelper } from "@eth-optimism/contracts/contracts/standards/AddressAliasHelper.sol";
 import { Lib_AddressResolver } from "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressResolver.sol";
 import { Lib_OVMCodec } from "@eth-optimism/contracts/contracts/libraries/codec/Lib_OVMCodec.sol";
 import { Lib_AddressManager } from "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressManager.sol";
@@ -29,7 +30,7 @@ import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/
  * Compiler used: solc
  * Runtime target: EVM
  */
-abstract contract L1CrossDomainMessengerFast is
+contract L1CrossDomainMessengerFast is
     IL1CrossDomainMessenger,
     Lib_AddressResolver,
     OwnableUpgradeable,
@@ -49,7 +50,6 @@ abstract contract L1CrossDomainMessengerFast is
     event MessageAllowed(
         bytes32 indexed _xDomainCalldataHash
     );
-
 
     /**********************
      * Contract Variables *
@@ -266,7 +266,8 @@ abstract contract L1CrossDomainMessengerFast is
         address _sender,
         bytes memory _message,
         uint256 _queueIndex,
-        uint32 _gasLimit
+        uint32 _oldGasLimit,
+        uint32 _newGasLimit
     )
         public
     {
@@ -275,21 +276,7 @@ abstract contract L1CrossDomainMessengerFast is
         Lib_OVMCodec.QueueElement memory element =
             ICanonicalTransactionChain(canonicalTransactionChain).getQueueElement(_queueIndex);
 
-        // Compute the transactionHash
-        bytes32 transactionHash = keccak256(
-            abi.encode(
-                address(this),
-                Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
-                _gasLimit,
-                _message
-            )
-        );
-
-        require(
-            transactionHash == element.transactionHash,
-            "Provided message has not been enqueued."
-        );
-
+        // Compute the calldata that was originally used to send the message.
         bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
             _target,
             _sender,
@@ -297,10 +284,27 @@ abstract contract L1CrossDomainMessengerFast is
             _queueIndex
         );
 
+        // Compute the transactionHash
+        bytes32 transactionHash = keccak256(
+            abi.encode(
+                AddressAliasHelper.applyL1ToL2Alias(address(this)),
+                Lib_PredeployAddresses.L2_CROSS_DOMAIN_MESSENGER,
+                _oldGasLimit,
+                xDomainCalldata
+            )
+        );
+
+        // Now check that the provided message data matches the one in the queue element.
+        require(
+            transactionHash == element.transactionHash,
+            "Provided message has not been enqueued."
+        );
+
+        // Send the same message but with the new gas limit.
         _sendXDomainMessage(
             canonicalTransactionChain,
             xDomainCalldata,
-            _gasLimit
+            _newGasLimit
         );
     }
 
