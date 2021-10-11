@@ -168,6 +168,12 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         _;
     }
 
+    function getPoolInfo(address _tokenAddress) public view returns(PoolInfo memory) {
+        PoolInfo storage pool = poolInfo[_tokenAddress];
+        require(pool.l2TokenAddress != address(0), "Token is not registered");
+        return pool;
+    }
+
     /********************
      * Public Functions *
      ********************/

@@ -169,6 +169,12 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         _;
     }
 
+    function getPoolInfo(address _tokenAddress) public view returns(PoolInfo memory) {
+        PoolInfo storage pool = poolInfo[_tokenAddress];
+        require(pool.l2TokenAddress != address(0), "Token is not registered");
+        return pool;
+    }
+
 
     /********************
      * Public Functions *
