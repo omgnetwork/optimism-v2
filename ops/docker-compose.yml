@@ -387,3 +387,128 @@ services:
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
       POLLING_INTERVAL:
       RETRIES: 70
+
+  vault:
+    depends_on:
+      - vault_agent
+      - l1_chain
+      - ecs-local-endpoints
+    image: bobanetwork/vault
+    ports:
+      - "127.0.0.1:8200:8900"
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.boba_vault
+    user: root
+    deploy:
+       replicas: 1
+    environment:
+      VAULT_ADDR: http://127.0.0.1:8900
+      VAULT_CACERT: /vault/config/ca.crt
+      RUN_TEST: "${RUN_TEST:-false}"
+      TEST: "${TEST:-false}"
+      URL: http://deployer:8081/addresses.json
+      AWS_ACCESS_KEY_ID: "AKIAIOSFODNN7EXAMPLE"
+      AWS_SECRET_ACCESS_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+      AWS_BOUND_IAM_PRINCIPAL_ARN: ""
+      AWS_ROLE: ""
+    volumes:
+      - "/tmp/vault_auth:/vault/config:rw"
+      - "./../packages/boba/vault/test:/vault/test"
+      - "./vault/data/vault/config:/vault/config:rw"
+    entrypoint:
+      - "/bin/sh"
+      - -ec
+      - |
+        ./provision_vault.sh
+    networks:
+        credentials_network:
+            ipv4_address: "169.254.170.3"
+
+  vault_agent:
+    depends_on:
+      - ecs-local-endpoints
+    image: hashicorp/vault-enterprise:latest
+    restart: always
+    ports:
+      - "18200:8200"
+    volumes:
+      - ./../packages/boba/vault/docker/:/vault-agent:rw
+      #AWS_SINK_JWT_TOKEN_PATH
+      - /tmp/vault_agent:/tmp/vault_agent:rw
+    environment:
+      VAULT_ADDR: "http://vault:8900"
+      AWS_SINK_JWT_TOKEN_PATH: "/tmp/vault_agent/vault_auth"
+      AWS_ACCESS_KEY_ID: "AKIAIOSFODNN7EXAMPLE"
+      AWS_SECRET_ACCESS_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+      AWS_VAULT_ROLE: ""
+      restart: always
+    entrypoint:
+      - "/bin/sh"
+      - -ec
+      - |
+        apk add gettext
+        envsubst < /vault-agent/vault-agent.hcl > /tmp/vault-agent.hcl
+        vault agent -log-level debug -config=/tmp/vault-agent.hcl
+    networks:
+        credentials_network:
+            ipv4_address: "169.254.170.3"
+
+  # This container vends credentials to your containers
+  ecs-local-endpoints:
+      depends_on:
+        - localstack
+      # The Amazon ECS Local Container Endpoints Docker Image
+      image: amazon/amazon-ecs-local-container-endpoints
+      volumes:
+        # Mount /var/run so we can access docker.sock and talk to Docker
+        - /var/run:/var/run
+        # Mount the shared configuration directory, used by the AWS CLI and AWS SDKs
+        # On Windows, this directory can be found at "%UserProfile%\.aws"
+        #- $HOME/.aws/:/home/.aws/
+      environment:
+        # # define the home folder; credentials will be read from $HOME/.aws
+        # HOME: "/home"
+        # # You can change which AWS CLI Profile is used
+        # AWS_PROFILE: "default"
+        # The simulated IAM and STS endpoints will accept any access key
+        # and secret key. These values may simply be left as dummy values.
+        - AWS_ACCESS_KEY_ID=accessKey
+        - AWS_REGION=us-east-1
+        - AWS_SECRET_ACCESS_KEY=secretAccessKey
+        - IAM_CUSTOM_ENDPOINT=http://localstack:4593
+        - STS_CUSTOM_ENDPOINT=http://localstack:4592
+      networks:
+          credentials_network:
+              # This special IP address is recognized by the AWS SDKs and AWS CLI
+              ipv4_address: "169.254.170.2"
+
+  localstack:
+      environment:
+          - DEFAULT_REGION=us-east-1
+          - SERVICES=iam,sts
+      image: localstack/localstack
+      networks:
+          - default
+      ports:
+          - '4592:4592'
+          - '4593:4593'
+      volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  # This is the default network. It is used for normal inter-container
+  # communications.
+  default:
+      driver: bridge
+      ipam:
+          driver: default
+  # This special network is configured so that the local metadata
+  # service can bind to the specific IP address that ECS uses
+  # in production
+  credentials_network:
+      driver: bridge
+      ipam:
+          config:
+              - subnet: "169.254.170.0/24"
+                gateway: 169.254.170.1

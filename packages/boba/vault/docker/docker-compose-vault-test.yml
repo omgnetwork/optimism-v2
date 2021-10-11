@@ -1,0 +1,76 @@
+version: "3"
+###
+### stuff is a bit convoluted here, simply because the process isn't trivial
+### To execute Vault tests, that submit stuff to L1 contracts, we need all the addresses (OVM_CTC, OVM_SCC).
+### But for these contracts to be deployed, these contracts need Sequencer and Proposer addresses.
+### So we start Vault and wait for it to be ready (the grep thingy in entrypoint)
+### We continue with wallet, account and policy creation and setup. And write them to a file tokens_and_accounts.sh.
+### The deployer mounts this volume and checks for the existence of this file and sources it when it comes up. This
+### Exposes Sequencer and Deployer addresses as ENV vars in the deployer node.
+### I guess this is OK for local docker-compose, but it certanly won't be OK for production Vault deploy.
+### The Vault is a delicate thing.
+
+services:
+  ###
+  ### deployer and batch_submitter are re-defined here
+  ### because we need to override the default env vars
+  ### that put in the sequencer and proposer private keys
+  ### via SEQUENCER_PRIVATE_KEY - SEQUENCER_ADDRESS, PROPOSER_PRIVATE_KEY - PROPOSER_ADDRESS
+  ### not very clean atm, because the modes exist side by side.
+
+  ### we inject a short script that was prepared in Vault.
+  ### It exposes Vault tokens, sequencer address and proposer address
+  ### as env vars.
+  ### PROPOSER_TOKEN, SEQUENCER_TOKEN, SEQUENCER_ADDRESS, PROPOSER_ADDRESS
+
+  ### The deployer takes these addresses and populates the contracts guard with these values.
+  ### Batch submitter will go into Vault mode if these env vars are present.
+  ### SEQUENCER_TOKEN and PROPOSER_TOKEN are optional. Batch submitter will try to get the
+  ### JWT token for vault from the AWS_SINK_JWT_TOKEN_PATH if they're not set.
+  deployer:
+    volumes:
+      - "./../packages/boba/vault/test:/vault/test"
+    entrypoint:
+      - "/bin/bash"
+      - -ec
+      - |
+       SCRIPT=$$(cat <<-END
+       while [ ! -f /vault/test/tokens_and_accounts.sh ]
+       do
+         sleep 5
+         echo "Waiting for the Vault accounts in tokens_and_accounts.sh"
+       done
+       source /vault/test/tokens_and_accounts.sh
+       END
+       )
+       preprocessed_VAR=$$(printf '%s\n' "$$SCRIPT" | sed 's/\\/&&/g;s/^[[:blank:]]/\\&/;s/$$/\\/')
+       sed -i -e "/set -e/a\\$${preprocessed_VAR%?}" deployer.sh
+       ./deployer.sh
+
+  batch_submitter:
+    volumes:
+      - "./../packages/boba/vault/test:/vault/test"
+      #AWS_SINK_JWT_TOKEN_PATH
+      - "/tmp/vault_agent:/tmp/vault_agent:rw"
+    environment:
+      VAULT_ADDR: http://vault:8900
+      AWS_SINK_JWT_TOKEN_PATH: "/tmp/vault_agent/vault_auth"
+    entrypoint:
+      - "/bin/bash"
+      - -ec
+      - |
+       SCRIPT=$$(cat <<-END
+       while [ ! -f /vault/test/tokens_and_accounts.sh ]
+       do
+         sleep 5
+         echo "Waiting for the Vault accounts in tokens_and_accounts.sh"
+       done
+       source /vault/test/tokens_and_accounts.sh
+       END
+       )
+       preprocessed_VAR=$$(printf '%s\n' "$$SCRIPT" | sed 's/\\/&&/g;s/^[[:blank:]]/\\&/;s/$$/\\/')
+       sed -i -e "/set -e/a\\$${preprocessed_VAR%?}" batches.sh
+       ./batches.sh
+
+
+
