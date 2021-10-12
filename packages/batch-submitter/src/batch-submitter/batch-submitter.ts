@@ -13,9 +13,17 @@ import {
 import { Gauge, Histogram, Counter } from 'prom-client'
 import { RollupInfo, sleep } from '@eth-optimism/core-utils'
 import { Logger, Metrics } from '@eth-optimism/common-ts'
-import { getContractFactory } from 'old-contracts'
+import { getContractInterface } from '@eth-optimism/contracts'
+import { getBalance } from './provider-helper'
+
+export interface Vault {
+  // one or the other, not both!
+  address: string
+  vault_addr: string
+  token: string
+}
 /* Internal Imports */
-import { TxSubmissionHooks } from '..'
+import { TxSubmissionHooks, AppendStateBatch } from '..'
 
 export interface BlockRange {
   start: number
@@ -42,7 +50,8 @@ export abstract class BatchSubmitter {
   protected metrics: BatchSubmitterMetrics
 
   constructor(
-    readonly signer: Signer,
+    readonly vault: Vault,
+    readonly l1Provider: providers.StaticJsonRpcProvider,
     readonly l2Provider: providers.StaticJsonRpcProvider,
     readonly minTxSize: number,
     readonly maxTxSize: number,
@@ -81,7 +90,7 @@ export abstract class BatchSubmitter {
 
     this.logger.info('Readying to submit next batch...', {
       l2ChainId: this.l2ChainId,
-      batchSubmitterAddress: await this.signer.getAddress(),
+      batchSubmitterAddress: this.vault.address,
     })
 
     if (this.syncing === true) {
@@ -99,8 +108,8 @@ export abstract class BatchSubmitter {
   }
 
   protected async _hasEnoughETHToCoverGasCosts(): Promise<boolean> {
-    const address = await this.signer.getAddress()
-    const balance = await this.signer.getBalance()
+    const address = this.vault.address
+    const balance = await getBalance(this.l1Provider, address)
     const ether = utils.formatEther(balance)
     const num = parseFloat(ether)
 
@@ -134,9 +143,11 @@ export abstract class BatchSubmitter {
     ctcAddress: string
     sccAddress: string
   }> {
-    const addressManager = (
-      await getContractFactory('Lib_AddressManager', this.signer)
-    ).attach(this.addressManagerAddress)
+    const addressManager = new Contract(
+      this.addressManagerAddress,
+      getContractInterface('Lib_AddressManager'),
+      this.l1Provider
+    )
     const sccAddress = await addressManager.getAddress('StateCommitmentChain')
     const ctcAddress = await addressManager.getAddress(
       'CanonicalTransactionChain'

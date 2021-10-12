@@ -1,3 +1,3 @@
-path "immutability-eth-plugin/wallets/proposer/accounts/0xe9c1A88cE9A6F9aC6a8baB7E85AF04Bc03260a9f/ovm/appendStateBatch" {
+path "immutability-eth-plugin/wallets/proposer/accounts/0x2b1e3bd68ecC1f0229C735838028BF567A033646/ovm/appendStateBatch" {
     capabilities = ["create", "update"]
 }

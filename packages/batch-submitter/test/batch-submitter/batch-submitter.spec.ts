@@ -225,11 +225,13 @@ describe('BatchSubmitter', () => {
     }
     const txBatchTxSubmitter = new YnatmTransactionSubmitter(
       sequencer,
+      l1Provider,
       resubmissionConfig,
       1
     )
     return new TransactionBatchSubmitter(
       sequencer,
+      l1ProviderMock || l1ProviderReal,
       l2Provider as any,
       MIN_TX_SIZE,
       MAX_TX_SIZE,

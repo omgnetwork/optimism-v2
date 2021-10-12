@@ -117,6 +117,8 @@ services:
       - ${L1CHAIN_HTTP_PORT:-9545}:8545
 
   deployer:
+    volumes:
+      - "./../packages/boba/vault/test:/vault/test"
     depends_on:
       - l1_chain
       - dtl
@@ -124,14 +126,27 @@ services:
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.deployer
-    entrypoint: ./deployer.sh
+    entrypoint:
+      - "/bin/bash"
+      - -ec
+      - |
+       SCRIPT=$$(cat <<-END
+       while [ ! -f /vault/test/tokens_and_accounts.sh ]
+       do
+         sleep 5
+         echo "Waiting for the Vault accounts in tokens_and_accounts.sh"
+       done
+       source /vault/test/tokens_and_accounts.sh
+       END
+       )
+       preprocessed_VAR=$$(printf '%s\n' "$$SCRIPT" | sed 's/\\/&&/g;s/^[[:blank:]]/\\&/;s/$$/\\/')
+       sed -i -e "/set -e/a\\$${preprocessed_VAR%?}" deployer.sh
+       ./deployer.sh
     environment:
         FRAUD_PROOF_WINDOW_SECONDS: 0
         L1_NODE_WEB3_URL: http://l1_chain:8545
         # these keys are hardhat's first 2 accounts, DO NOT use in production
         << : *deployer_pk
-        << : *sequencer_pk
-        << : *proposer_pk
         << : *relayer_pk
         # setting the whitelist owner to address(0) disables the whitelist
         WHITELIST_OWNER: "0x0000000000000000000000000000000000000000"
@@ -283,18 +298,37 @@ services:
       - dtl
       - l2geth
     image: bobanetwork/batch-submitter:latest
+    volumes:
+      - "./../packages/boba/vault/test:/vault/test"
+      #AWS_SINK_JWT_TOKEN_PATH
+      - "/tmp/vault_agent:/tmp/vault_agent:rw"
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.batch-submitter
-    entrypoint: ./batches.sh
+    entrypoint:
+      - "/bin/bash"
+      - -ec
+      - |
+       SCRIPT=$$(cat <<-END
+       while [ ! -f /vault/test/tokens_and_accounts.sh ]
+       do
+         sleep 5
+         echo "Waiting for the Vault accounts in tokens_and_accounts.sh"
+       done
+       source /vault/test/tokens_and_accounts.sh
+       END
+       )
+       preprocessed_VAR=$$(printf '%s\n' "$$SCRIPT" | sed 's/\\/&&/g;s/^[[:blank:]]/\\&/;s/$$/\\/')
+       sed -i -e "/set -e/a\\$${preprocessed_VAR%?}" batches.sh
+       ./batches.sh
     env_file:
       - ./envs/batches.env
     environment:
+        VAULT_ADDR: http://vault:8900
+        AWS_SINK_JWT_TOKEN_PATH: "/tmp/vault_agent/vault_auth"
         L1_NODE_WEB3_URL: http://l1_chain:8545
         L2_NODE_WEB3_URL: http://l2geth:8545
         URL: http://dtl:8081/addresses.json
-        << : *sequencer_pk
-        << : *proposer_pk
 
   verifier:
     depends_on:
@@ -395,25 +429,23 @@ services:
       - ecs-local-endpoints
     image: bobanetwork/vault
     ports:
-      - "127.0.0.1:8200:8900"
+      - "8200:8900"
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.boba_vault
     user: root
-    deploy:
-       replicas: 1
     environment:
       VAULT_ADDR: http://127.0.0.1:8900
       VAULT_CACERT: /vault/config/ca.crt
       RUN_TEST: "${RUN_TEST:-false}"
       TEST: "${TEST:-false}"
-      URL: http://deployer:8081/addresses.json
-      AWS_ACCESS_KEY_ID: "AKIAIOSFODNN7EXAMPLE"
-      AWS_SECRET_ACCESS_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-      AWS_BOUND_IAM_PRINCIPAL_ARN: ""
-      AWS_ROLE: ""
+      URL: http://dtl:8081/addresses.json
+      AWS_ACCESS_KEY_ID: "accessKey"
+      AWS_SECRET_ACCESS_KEY: "secretAccessKey"
+      AWS_BOUND_IAM_PRINCIPAL_ARN: "arn:aws:iam::12341234:user/vault-tester"
+      AWS_ROLE: "dev_role"
     volumes:
-      - "/tmp/vault_auth:/vault/config:rw"
+      #- "/tmp/vault_auth:/vault/config:rw"
       - "./../packages/boba/vault/test:/vault/test"
       - "./vault/data/vault/config:/vault/config:rw"
     entrypoint:
@@ -423,7 +455,8 @@ services:
         ./provision_vault.sh
     networks:
         credentials_network:
-            ipv4_address: "169.254.170.3"
+            ipv4_address: "169.254.170.4"
+        default:
 
   vault_agent:
     depends_on:
@@ -439,9 +472,9 @@ services:
     environment:
       VAULT_ADDR: "http://vault:8900"
       AWS_SINK_JWT_TOKEN_PATH: "/tmp/vault_agent/vault_auth"
-      AWS_ACCESS_KEY_ID: "AKIAIOSFODNN7EXAMPLE"
-      AWS_SECRET_ACCESS_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-      AWS_VAULT_ROLE: ""
+      AWS_ACCESS_KEY_ID: "accessKey"
+      AWS_SECRET_ACCESS_KEY: "secretAccessKey"
+      AWS_VAULT_ROLE: "dev_role"
       restart: always
     entrypoint:
       - "/bin/sh"
@@ -453,6 +486,7 @@ services:
     networks:
         credentials_network:
             ipv4_address: "169.254.170.3"
+        default:
 
   # This container vends credentials to your containers
   ecs-local-endpoints:
@@ -482,19 +516,25 @@ services:
           credentials_network:
               # This special IP address is recognized by the AWS SDKs and AWS CLI
               ipv4_address: "169.254.170.2"
+          default:
 
   localstack:
       environment:
-          - DEFAULT_REGION=us-east-1
-          - SERVICES=iam,sts
-      image: localstack/localstack
+        - DEFAULT_REGION=us-east-1
+        - SERVICES=iam,sts
+        - DEBUG=1
+        - USE_SSL=false
+      image: localstack/localstack:0.11.5
       networks:
-          - default
+          credentials_network:
+              # This special IP address is recognized by the AWS SDKs and AWS CLI
+              ipv4_address: "169.254.170.5"
+          default:
       ports:
-          - '4592:4592'
-          - '4593:4593'
+        - '4592:4592'
+        - '4593:4593'
       volumes:
-          - /var/run/docker.sock:/var/run/docker.sock
+        - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   # This is the default network. It is used for normal inter-container

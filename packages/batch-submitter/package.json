@@ -40,6 +40,7 @@
     "@ethersproject/abstract-provider": "^5.4.1",
     "@ethersproject/providers": "^5.4.4",
     "@sentry/node": "^6.2.5",
+    "node-fetch": "2.6.1",
     "bcfg": "^0.1.6",
     "bluebird": "^3.7.2",
     "dotenv": "^8.2.0",

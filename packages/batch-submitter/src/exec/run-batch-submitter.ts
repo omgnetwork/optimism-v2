@@ -3,7 +3,7 @@ import { injectL2Context, Bcfg } from '@eth-optimism/core-utils'
 import * as Sentry from '@sentry/node'
 import { Logger, Metrics, createMetricsServer } from '@eth-optimism/common-ts'
 import { exit } from 'process'
-import { Signer, Wallet } from 'ethers'
+import { Vault } from '../batch-submitter/batch-submitter'
 import {
   StaticJsonRpcProvider,
   TransactionReceipt,
@@ -68,15 +68,14 @@ interface RequiredEnvVars {
  * SEQUENCER_PRIVATE_KEY
  * PROPOSER_PRIVATE_KEY
  * MNEMONIC
- * SEQUENCER_MNEMONIC
- * PROPOSER_MNEMONIC
- * SEQUENCER_HD_PATH
- * PROPOSER_HD_PATH
  * BLOCK_OFFSET
  * USE_HARDHAT
  * DEBUG_IMPERSONATE_SEQUENCER_ADDRESS
  * DEBUG_IMPERSONATE_PROPOSER_ADDRESS
  * RUN_METRICS_SERVER
+ * VAULT_ADDR
+ * PROPOSER_ADDRESS
+ * SEQUENCER_ADDRESS
  */
 
 export const run = async () => {
@@ -138,8 +137,8 @@ export const run = async () => {
     env.DEBUG_IMPERSONATE_PROPOSER_ADDRESS
   )
 
-  const getSequencerSigner = async (): Promise<Signer> => {
-    const l1Provider = new StaticJsonRpcProvider(
+  const getSequencerSigner = async (): Promise<Vault> => {
+    const l1ProviderTmp = new StaticJsonRpcProvider(
       requiredEnvVars.L1_NODE_WEB3_URL
     )
 
@@ -147,26 +146,33 @@ export const run = async () => {
       if (!DEBUG_IMPERSONATE_SEQUENCER_ADDRESS) {
         throw new Error('Must pass DEBUG_IMPERSONATE_SEQUENCER_ADDRESS')
       }
-      await l1Provider.send('hardhat_impersonateAccount', [
+      await l1ProviderTmp.send('hardhat_impersonateAccount', [
         DEBUG_IMPERSONATE_SEQUENCER_ADDRESS,
       ])
-      return l1Provider.getSigner(DEBUG_IMPERSONATE_SEQUENCER_ADDRESS)
+      return {
+        address: undefined,
+        vault_addr: undefined,
+        token: undefined,
+      }
     }
 
-    if (SEQUENCER_PRIVATE_KEY) {
-      return new Wallet(SEQUENCER_PRIVATE_KEY, l1Provider)
-    } else if (SEQUENCER_MNEMONIC) {
-      return Wallet.fromMnemonic(SEQUENCER_MNEMONIC, SEQUENCER_HD_PATH).connect(
-        l1Provider
-      )
+    // if the SEQUENCER_ADDRESS is present
+    // it takes precedence over a sequencer private key
+    // this means all eth transactions go through the vault
+    if (SEQUENCER_ADDRESS) {
+      logger.info('Sequencer in Vault')
+      return {
+        address: SEQUENCER_ADDRESS,
+        token: SEQUENCER_TOKEN,
+        vault_addr: VAULT_ADDR,
+      }
+    } else {
+      throw new Error('Must pass SEQUENCER_ADDRESS')
     }
-    throw new Error(
-      'Must pass one of SEQUENCER_PRIVATE_KEY, MNEMONIC, or SEQUENCER_MNEMONIC'
-    )
   }
 
-  const getProposerSigner = async (): Promise<Signer> => {
-    const l1Provider = new StaticJsonRpcProvider(
+  const getProposerSigner = async (): Promise<Vault> => {
+    const l1ProviderTmp = new StaticJsonRpcProvider(
       requiredEnvVars.L1_NODE_WEB3_URL
     )
 
@@ -174,21 +180,29 @@ export const run = async () => {
       if (!DEBUG_IMPERSONATE_PROPOSER_ADDRESS) {
         throw new Error('Must pass DEBUG_IMPERSONATE_PROPOSER_ADDRESS')
       }
-      await l1Provider.send('hardhat_impersonateAccount', [
+      await l1ProviderTmp.send('hardhat_impersonateAccount', [
         DEBUG_IMPERSONATE_PROPOSER_ADDRESS,
       ])
-      return l1Provider.getSigner(DEBUG_IMPERSONATE_PROPOSER_ADDRESS)
+      return {
+        address: undefined,
+        vault_addr: undefined,
+        token: undefined,
+      }
     }
 
-    if (PROPOSER_PRIVATE_KEY) {
-      return new Wallet(PROPOSER_PRIVATE_KEY, l1Provider)
-    } else if (PROPOSER_MNEMONIC) {
-      return Wallet.fromMnemonic(PROPOSER_MNEMONIC, PROPOSER_HD_PATH).connect(
-        l1Provider
-      )
+    // if the PROPOSER_ADDRESS is present
+    // it takes precedence over a sequencer private key
+    // this means all eth transactions go through the vault
+    if (PROPOSER_ADDRESS) {
+      logger.info('Proposer in Vault')
+      return {
+        address: PROPOSER_ADDRESS,
+        token: PROPOSER_TOKEN,
+        vault_addr: VAULT_ADDR,
+      }
     }
     throw new Error(
-      'Must pass one of PROPOSER_PRIVATE_KEY, MNEMONIC, or PROPOSER_MNEMONIC'
+      'Must pass one of PROPOSER_PRIVATE_KEY, MNEMONIC, PROPOSER_MNEMONIC or PROPOSER_ADDRESS'
     )
   }
 
@@ -222,31 +236,20 @@ export const run = async () => {
     parseInt(env.GAS_THRESHOLD_IN_GWEI, 10) || 100
   )
 
-  // Private keys & mnemonics
-  const SEQUENCER_PRIVATE_KEY = config.str(
-    'sequencer-private-key',
-    env.SEQUENCER_PRIVATE_KEY
+  const SEQUENCER_ADDRESS = config.str(
+    'sequencer-address',
+    env.SEQUENCER_ADDRESS
   )
+  const SEQUENCER_TOKEN = config.str(
+    'sequencer-vault-token',
+    env.SEQUENCER_TOKEN
+  )
+  const PROPOSER_TOKEN = config.str('proposer-vault-token', env.PROPOSER_TOKEN)
+  const VAULT_ADDR = config.str('vault-url', env.VAULT_ADDR)
   // Kept for backwards compatibility
-  const PROPOSER_PRIVATE_KEY = config.str(
+  const PROPOSER_ADDRESS = config.str(
     'proposer-private-key',
-    env.PROPOSER_PRIVATE_KEY || env.SEQUENCER_PRIVATE_KEY
-  )
-  const SEQUENCER_MNEMONIC = config.str(
-    'sequencer-mnemonic',
-    env.SEQUENCER_MNEMONIC || env.MNEMONIC
-  )
-  const PROPOSER_MNEMONIC = config.str(
-    'proposer-mnemonic',
-    env.PROPOSER_MNEMONIC || env.MNEMONIC
-  )
-  const SEQUENCER_HD_PATH = config.str(
-    'sequencer-hd-path',
-    env.SEQUENCER_HD_PATH || env.HD_PATH
-  )
-  const PROPOSER_HD_PATH = config.str(
-    'proposer-hd-path',
-    env.PROPOSER_HD_PATH || env.HD_PATH
+    env.PROPOSER_ADDRESS || env.PROPOSER_ADDRESS
   )
 
   // Auto fix batch options -- TODO: Remove this very hacky config
@@ -349,15 +352,15 @@ export const run = async () => {
   const l2Provider = injectL2Context(
     new StaticJsonRpcProvider(requiredEnvVars.L2_NODE_WEB3_URL)
   )
+  const l1Provider = new StaticJsonRpcProvider(requiredEnvVars.L1_NODE_WEB3_URL)
+  const sequencerVault: Vault = await getSequencerSigner()
+  let proposerVault: Vault = await getProposerSigner()
 
-  const sequencerSigner: Signer = await getSequencerSigner()
-  let proposerSigner: Signer = await getProposerSigner()
-
-  const sequencerAddress = await sequencerSigner.getAddress()
-  const proposerAddress = await proposerSigner.getAddress()
+  const sequencerAddress = sequencerVault.address
+  const proposerAddress = proposerVault.address
   // If the sequencer & proposer are the same, use a single wallet
   if (sequencerAddress === proposerAddress) {
-    proposerSigner = sequencerSigner
+    proposerVault = sequencerVault
   }
 
   logger.info('Configured batch submitter addresses', {
@@ -374,12 +377,14 @@ export const run = async () => {
   }
   const txBatchTxSubmitter: TransactionSubmitter =
     new YnatmTransactionSubmitter(
-      sequencerSigner,
+      sequencerVault,
+      l1Provider,
       resubmissionConfig,
       requiredEnvVars.NUM_CONFIRMATIONS
     )
   const txBatchSubmitter = new TransactionBatchSubmitter(
-    sequencerSigner,
+    sequencerVault,
+    l1Provider,
     l2Provider,
     requiredEnvVars.MIN_L1_TX_SIZE,
     requiredEnvVars.MAX_L1_TX_SIZE,
@@ -400,12 +405,14 @@ export const run = async () => {
 
   const stateBatchTxSubmitter: TransactionSubmitter =
     new YnatmTransactionSubmitter(
-      proposerSigner,
+      proposerVault,
+      l1Provider,
       resubmissionConfig,
       requiredEnvVars.NUM_CONFIRMATIONS
     )
   const stateBatchSubmitter = new StateBatchSubmitter(
-    proposerSigner,
+    proposerVault,
+    l1Provider,
     l2Provider,
     requiredEnvVars.MIN_L1_TX_SIZE,
     requiredEnvVars.MAX_L1_TX_SIZE,
@@ -427,46 +434,6 @@ export const run = async () => {
   const loop = async (
     func: () => Promise<TransactionReceipt>
   ): Promise<void> => {
-    // Clear all pending transactions
-    if (clearPendingTxs) {
-      try {
-        const pendingTxs = await sequencerSigner.getTransactionCount('pending')
-        const latestTxs = await sequencerSigner.getTransactionCount('latest')
-        if (pendingTxs > latestTxs) {
-          logger.info(
-            'Detected pending transactions. Clearing all transactions!'
-          )
-          for (let i = latestTxs; i < pendingTxs; i++) {
-            const response = await sequencerSigner.sendTransaction({
-              to: await sequencerSigner.getAddress(),
-              value: 0,
-              nonce: i,
-            })
-            logger.info('Submitted empty transaction', {
-              nonce: i,
-              txHash: response.hash,
-              to: response.to,
-              from: response.from,
-            })
-            logger.debug('empty transaction data', {
-              data: response.data,
-            })
-            await sequencerSigner.provider.waitForTransaction(
-              response.hash,
-              requiredEnvVars.NUM_CONFIRMATIONS
-            )
-          }
-        }
-      } catch (err) {
-        logger.error('Cannot clear transactions', {
-          message: err.toString(),
-          stack: err.stack,
-          code: err.code,
-        })
-        process.exit(1)
-      }
-    }
-
     while (true) {
       try {
         await func()

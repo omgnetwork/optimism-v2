@@ -17,10 +17,29 @@ process.env.CONTRACTS_RPC_URL =
 
 import hre from 'hardhat'
 
-const sequencer = new Wallet(process.env.SEQUENCER_PRIVATE_KEY)
 const deployer = new Wallet(process.env.DEPLOYER_PRIVATE_KEY)
-const proposer = new Wallet(process.env.PROPOSER_PRIVATE_KEY)
 const relayer = new Wallet(process.env.RELAYER_PRIVATE_KEY)
+const getSequencerAddress = () => {
+  const address = process.env.SEQUENCER_ADDRESS
+  if (address === undefined) {
+    console.log('Sequencer address not found')
+    process.exit(1)
+  } else {
+    console.log(`Sequencer set from provided address ${address}`)
+    return address
+  }
+}
+
+const getProposerAddress = () => {
+  const address = process.env.PROPOSER_ADDRESS
+  if (address === undefined) {
+    console.log('Proposer address not found')
+    process.exit(1)
+  } else {
+    console.log(`Proposer set from provided address ${address}`)
+    return address
+  }
+}
 
 const parseEnv = () => {
   const ensure = (env, type) => {
@@ -56,8 +75,8 @@ const main = async () => {
     ctcEnqueueGasCost: config.ctcEnqueueGasCost,
     sccFraudProofWindow: config.sccFraudProofWindow,
     sccSequencerPublishWindow: config.sccFraudProofWindow,
-    ovmSequencerAddress: sequencer.address,
-    ovmProposerAddress: proposer.address,
+    ovmSequencerAddress: getSequencerAddress(),
+    ovmProposerAddress: getProposerAddress(),
     ovmRelayerAddress: relayer.address,
     ovmAddressManagerOwner: deployer.address,
     noCompile: process.env.NO_COMPILE ? true : false,
@@ -88,7 +107,7 @@ const main = async () => {
       return contractsAccumulator
     }, {})
 
-  contracts.OVM_Sequencer = await sequencer.getAddress()
+  contracts.OVM_Sequencer = getSequencerAddress()
   contracts.Deployer = await deployer.getAddress()
 
   const addresses = JSON.stringify(contracts, null, 2)
