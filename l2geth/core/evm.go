@@ -52,28 +52,20 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 	}
 	if rcfg.UsingOVM {
 		// When using the OVM, we must:
-		// (1) Attach the L1MessageSender context value and
-		// (2) Set the BlockNumber to be the msg.L1BlockNumber
-		// (3) Set the Time to be the msg.L1Timestamp
-		var l1MessageSender common.Address
-		if msg.L1MessageSender() == nil {
-			l1MessageSender = DefaultL1MessageSender
-		} else {
-			l1MessageSender = *msg.L1MessageSender()
-		}
+		// - Set the BlockNumber to be the msg.L1BlockNumber
+		// - Set the Time to be the msg.L1Timestamp
 		return vm.Context{
-			CanTransfer:     CanTransfer,
-			Transfer:        Transfer,
-			GetHash:         GetHashFn(header, chain),
-			Origin:          msg.From(),
-			Coinbase:        dump.OvmFeeWallet, // Coinbase is the fee vault.
-			BlockNumber:     new(big.Int).Set(header.Number),
-			Time:            new(big.Int).SetUint64(msg.L1Timestamp()),
-			Difficulty:      new(big.Int), // Difficulty always returns zero.
-			GasLimit:        header.GasLimit,
-			GasPrice:        new(big.Int).Set(msg.GasPrice()),
-			L1MessageSender: l1MessageSender,
-			L1BlockNumber:   msg.L1BlockNumber(),
+			CanTransfer:   CanTransfer,
+			Transfer:      Transfer,
+			GetHash:       GetHashFn(header, chain),
+			Origin:        msg.From(),
+			Coinbase:      dump.OvmFeeWallet, // Coinbase is the fee vault.
+			BlockNumber:   new(big.Int).Set(header.Number),
+			Time:          new(big.Int).SetUint64(msg.L1Timestamp()),
+			Difficulty:    new(big.Int), // Difficulty always returns zero.
+			GasLimit:      header.GasLimit,
+			GasPrice:      new(big.Int).Set(msg.GasPrice()),
+			L1BlockNumber: msg.L1BlockNumber(),
 		}
 	} else {
 		return vm.Context{
