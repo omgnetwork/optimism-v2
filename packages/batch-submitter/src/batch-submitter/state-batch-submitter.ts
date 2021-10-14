@@ -98,13 +98,13 @@ export class StateBatchSubmitter extends BatchSubmitter {
 
     this.chainContract = new Contract(
       sccAddress,
-      getContractInterface('OVM_StateCommitmentChain'),
+      getContractInterface('StateCommitmentChain'),
       this.l1Provider
     )
 
     this.ctcContract = new Contract(
       ctcAddress,
-      getContractInterface('OVM_CanonicalTransactionChain'),
+      getContractInterface('CanonicalTransactionChain'),
       this.l1Provider
     )
     return

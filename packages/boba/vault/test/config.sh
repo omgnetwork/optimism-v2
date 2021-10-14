@@ -50,9 +50,6 @@ echo "export PROPOSER_ADDRESS=$ACCOUNT1" >> $DIR/tokens_and_accounts.sh
 if [[ ! -z "$AWS_ROLE" && ! -z "$AWS_BOUND_IAM_PRINCIPAL_ARN" && ! -z "$AWS_ACCESS_KEY_ID" && ! -z "$AWS_SECRET_ACCESS_KEY" ]]; then
   echo "Not writting tokens in helper - enabling AWS auth backend"
   vault auth enable aws
-  echo "custom sts endpoint!"
-  vault write auth/aws/config/client iam_endpoint=http://localstack:4593
-  vault write auth/aws/config/client sts_endpoint=http://localstack:4592
   vault write auth/aws/role/${AWS_ROLE} auth_type=iam \
                 bound_iam_principal_arn=${AWS_BOUND_IAM_PRINCIPAL_ARN} policies=append-state-batch-proposer,append-sequencer-batch max_ttl=500h
   vault login -method=aws role=${AWS_ROLE}
@@ -63,6 +60,5 @@ else
   echo "export SEQUENCER_TOKEN=$SEQUENCER_TOKEN" >> $DIR/tokens_and_accounts.sh
 fi
 cat $DIR/tokens_and_accounts.sh
-
 
 

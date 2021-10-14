@@ -2,7 +2,7 @@
 
 set -e
 
-RETRIES=${RETRIES:-60}
+RETRIES=${RETRIES:-150}
 
 if [[ ! -z "$URL" ]]; then
     # get the addrs from the URL provided
@@ -19,7 +19,7 @@ curl \
     --output /dev/null \
     --retry-connrefused \
     --retry $RETRIES \
-    --retry-delay 1 \
+    --retry-delay 2 \
     $L2_NODE_WEB3_URL
 
 # go

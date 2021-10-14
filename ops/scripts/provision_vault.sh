@@ -21,8 +21,8 @@ if [[ ! -z "$URL" ]]; then
   # get the addrs from the URL provided
   ADDRESSES=$(curl --fail --show-error --silent --retry-connrefused --retry $RETRIES --retry-delay 5 $URL)
   echo $ADDRESSES
-  export OVM_CTC=$(echo $ADDRESSES | jq -r '.OVM_CanonicalTransactionChain') && echo $OVM_CTC
-  export OVM_SCC=$(echo $ADDRESSES | jq -r '.OVM_StateCommitmentChain') && echo $OVM_SCC
+  export OVM_CTC=$(echo $ADDRESSES | jq -r '.CanonicalTransactionChain') && echo $OVM_CTC
+  export OVM_SCC=$(echo $ADDRESSES | jq -r '.StateCommitmentChain') && echo $OVM_SCC
 fi
 echo "Sourcing tokens and accounts"
 source /vault/test/tokens_and_accounts.sh

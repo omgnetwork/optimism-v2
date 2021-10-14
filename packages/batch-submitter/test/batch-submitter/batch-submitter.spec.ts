@@ -107,7 +107,7 @@ describe('BatchSubmitter', () => {
     )
 
     Mock__OVM_StateCommitmentChain = await smockit(
-      await getContractFactory('OVM_StateCommitmentChain')
+      await getContractFactory('StateCommitmentChain')
     )
 
     await setProxyTarget(
@@ -124,7 +124,7 @@ describe('BatchSubmitter', () => {
 
     await setProxyTarget(
       AddressManager,
-      'OVM_StateCommitmentChain',
+      'StateCommitmentChain',
       Mock__OVM_StateCommitmentChain
     )
 
@@ -139,14 +139,14 @@ describe('BatchSubmitter', () => {
   let Factory__OVM_StateCommitmentChain: ContractFactory
   before(async () => {
     Factory__OVM_CanonicalTransactionChain = await getContractFactory(
-      'OVM_CanonicalTransactionChain'
+      'CanonicalTransactionChain'
     )
 
     Factory__OVM_CanonicalTransactionChain =
       Factory__OVM_CanonicalTransactionChain.connect(signer)
 
     Factory__OVM_StateCommitmentChain = await getContractFactory(
-      'OVM_StateCommitmentChain'
+      'StateCommitmentChain'
     )
 
     Factory__OVM_StateCommitmentChain =
@@ -166,7 +166,7 @@ describe('BatchSubmitter', () => {
     await unwrapped_OVM_CanonicalTransactionChain.init()
 
     await AddressManager.setAddress(
-      'OVM_CanonicalTransactionChain',
+      'CanonicalTransactionChain',
       unwrapped_OVM_CanonicalTransactionChain.address
     )
 
@@ -191,7 +191,7 @@ describe('BatchSubmitter', () => {
     await unwrapped_OVM_StateCommitmentChain.init()
 
     await AddressManager.setAddress(
-      'OVM_StateCommitmentChain',
+      'StateCommitmentChain',
       unwrapped_OVM_StateCommitmentChain.address
     )
 
