@@ -1,0 +1,110 @@
+name: Vault tests
+
+
+on:
+  push:
+    paths:
+      - 'packages/boba/vault/**'
+    branches:
+      - 'master'
+      - 'develop'
+      - '*rc'
+      - 'regenesis/*'
+  pull_request:
+    paths:
+      - 'packages/boba/vault/**'
+    branches:
+      - 'master'
+      - 'develop'
+      - '*rc'
+      - 'regenesis/*'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: ./ops
+
+jobs:
+  start-runner:
+    name: Start self-hosted EC2 runner
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Start EC2 runner
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          ec2-image-id: ami-00b46fa1102c70ff2
+          ec2-instance-type: t2.xlarge
+          subnet-id: subnet-905870ae
+          security-group-id: sg-0855631d714870b32
+
+  vault_tests:
+    needs: start-runner
+    runs-on: ${{ needs.start-runner.outputs.label }}
+    env:
+      DATA_DIR: "vault/data/vault/config"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run vault and execute tests
+      working-directory: ./ops
+      run: |
+        mkdir -p $DATA_DIR
+        sudo chown -R 100:1000 $DATA_DIR && sudo chmod -R 777 $DATA_DIR
+        RUN_TEST=true TEST=true docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml up -d --build builder l1_chain deployer vault
+
+    - name: Building logs
+      working-directory: ./ops
+      run: |
+        sleep 60s
+        docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml logs
+
+    - name: Wait for Vault
+      working-directory: ./ops
+      run: |
+        while [ $(docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml logs | grep -c "Done with tests.") -ne 1 ];
+        do
+            sleep 1
+            echo "Waiting for Vault..."
+        done
+        echo "Vault has executed tests"
+        docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml logs
+
+    - name: Test validation
+      working-directory: ./ops
+      run: exit $(docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml logs | grep -c "DID NOT PASS THE REQUIRED TEST")
+
+    - name: Build the services
+      working-directory: ./ops
+      run: ./scripts/build-ci.sh
+
+    - name: Bring the stack up
+      working-directory: ./ops
+      run: |
+        docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml down
+        rm -rf vault/
+        docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml up -d
+
+    - name: Wait for the Sequencer node
+      working-directory: ./ops
+      run: ./scripts/wait-for-sequencer.sh
+
+    - name: Start background logging
+      working-directory: ./ops
+      run: docker-compose -f docker-compose.yml logs --follow &
+
+    - name: Run the integration tests
+      working-directory: ./ops
+      run: docker-compose run integration_tests
+
+
