@@ -49,7 +49,7 @@ services:
 
   batch_submitter:
     volumes:
-      - "./../packages/omgx/immutability/test:/vault/test"
+      - "./../packages/boba/immutability/test:/vault/test"
       #AWS_SINK_JWT_TOKEN_PATH
       - "/tmp/vault_agent:/tmp/vault_agent:rw"
     environment:
@@ -73,9 +73,9 @@ services:
        ./batches.sh
 
   vault:
-    image: omgx/vault
+    image: boba/vault
     ports:
-      - "127.0.0.1:8200:8900"
+      - "8200:8900"
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.boba_vault
@@ -93,9 +93,9 @@ services:
       AWS_BOUND_IAM_PRINCIPAL_ARN: ""
       AWS_ROLE: ""
     volumes:
-      - "/tmp/vault_auth:/vault/config:rw"
-      - "./../packages/omgx/immutability/test:/vault/test"
-      - "./vault/data/immutability/config:/vault/config:rw"
+      #- "/tmp/vault_auth:/vault/config:rw"
+      - "./../packages/boba/immutability/test:/vault/test"
+      #- "./vault/data/immutability/config:/vault/config:rw"
     entrypoint:
       - "/bin/sh"
       - -ec
@@ -110,7 +110,7 @@ services:
     ports:
       - "18200:8200"
     volumes:
-      - ./../packages/omgx/immutability/docker/:/vault-agent:rw
+      - ./../packages/boba/immutability/docker/:/vault-agent:rw
       #AWS_SINK_JWT_TOKEN_PATH
       - /tmp/vault_agent:/tmp/vault_agent:rw
     environment:

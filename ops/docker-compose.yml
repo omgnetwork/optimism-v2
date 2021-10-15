@@ -130,6 +130,8 @@ services:
       - "/bin/bash"
       - -ec
       - |
+       # we inject this chunk of `retry until you find the file`
+       # so that we wait for the Vault to finish it's startup
        SCRIPT=$$(cat <<-END
        while [ ! -f /vault/test/tokens_and_accounts.sh ]
        do
@@ -165,6 +167,7 @@ services:
         NO_COMPILE: 1
         DTL_REGISTRY_URL: http://dtl:8081/addresses.json
         DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
+        RETRIES: 150
     ports:
       - ${DEPLOYER_PORT:-8099}:8081 # Can eventually remove this now that DTL is serving stuff
 
@@ -309,6 +312,8 @@ services:
       - "/bin/bash"
       - -ec
       - |
+       # we inject this chunk of `retry until you find the file`
+       # so that we wait for the Vault to finish it's startup
        SCRIPT=$$(cat <<-END
        while [ ! -f /vault/test/tokens_and_accounts.sh ]
        do
@@ -329,6 +334,7 @@ services:
         L1_NODE_WEB3_URL: http://l1_chain:8545
         L2_NODE_WEB3_URL: http://l2geth:8545
         URL: http://dtl:8081/addresses.json
+        RETRIES: 140
 
   verifier:
     depends_on:
@@ -445,9 +451,9 @@ services:
       AWS_SECRET_ACCESS_KEY: ""
       AWS_SESSION_TOKEN: ""
     volumes:
-      #- "/tmp/vault_auth:/vault/config:rw"
       - "./../packages/boba/vault/test:/vault/test"
-      #- "./vault/data/vault/config:/vault/config:rw"
+      # if you want to access Vaults configuration, uncomment this
+      # - "./vault/data/vault/config:/vault/config:rw"
     entrypoint:
       - "/bin/sh"
       - -ec

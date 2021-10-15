@@ -2,7 +2,7 @@
 
 set -e
 
-RETRIES=${RETRIES:-140}
+RETRIES=${RETRIES:-40}
 
 if [[ ! -z "$URL" ]]; then
     # get the addrs from the URL provided

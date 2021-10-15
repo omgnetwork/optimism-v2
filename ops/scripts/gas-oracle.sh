@@ -1,6 +1,6 @@
 #!/bin/sh
 
-RETRIES=${RETRIES:-150}
+RETRIES=${RETRIES:-40}
 
 if [[ -z $GAS_PRICE_ORACLE_ETHEREUM_HTTP_URL ]]; then
     echo "Must set env GAS_PRICE_ORACLE_ETHEREUM_HTTP_URL"
