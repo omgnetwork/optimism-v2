@@ -61,7 +61,7 @@ jobs:
       run: |
         mkdir -p $DATA_DIR
         sudo chown -R 100:1000 $DATA_DIR && sudo chmod -R 777 $DATA_DIR
-        RUN_TEST=true TEST=true docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml up -d --build builder l1_chain deployer vault
+        RUN_TEST=true TEST=true docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml up -d --build builder l1_chain deployer dtl vault
 
     - name: Building logs
       working-directory: ./ops
@@ -84,27 +84,5 @@ jobs:
       working-directory: ./ops
       run: exit $(docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml logs | grep -c "DID NOT PASS THE REQUIRED TEST")
 
-    - name: Build the services
-      working-directory: ./ops
-      run: ./scripts/build-ci.sh
-
-    - name: Bring the stack up
-      working-directory: ./ops
-      run: |
-        docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml down
-        rm -rf vault/
-        docker-compose -f docker-compose.yml -f ../packages/boba/vault/docker/docker-compose-vault-test.yml up -d
-
-    - name: Wait for the Sequencer node
-      working-directory: ./ops
-      run: ./scripts/wait-for-sequencer.sh
-
-    - name: Start background logging
-      working-directory: ./ops
-      run: docker-compose -f docker-compose.yml logs --follow &
-
-    - name: Run the integration tests
-      working-directory: ./ops
-      run: docker-compose run integration_tests
 
 
