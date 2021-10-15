@@ -1,6 +1,6 @@
 # immutability-eth-plugin docker
 cd ops/
-rm -rf vault/ && docker build ../ --file /Users/inomurko/opt/optimism/ops/docker/Dockerfile.boba_vault --tag boba/vault:latest && docker-compose -f ../packages/boba/immutability/docker/docker-compose-vault-test.yml up l1_chain vault
+rm -rf vault/ && docker build ../ --file /Users/inomurko/opt/optimism/ops/docker/Dockerfile.boba_vault --tag boba/vault:latest && docker-compose -f ../packages/boba/vault/docker/docker-compose-vault-test.yml up l1_chain vault
 
 The overlay `docker-compose-vault-test.yml` persist data on disk, if you want to re-start from fresh, delete the Vault dir like above.
 If you make any changes to Vault code (lets say route plugins for http req/resp) you need to delete the Vault dir so that the plugin reloads or use the cycle.sh script in test/.

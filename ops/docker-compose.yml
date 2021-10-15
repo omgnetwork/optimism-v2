@@ -439,7 +439,6 @@ services:
       dockerfile: ./ops/docker/Dockerfile.boba_vault
     user: root
     environment:
-      VAULT_LOG_LEVEL: "debug"
       VAULT_ADDR: http://127.0.0.1:8900
       VAULT_CACERT: /vault/config/ca.crt
       RUN_TEST: "${RUN_TEST:-false}"

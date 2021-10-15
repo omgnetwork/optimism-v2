@@ -29,7 +29,7 @@ services:
   ### JWT token for vault from the AWS_SINK_JWT_TOKEN_PATH if they're not set.
   deployer:
     volumes:
-      - "./../packages/boba/immutability/test:/vault/test"
+      - "./../packages/boba/vault/test:/vault/test"
     entrypoint:
       - "/bin/bash"
       - -ec
@@ -49,7 +49,7 @@ services:
 
   batch_submitter:
     volumes:
-      - "./../packages/boba/immutability/test:/vault/test"
+      - "./../packages/boba/vault/test:/vault/test"
       #AWS_SINK_JWT_TOKEN_PATH
       - "/tmp/vault_agent:/tmp/vault_agent:rw"
     environment:
@@ -87,15 +87,15 @@ services:
       VAULT_CACERT: /vault/config/ca.crt
       RUN_TEST: "${RUN_TEST:-false}"
       TEST: "${TEST:-false}"
-      URL: http://deployer:8081/addresses.json
+      URL: http://dtl:8081/addresses.json
       AWS_ACCESS_KEY_ID: ""
       AWS_SECRET_ACCESS_KEY: ""
       AWS_BOUND_IAM_PRINCIPAL_ARN: ""
       AWS_ROLE: ""
     volumes:
       #- "/tmp/vault_auth:/vault/config:rw"
-      - "./../packages/boba/immutability/test:/vault/test"
-      #- "./vault/data/immutability/config:/vault/config:rw"
+      - "./../packages/boba/vault/test:/vault/test"
+      #- "./vault/data/vault/config:/vault/config:rw"
     entrypoint:
       - "/bin/sh"
       - -ec
@@ -110,7 +110,7 @@ services:
     ports:
       - "18200:8200"
     volumes:
-      - ./../packages/boba/immutability/docker/:/vault-agent:rw
+      - ./../packages/boba/vault/docker/:/vault-agent:rw
       #AWS_SINK_JWT_TOKEN_PATH
       - /tmp/vault_agent:/tmp/vault_agent:rw
     environment:
