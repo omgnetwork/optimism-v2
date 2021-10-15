@@ -1,7 +1,7 @@
 .ONESHELL:
 
 abigen:
-	docker run -d --rm -it --name ovm_contracts --entrypoint /bin/bash omgx/deployer:latest
+	docker run -d --rm -it --name ovm_contracts --entrypoint /bin/bash boba/deployer:latest
 	sleep 5s
 	docker cp ovm_contracts:/opt/optimism/packages/contracts/artifacts /tmp/oc
 	docker stop ovm_contracts

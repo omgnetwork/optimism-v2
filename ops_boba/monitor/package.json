@@ -1,7 +1,7 @@
 {
-  "name": "@omgx/transaction-monitor",
+  "name": "@boba/transaction-monitor",
   "version": "1.0.0",
-  "description": "omgx transaction monitor",
+  "description": "boba transaction monitor",
   "main": "index.js",
   "scripts": {
     "start": "node ./exec/run-monitor.js",

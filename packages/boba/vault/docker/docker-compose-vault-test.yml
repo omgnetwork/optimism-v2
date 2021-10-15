@@ -29,7 +29,7 @@ services:
   ### JWT token for vault from the AWS_SINK_JWT_TOKEN_PATH if they're not set.
   deployer:
     volumes:
-      - "./../packages/omgx/immutability/test:/vault/test"
+      - "./../packages/boba/immutability/test:/vault/test"
     entrypoint:
       - "/bin/bash"
       - -ec
@@ -78,7 +78,7 @@ services:
       - "127.0.0.1:8200:8900"
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.omgx_vault
+      dockerfile: ./ops/docker/Dockerfile.boba_vault
     user: root
     deploy:
        replicas: 1
