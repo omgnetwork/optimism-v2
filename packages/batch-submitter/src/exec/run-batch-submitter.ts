@@ -153,6 +153,7 @@ export const run = async () => {
         address: undefined,
         vault_addr: undefined,
         token: undefined,
+        signer: undefined,
       }
     }
 
@@ -165,6 +166,7 @@ export const run = async () => {
         address: SEQUENCER_ADDRESS,
         token: SEQUENCER_TOKEN,
         vault_addr: VAULT_ADDR,
+        signer: undefined,
       }
     } else {
       throw new Error('Must pass SEQUENCER_ADDRESS')
@@ -187,6 +189,7 @@ export const run = async () => {
         address: undefined,
         vault_addr: undefined,
         token: undefined,
+        signer: undefined,
       }
     }
 
@@ -199,6 +202,7 @@ export const run = async () => {
         address: PROPOSER_ADDRESS,
         token: PROPOSER_TOKEN,
         vault_addr: VAULT_ADDR,
+        signer: undefined,
       }
     }
     throw new Error(

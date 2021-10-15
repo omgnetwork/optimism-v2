@@ -1,7 +1,7 @@
 import { expect } from '../setup'
 
 /* External Imports */
-import { ethers } from 'hardhat'
+import { ethers as hardhatEthers } from 'hardhat'
 import '@nomiclabs/hardhat-ethers'
 import { Signer, ContractFactory, Contract, BigNumber } from 'ethers'
 import ganache from 'ganache-core'
@@ -30,6 +30,7 @@ import {
   BatchSubmitter,
   YnatmTransactionSubmitter,
   ResubmissionConfig,
+  Vault,
 } from '../../src'
 
 import {
@@ -83,8 +84,9 @@ const testMetrics = new Metrics({ prefix: 'bs_test' })
 describe('BatchSubmitter', () => {
   let signer: Signer
   let sequencer: Signer
+  const l1Provider = hardhatEthers.provider
   before(async () => {
-    ;[signer, sequencer] = await ethers.getSigners()
+    ;[signer, sequencer] = await hardhatEthers.getSigners()
   })
 
   let AddressManager: Contract
@@ -224,14 +226,14 @@ describe('BatchSubmitter', () => {
       gasRetryIncrement: GAS_RETRY_INCREMENT,
     }
     const txBatchTxSubmitter = new YnatmTransactionSubmitter(
-      sequencer,
+      createVaultWithSigner(sequencer),
       l1Provider,
       resubmissionConfig,
       1
     )
     return new TransactionBatchSubmitter(
-      sequencer,
-      l1ProviderMock || l1ProviderReal,
+      createVaultWithSigner(sequencer),
+      l1Provider,
       l2Provider as any,
       MIN_TX_SIZE,
       MAX_TX_SIZE,
@@ -452,12 +454,14 @@ describe('BatchSubmitter', () => {
         gasRetryIncrement: GAS_RETRY_INCREMENT,
       }
       const stateBatchTxSubmitter = new YnatmTransactionSubmitter(
-        sequencer,
+        createVaultWithSigner(sequencer),
+        l1Provider,
         resubmissionConfig,
         1
       )
       stateBatchSubmitter = new StateBatchSubmitter(
-        sequencer,
+        createVaultWithSigner(sequencer),
+        l1Provider,
         l2Provider as any,
         MIN_TX_SIZE,
         MAX_TX_SIZE,
@@ -481,7 +485,7 @@ describe('BatchSubmitter', () => {
         const receipt = await stateBatchSubmitter.submitNextBatch()
         expect(receipt).to.not.be.undefined
 
-        const iface = new ethers.utils.Interface(scc.abi)
+        const iface = new hardhatEthers.utils.Interface(scc.abi)
         const parsedLogs = iface.parseLog(receipt.logs[0])
 
         expect(parsedLogs.eventFragment.name).to.eq('StateBatchAppended')
@@ -510,3 +514,11 @@ describe('Batch Submitter with Ganache', () => {
     await server.close()
   })
 })
+const createVaultWithSigner = (signer: Signer): Vault => {
+  return {
+    signer,
+    address: undefined,
+    token: undefined,
+    vault_addr: undefined,
+  }
+}

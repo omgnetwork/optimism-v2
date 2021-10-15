@@ -11,6 +11,7 @@ import {
   VaultTransactionResponse,
   VaultPopulatedTransaction,
 } from '../batch-submitter/vault'
+import { submitTransaction } from './spec-only-submission'
 export interface ResubmissionConfig {
   resubmissionTimeout: number
   minGasPriceInGwei: number
@@ -64,9 +65,19 @@ export const submitTransactionWithYNATM = async (
   const sendTxAndWaitForReceipt = async (
     gasPrice
   ): Promise<TransactionReceipt> => {
-    const transactionHash = await submitToVault(call, vault, hooks, gasPrice)
-    return provider.waitForTransaction(transactionHash, numConfirmations)
-
+    if (vault.signer !== undefined) {
+      return submitTransaction(
+        call,
+        vault,
+        provider,
+        numConfirmations,
+        hooks,
+        gasPrice
+      )
+    } else {
+      const transactionHash = await submitToVault(call, vault, hooks, gasPrice)
+      return provider.waitForTransaction(transactionHash, numConfirmations)
+    }
   }
   const minGasPrice = await getGasPriceInGwei(provider)
   const receipt = await ynatm.send({
