@@ -205,9 +205,7 @@ export const run = async () => {
         signer: undefined,
       }
     }
-    throw new Error(
-      'Must pass one of PROPOSER_PRIVATE_KEY, MNEMONIC, PROPOSER_MNEMONIC or PROPOSER_ADDRESS'
-    )
+    throw new Error('Must pass PROPOSER_ADDRESS from Vault')
   }
 
   /* Metrics */
