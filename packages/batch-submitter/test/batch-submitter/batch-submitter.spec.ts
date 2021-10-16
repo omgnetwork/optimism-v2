@@ -7,7 +7,6 @@ import { Signer, ContractFactory, Contract, BigNumber } from 'ethers'
 import ganache from 'ganache-core'
 import sinon from 'sinon'
 import { Web3Provider } from '@ethersproject/providers'
-
 import scc from '@eth-optimism/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json'
 import { getContractInterface, predeploys } from '@eth-optimism/contracts'
 import { smockit, MockContract } from '@eth-optimism/smock'
@@ -99,17 +98,15 @@ describe('BatchSubmitter', () => {
       'OVM_Sequencer',
       await sequencer.getAddress()
     )
-
     Mock__OVM_ExecutionManager = await smockit(
       await getContractFactory('OVM_ExecutionManager')
     )
-
     Mock__OVM_BondManager = await smockit(
       await getContractFactory('OVM_BondManager')
     )
 
     Mock__OVM_StateCommitmentChain = await smockit(
-      await getContractFactory('StateCommitmentChain')
+      await getContractFactory('OVM_StateCommitmentChain')
     )
 
     await setProxyTarget(
@@ -117,7 +114,6 @@ describe('BatchSubmitter', () => {
       'OVM_ExecutionManager',
       Mock__OVM_ExecutionManager
     )
-
     await setProxyTarget(
       AddressManager,
       'OVM_BondManager',
@@ -126,7 +122,7 @@ describe('BatchSubmitter', () => {
 
     await setProxyTarget(
       AddressManager,
-      'StateCommitmentChain',
+      'OVM_StateCommitmentChain',
       Mock__OVM_StateCommitmentChain
     )
 
@@ -141,14 +137,14 @@ describe('BatchSubmitter', () => {
   let Factory__OVM_StateCommitmentChain: ContractFactory
   before(async () => {
     Factory__OVM_CanonicalTransactionChain = await getContractFactory(
-      'CanonicalTransactionChain'
+      'OVM_CanonicalTransactionChain'
     )
 
     Factory__OVM_CanonicalTransactionChain =
       Factory__OVM_CanonicalTransactionChain.connect(signer)
 
     Factory__OVM_StateCommitmentChain = await getContractFactory(
-      'StateCommitmentChain'
+      'OVM_StateCommitmentChain'
     )
 
     Factory__OVM_StateCommitmentChain =
@@ -168,18 +164,18 @@ describe('BatchSubmitter', () => {
     await unwrapped_OVM_CanonicalTransactionChain.init()
 
     await AddressManager.setAddress(
-      'CanonicalTransactionChain',
+      'OVM_CanonicalTransactionChain',
       unwrapped_OVM_CanonicalTransactionChain.address
     )
 
     await AddressManager.setAddress(
-      'CanonicalTransactionChain',
+      'OVM_CanonicalTransactionChain',
       unwrapped_OVM_CanonicalTransactionChain.address
     )
 
     OVM_CanonicalTransactionChain = new CanonicalTransactionChainContract(
       unwrapped_OVM_CanonicalTransactionChain.address,
-      getContractInterface('CanonicalTransactionChain'),
+      getContractInterface('OVM_CanonicalTransactionChain'),
       sequencer
     )
 
@@ -193,7 +189,7 @@ describe('BatchSubmitter', () => {
     await unwrapped_OVM_StateCommitmentChain.init()
 
     await AddressManager.setAddress(
-      'StateCommitmentChain',
+      'OVM_StateCommitmentChain',
       unwrapped_OVM_StateCommitmentChain.address
     )
 
@@ -218,7 +214,7 @@ describe('BatchSubmitter', () => {
     sinon.restore()
   })
 
-  const createBatchSubmitter = (timeout: number): TransactionBatchSubmitter => {
+  const createBatchSubmitter = async (timeout: number): Promise<TransactionBatchSubmitter> => {
     const resubmissionConfig: ResubmissionConfig = {
       resubmissionTimeout: 100000,
       minGasPriceInGwei: MIN_GAS_PRICE_IN_GWEI,
@@ -226,13 +222,13 @@ describe('BatchSubmitter', () => {
       gasRetryIncrement: GAS_RETRY_INCREMENT,
     }
     const txBatchTxSubmitter = new YnatmTransactionSubmitter(
-      createVaultWithSigner(sequencer),
+      await createVaultWithSigner(sequencer),
       l1Provider,
       resubmissionConfig,
       1
     )
     return new TransactionBatchSubmitter(
-      createVaultWithSigner(sequencer),
+      await createVaultWithSigner(sequencer),
       l1Provider,
       l2Provider as any,
       MIN_TX_SIZE,
@@ -271,7 +267,7 @@ describe('BatchSubmitter', () => {
             }
           )
         }
-        batchSubmitter = createBatchSubmitter(0)
+        batchSubmitter = await createBatchSubmitter(0)
       })
 
       it('should submit a sequencer batch correctly', async () => {
@@ -356,7 +352,7 @@ describe('BatchSubmitter', () => {
 
         // Create a batch submitter with a long timeout & make sure it doesn't submit the batches one after another
         const longTimeout = 10_000
-        batchSubmitter = createBatchSubmitter(longTimeout)
+        batchSubmitter = await createBatchSubmitter(longTimeout)
         let receipt = await batchSubmitter.submitNextBatch()
         expect(receipt).to.not.be.undefined
         receipt = await batchSubmitter.submitNextBatch()
@@ -365,7 +361,7 @@ describe('BatchSubmitter', () => {
 
         // This time create a batch submitter with a short timeout & it should submit batches after the timeout is reached
         const shortTimeout = 5
-        batchSubmitter = createBatchSubmitter(shortTimeout)
+        batchSubmitter = await createBatchSubmitter(shortTimeout)
         receipt = await batchSubmitter.submitNextBatch()
         expect(receipt).to.not.be.undefined
         // Sleep for the short timeout
@@ -426,12 +422,13 @@ describe('BatchSubmitter', () => {
         )
       }
 
-      txBatchSubmitter = createBatchSubmitter(0)
+      txBatchSubmitter = await createBatchSubmitter(0)
 
       l2Provider.setNumBlocksToReturn(5)
       const nextQueueElement = await getQueueElement(
         OVM_CanonicalTransactionChain
       )
+
       l2Provider.setL2BlockData(
         {
           rawTransaction: '0x1234',
@@ -454,13 +451,13 @@ describe('BatchSubmitter', () => {
         gasRetryIncrement: GAS_RETRY_INCREMENT,
       }
       const stateBatchTxSubmitter = new YnatmTransactionSubmitter(
-        createVaultWithSigner(sequencer),
+        await createVaultWithSigner(sequencer),
         l1Provider,
         resubmissionConfig,
         1
       )
       stateBatchSubmitter = new StateBatchSubmitter(
-        createVaultWithSigner(sequencer),
+        await createVaultWithSigner(sequencer),
         l1Provider,
         l2Provider as any,
         MIN_TX_SIZE,
@@ -481,7 +478,7 @@ describe('BatchSubmitter', () => {
     })
 
     describe('submitNextBatch', () => {
-      it('should submit a state batch after a transaction batch', async () => {
+      it.only('should submit a state batch after a transaction batch', async () => {
         const receipt = await stateBatchSubmitter.submitNextBatch()
         expect(receipt).to.not.be.undefined
 
@@ -514,10 +511,10 @@ describe('Batch Submitter with Ganache', () => {
     await server.close()
   })
 })
-const createVaultWithSigner = (signer: Signer): Vault => {
+const createVaultWithSigner = async (signer: Signer): Promise<Vault> => {
   return {
     signer,
-    address: undefined,
+    address: await signer.getAddress(),
     token: undefined,
     vault_addr: undefined,
   }

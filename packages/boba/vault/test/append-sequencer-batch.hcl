@@ -1,3 +1,3 @@
-path "immutability-eth-plugin/wallets/sequencer/accounts/0x6f70A7f0C56689949C2682280563536850ab3102/ovm/appendSequencerBatch" {
+path "immutability-eth-plugin/wallets/sequencer/accounts/0x282274A1a53a6091363c3E6203217BB7a7350082/ovm/appendSequencerBatch" {
     capabilities = ["create", "update"]
 }

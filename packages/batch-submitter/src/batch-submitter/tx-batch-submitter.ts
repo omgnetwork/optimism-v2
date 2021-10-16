@@ -113,7 +113,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     const unwrapped_OVM_CanonicalTransactionChain = new Contract(
       ctcAddress,
-      getContractInterface('CanonicalTransactionChain'),
+      getContractInterface('OVM_CanonicalTransactionChain'),
       this.l1Provider
     )
 
