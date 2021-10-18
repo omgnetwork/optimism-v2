@@ -2,7 +2,8 @@
 import { Promise as bPromise } from 'bluebird'
 import { ethers, Contract, providers, BigNumber } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
-import { getContractInterface } from '@eth-optimism/contracts'
+import { getContractInterface, getContractFactory } from 'old-contracts'
+import { getContractInterface as getNewContractInterface } from '@eth-optimism/contracts'
 import {
   L2Block,
   RollupInfo,
@@ -603,7 +604,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   }> {
     const manager = new Contract(
       this.addressManagerAddress,
-      getContractInterface('Lib_AddressManager'),
+      getNewContractInterface('Lib_AddressManager'),
       this.l1Provider
     )
 
@@ -611,7 +612,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     const container = new Contract(
       addr,
-      getContractInterface('IChainStorageContainer'),
+      getNewContractInterface('IChainStorageContainer'),
       this.l1Provider
     )
 

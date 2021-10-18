@@ -164,18 +164,18 @@ describe('BatchSubmitter', () => {
     await unwrapped_OVM_CanonicalTransactionChain.init()
 
     await AddressManager.setAddress(
-      'OVM_CanonicalTransactionChain',
+      'CanonicalTransactionChain',
       unwrapped_OVM_CanonicalTransactionChain.address
     )
 
     await AddressManager.setAddress(
-      'OVM_CanonicalTransactionChain',
+      'CanonicalTransactionChain',
       unwrapped_OVM_CanonicalTransactionChain.address
     )
 
     OVM_CanonicalTransactionChain = new CanonicalTransactionChainContract(
       unwrapped_OVM_CanonicalTransactionChain.address,
-      getContractInterface('OVM_CanonicalTransactionChain'),
+      getContractInterface('CanonicalTransactionChain'),
       sequencer
     )
 

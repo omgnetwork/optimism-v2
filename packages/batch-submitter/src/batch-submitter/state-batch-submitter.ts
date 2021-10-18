@@ -3,6 +3,7 @@ import { Promise as bPromise } from 'bluebird'
 import { Contract, Signer, providers } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import { getContractInterface } from '@eth-optimism/contracts'
+import { getContractFactory } from 'old-contracts'
 import {
   L2Block,
   RollupInfo,
@@ -96,17 +97,12 @@ export class StateBatchSubmitter extends BatchSubmitter {
       return
     }
 
-    this.chainContract = new Contract(
-      sccAddress,
-      getContractInterface('OVM_StateCommitmentChain'),
-      this.l1Provider
-    )
-
-    this.ctcContract = new Contract(
-      ctcAddress,
-      getContractInterface('OVM_CanonicalTransactionChain'),
-      this.l1Provider
-    )
+    this.chainContract = (
+      await getContractFactory('OVM_StateCommitmentChain', this.l1Provider)
+    ).attach(sccAddress)
+    this.ctcContract = (
+      await getContractFactory('OVM_CanonicalTransactionChain', this.l1Provider)
+    ).attach(ctcAddress)
     return
   }
 
