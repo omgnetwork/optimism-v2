@@ -82,12 +82,10 @@ export class StateBatchSubmitter extends BatchSubmitter {
     }
     this.syncing = info.syncing
 
-    console.log('ne da se mi vec111')
     const addrs = await this._getChainAddresses()
     const sccAddress = addrs.sccAddress
     const ctcAddress = addrs.ctcAddress
 
-    console.log('ne da se mi vec222')
     if (
       typeof this.chainContract !== 'undefined' &&
       sccAddress === this.chainContract.address &&

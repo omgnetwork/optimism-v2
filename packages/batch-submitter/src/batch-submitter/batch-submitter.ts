@@ -153,10 +153,12 @@ export abstract class BatchSubmitter {
       getContractInterface('Lib_AddressManager'),
       this.l1Provider
     )
+
     const sccAddress = await addressManager.getAddress('StateCommitmentChain')
     const ctcAddress = await addressManager.getAddress(
       'CanonicalTransactionChain'
     )
+
     return {
       ctcAddress,
       sccAddress,

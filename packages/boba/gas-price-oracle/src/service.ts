@@ -64,6 +64,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       gasPriceOracleAddress: this.options.gasPriceOracleAddress,
       OVM_SequencerFeeVault: this.options.OVM_SequencerFeeVault,
       gasOracleOwnerAddress: this.options.gasPriceOracleOwnerWallet.address,
+      sequencerWallet: this.options.sequencerAddress,
+      proposerWallet: this.options.proposerAddress,
       relayerWallet: this.options.relayerAddress,
       fastRelayerWallet: this.options.fastRelayerAddress,
       gasFloorPrice: this.options.gasFloorPrice,

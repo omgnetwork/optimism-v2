@@ -11,6 +11,7 @@ import {
   TransactionResponse,
 } from '@ethersproject/abstract-provider'
 import { StaticJsonRpcProvider } from '@ethersproject/providers'
+import { sign } from 'crypto'
 
 const nullFunction = () => undefined
 const nullHooks = {
@@ -79,7 +80,7 @@ describe('submitTransactionWithYNATM', async () => {
     }
     await submitTransactionWithYNATM(
       appendSequencerBatch(mockAppendSequncerBatchFun, data, 0),
-      createBatchSigner(signer),
+      await createBatchSigner(signer),
       provider,
       config,
       numConfirmations,
@@ -110,7 +111,7 @@ describe('submitTransactionWithYNATM', async () => {
       expect(_tx.gasPrice > lastGasPrice).to.be.true
       lastGasPrice = _tx.gasPrice
       return {
-        hash: 'dummy hash'
+        hash: 'dummy hash',
       } as TransactionResponse
     }
     const waitForTransaction = async (
@@ -136,7 +137,7 @@ describe('submitTransactionWithYNATM', async () => {
     }
     await submitTransactionWithYNATM(
       appendSequencerBatch(mockAppendSequncerBatchFun, data, 0),
-      createBatchSigner(signer),
+      await createBatchSigner(signer),
       l1Provider,
       config,
       0,
@@ -144,7 +145,7 @@ describe('submitTransactionWithYNATM', async () => {
     )
   })
 })
-const createBatchSigner = (signer: Signer): Vault => {
+const createBatchSigner = async (signer: Signer): Promise<Vault> => {
   return {
     signer,
     address: undefined,

@@ -23,6 +23,10 @@ export const submitTransaction = async (
     tx = await call.appendStateBatch(call.batch, call.offsetStartsAtIndex, {
       nonce: call.nonce,
     })
+    console.log('hahahahlalala')
+    console.log(tx)
+    console.log(call)
+    console.log('hahahahlalala')
   } else if (call.type === 'AppendSequencerBatch') {
     tx = await call.appendSequencerBatch(
       call.batchParams,
@@ -36,7 +40,16 @@ export const submitTransaction = async (
     gasPrice,
   }
   hooks.beforeSendTransaction(fullTx)
-  const txResponse = await vault.signer.sendTransaction(fullTx)
+  let txResponse
+  if (call.type === 'AppendStateBatch') {
+    console.log(`tu smo zdaj bemo milo mater ${fullTx}`)
+    console.log(fullTx)
+    console.log(vault.signer)
+    txResponse = await vault.signer.sendTransaction(fullTx)
+    console.log(txResponse)
+  } else {
+    txResponse = await vault.signer.sendTransaction(fullTx)
+  }
   hooks.onTransactionResponse(txResponse)
   return provider.waitForTransaction(txResponse.hash, numConfirmations)
 }

@@ -269,7 +269,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         this._makeHooks('appendSequencerBatch')
       )
     }
-    console.log('hahah')
     return this._submitAndLogTx(submitTransaction, 'Submitted batch!')
   }
 
