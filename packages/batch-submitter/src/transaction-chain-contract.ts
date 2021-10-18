@@ -1,5 +1,5 @@
 /* External Imports */
-import { Contract, ethers } from 'ethers'
+import { Contract, ethers, Signer } from 'ethers'
 import {
   TransactionResponse,
   TransactionRequest,
@@ -21,14 +21,15 @@ export { encodeAppendSequencerBatch, BatchContext, AppendSequencerBatchParams }
 export class CanonicalTransactionChainContract extends Contract {
   public customPopulateTransaction = {
     appendSequencerBatch: async (
-      batch: AppendSequencerBatchParams
+      batch: AppendSequencerBatchParams,
+      nonce: number,
+      signer: Signer
     ): Promise<ethers.PopulatedTransaction> => {
-      const nonce = await this.signer.getTransactionCount()
       const to = this.address
       const data = getEncodedCalldata(batch)
-      const gasLimit = await this.signer.provider.estimateGas({
+      const gasLimit = await signer.provider.estimateGas({
         to,
-        from: await this.signer.getAddress(),
+        from: await signer.getAddress(),
         data,
       })
       const safeGasLimit = gasLimit

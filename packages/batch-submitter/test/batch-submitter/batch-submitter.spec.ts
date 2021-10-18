@@ -214,7 +214,9 @@ describe('BatchSubmitter', () => {
     sinon.restore()
   })
 
-  const createBatchSubmitter = async (timeout: number): Promise<TransactionBatchSubmitter> => {
+  const createBatchSubmitter = async (
+    timeout: number
+  ): Promise<TransactionBatchSubmitter> => {
     const resubmissionConfig: ResubmissionConfig = {
       resubmissionTimeout: 100000,
       minGasPriceInGwei: MIN_GAS_PRICE_IN_GWEI,
@@ -440,10 +442,11 @@ describe('BatchSubmitter', () => {
         nextQueueElement.timestamp - 1,
         EXAMPLE_STATE_ROOT // example stateRoot
       )
-
+console.log('here?')
       // submit a batch of transactions to enable state batch submission
       await txBatchSubmitter.submitNextBatch()
 
+console.log('here2?')
       const resubmissionConfig: ResubmissionConfig = {
         resubmissionTimeout: 100000,
         minGasPriceInGwei: MIN_GAS_PRICE_IN_GWEI,
@@ -478,8 +481,10 @@ describe('BatchSubmitter', () => {
     })
 
     describe('submitNextBatch', () => {
-      it.only('should submit a state batch after a transaction batch', async () => {
+      it('should submit a state batch after a transaction batch', async () => {
         const receipt = await stateBatchSubmitter.submitNextBatch()
+        console.log('omfg11')
+        console.log(receipt)
         expect(receipt).to.not.be.undefined
 
         const iface = new hardhatEthers.utils.Interface(scc.abi)

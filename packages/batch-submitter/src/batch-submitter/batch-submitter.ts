@@ -85,6 +85,7 @@ export abstract class BatchSubmitter {
     if (typeof this.l2ChainId === 'undefined') {
       this.l2ChainId = await this._getL2ChainId()
     }
+
     await this._updateChainInfo()
 
     if (!(await this._hasEnoughETHToCoverGasCosts())) {

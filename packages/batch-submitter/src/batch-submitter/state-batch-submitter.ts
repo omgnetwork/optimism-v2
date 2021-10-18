@@ -81,10 +81,13 @@ export class StateBatchSubmitter extends BatchSubmitter {
       process.exit(1)
     }
     this.syncing = info.syncing
+
+    console.log('ne da se mi vec111')
     const addrs = await this._getChainAddresses()
     const sccAddress = addrs.sccAddress
     const ctcAddress = addrs.ctcAddress
 
+    console.log('ne da se mi vec222')
     if (
       typeof this.chainContract !== 'undefined' &&
       sccAddress === this.chainContract.address &&
@@ -97,12 +100,17 @@ export class StateBatchSubmitter extends BatchSubmitter {
       return
     }
 
-    this.chainContract = (
-      await getContractFactory('OVM_StateCommitmentChain', this.l1Provider)
-    ).attach(sccAddress)
-    this.ctcContract = (
-      await getContractFactory('OVM_CanonicalTransactionChain', this.l1Provider)
-    ).attach(ctcAddress)
+    this.chainContract = new Contract(
+      sccAddress,
+      getContractInterface('StateCommitmentChain'),
+      this.l1Provider
+    )
+
+    this.ctcContract = new Contract(
+      ctcAddress,
+      getContractInterface('CanonicalTransactionChain'),
+      this.l1Provider
+    )
     return
   }
 

@@ -2,7 +2,7 @@
 import { Promise as bPromise } from 'bluebird'
 import { ethers, Contract, providers, BigNumber } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
-import { getContractInterface, getContractFactory } from 'old-contracts'
+import { getContractInterface } from 'old-contracts'
 import { getContractInterface as getNewContractInterface } from '@eth-optimism/contracts'
 import {
   L2Block,
@@ -235,6 +235,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       l1tipHeight,
     })
     const nonce = await getTransactionCount(this.l1Provider, this.vault.address)
+
     return this.submitAppendSequencerBatch(batchParams, nonce)
   }
 
@@ -268,6 +269,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         this._makeHooks('appendSequencerBatch')
       )
     }
+    console.log('hahah')
     return this._submitAndLogTx(submitTransaction, 'Submitted batch!')
   }
 

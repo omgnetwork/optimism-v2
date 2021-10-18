@@ -24,7 +24,11 @@ export const submitTransaction = async (
       nonce: call.nonce,
     })
   } else if (call.type === 'AppendSequencerBatch') {
-    tx = await call.appendSequencerBatch(call.batchParams, call.nonce)
+    tx = await call.appendSequencerBatch(
+      call.batchParams,
+      call.nonce,
+      vault.signer
+    )
   }
 
   const fullTx = {
@@ -32,7 +36,6 @@ export const submitTransaction = async (
     gasPrice,
   }
   hooks.beforeSendTransaction(fullTx)
-
   const txResponse = await vault.signer.sendTransaction(fullTx)
   hooks.onTransactionResponse(txResponse)
   return provider.waitForTransaction(txResponse.hash, numConfirmations)
