@@ -3,7 +3,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import chalk from 'chalk'
 
-require('dotenv').config()
+import envVars from 'dotenv/config'
 
 import L1_MessengerJson from '../artifacts/contracts/L1CrossDomainMessengerFast.sol/L1CrossDomainMessengerFast.json'
 
@@ -16,7 +16,7 @@ let Proxy_L1_Messenger: Contract
 const deployFn: DeployFunction = async (hre) => {
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
-    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
+    .attach(envVars.ADDRESS_MANAGER_ADDRESS) as any
 
   Factory__L1_Messenger = new ContractFactory(
     L1_MessengerJson.abi,

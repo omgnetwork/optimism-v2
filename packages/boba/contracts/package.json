@@ -1,6 +1,6 @@
 {
   "name": "@boba/contracts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "BOBA Smart Contracts and Deployer HTTP Server",
   "private": true,
   "author": "OMG",
@@ -13,6 +13,10 @@
     "build:contracts": "hardhat compile",
     "deploy": "ts-node \"./bin/deploy.ts\"",
     "postinstall": "patch-package",
+    "lint": "yarn lint:check",
+    "lint:check": "eslint .",
+    "lint:fix": "yarn lint:check --fix",
+    "lint:contracts": "yarn solhint -f table contracts/**/*.sol",
     "clean": "rm -rf ./dist ./artifacts ./artifacts-ovm ./cache ./cache-ovm ./tsconfig.build.tsbuildinfo"
   },
   "devDependencies": {
@@ -35,6 +39,8 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
+    "@eth-optimism/contracts": "^0.4.13",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "4.3.2",
     "chalk": "^4.1.1",
     "dotenv": "^8.2.0",
