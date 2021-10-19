@@ -3,15 +3,29 @@ import { expect } from '../setup'
 /* External Imports */
 import { ethers as hardhatEthers } from 'hardhat'
 import '@nomiclabs/hardhat-ethers'
-import { Signer, ContractFactory, Contract, BigNumber, providers, ethers } from 'ethers'
+import {
+  Signer,
+  ContractFactory,
+  Contract,
+  BigNumber,
+  providers,
+  ethers,
+  ContractInterface,
+} from 'ethers'
 import ganache from 'ganache-core'
 import sinon from 'sinon'
-import { StaticJsonRpcProvider, TransactionReceipt, Web3Provider } from '@ethersproject/providers'
+import {
+  StaticJsonRpcProvider,
+  TransactionReceipt,
+  Web3Provider,
+} from '@ethersproject/providers'
 import scc from '@eth-optimism/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json'
-import { getContractInterface, predeploys } from '@eth-optimism/contracts'
+import {
+  getContractInterface,
+  getContractFactory,
+  predeploys,
+} from '@eth-optimism/contracts'
 import { smockit, MockContract } from '@eth-optimism/smock'
-
-import { getContractFactory } from 'old-contracts'
 
 /* Internal Imports */
 import { MockchainProvider } from './mockchain-provider'
@@ -39,6 +53,7 @@ import {
   remove0x,
 } from '@eth-optimism/core-utils'
 import { Logger, Metrics } from '@eth-optimism/common-ts'
+import { sign } from 'crypto'
 
 const DUMMY_ADDRESS = '0x' + '00'.repeat(20)
 const EXAMPLE_STATE_ROOT =
@@ -106,124 +121,118 @@ describe('BatchSubmitter', () => {
   })
 
   let AddressManager: Contract
-  let Mock__OVM_ExecutionManager: MockContract
-  let Mock__OVM_BondManager: MockContract
-  let Mock__OVM_StateCommitmentChain: MockContract
+  //let Mock__ExecutionManager: MockContract
+  let Mock__BondManager: MockContract
+  let Mock__StateCommitmentChain: MockContract
   before(async () => {
     AddressManager = await makeAddressManager()
     await AddressManager.setAddress(
       'OVM_Sequencer',
       await sequencer.getAddress()
     )
-    Mock__OVM_ExecutionManager = await smockit(
-      await getContractFactory('OVM_ExecutionManager')
-    )
-    Mock__OVM_BondManager = await smockit(
-      await getContractFactory('OVM_BondManager')
-    )
+    Mock__BondManager = await smockit(await getContractInterface('BondManager'))
 
-    Mock__OVM_StateCommitmentChain = await smockit(
-      await getContractFactory('OVM_StateCommitmentChain')
-    )
+    await setProxyTarget(AddressManager, 'BondManager', Mock__BondManager)
 
-    await setProxyTarget(
-      AddressManager,
-      'OVM_ExecutionManager',
-      Mock__OVM_ExecutionManager
-    )
-    await setProxyTarget(
-      AddressManager,
-      'OVM_BondManager',
-      Mock__OVM_BondManager
-    )
-
-    await setProxyTarget(
-      AddressManager,
-      'OVM_StateCommitmentChain',
-      Mock__OVM_StateCommitmentChain
-    )
-
-    Mock__OVM_StateCommitmentChain.smocked.canOverwrite.will.return.with(false)
-    Mock__OVM_ExecutionManager.smocked.getMaxTransactionGasLimit.will.return.with(
-      MAX_GAS_LIMIT
-    )
-    Mock__OVM_BondManager.smocked.isCollateralized.will.return.with(true)
+    Mock__BondManager.smocked.isCollateralized.will.return.with(true)
   })
 
-  let Factory__OVM_CanonicalTransactionChain: ContractFactory
-  let Factory__OVM_StateCommitmentChain: ContractFactory
+  let Factory__CanonicalTransactionChain: ContractFactory
+  let Factory__StateCommitmentChain: ContractFactory
   before(async () => {
-    Factory__OVM_CanonicalTransactionChain = await getContractFactory(
-      'OVM_CanonicalTransactionChain'
-    )
+    Factory__CanonicalTransactionChain = getContractFactory(
+      'CanonicalTransactionChain'
+    ).connect(signer)
 
-    Factory__OVM_CanonicalTransactionChain =
-      Factory__OVM_CanonicalTransactionChain.connect(signer)
-
-    Factory__OVM_StateCommitmentChain = await getContractFactory(
-      'OVM_StateCommitmentChain'
-    )
-
-    Factory__OVM_StateCommitmentChain =
-      Factory__OVM_StateCommitmentChain.connect(signer)
+    Factory__StateCommitmentChain = getContractFactory(
+      'StateCommitmentChain',
+      signer
+    ).connect(signer)
   })
 
-  let OVM_CanonicalTransactionChain: CanonicalTransactionChainContract
-  let OVM_StateCommitmentChain: Contract
+  let CanonicalTransactionChain: CanonicalTransactionChainContract
+  let StateCommitmentChain: Contract
   let l2Provider: MockchainProvider
+  let Factory__ChainStorageContainer: ContractFactory
+  const L2_GAS_DISCOUNT_DIVISOR = 32
+  const ENQUEUE_GAS_COST = 60_000
   beforeEach(async () => {
-    const unwrapped_OVM_CanonicalTransactionChain =
-      await Factory__OVM_CanonicalTransactionChain.deploy(
+    const unwrapped_CanonicalTransactionChain =
+      await Factory__CanonicalTransactionChain.deploy(
         AddressManager.address,
-        FORCE_INCLUSION_PERIOD_SECONDS
+        MAX_GAS_LIMIT,
+        L2_GAS_DISCOUNT_DIVISOR,
+        ENQUEUE_GAS_COST
       )
+    Factory__ChainStorageContainer = getContractFactory('ChainStorageContainer',
+      signer
+    ).connect(signer)
 
-    await unwrapped_OVM_CanonicalTransactionChain.init()
+    const batches = await Factory__ChainStorageContainer.deploy(
+      AddressManager.address,
+      'CanonicalTransactionChain'
+    )
+    const queue = await Factory__ChainStorageContainer.deploy(
+      AddressManager.address,
+      'CanonicalTransactionChain'
+    )
 
     await AddressManager.setAddress(
-      'CanonicalTransactionChain',
-      unwrapped_OVM_CanonicalTransactionChain.address
+      'ChainStorageContainer-CTC-batches',
+      batches.address
+    )
+
+    await AddressManager.setAddress(
+      'ChainStorageContainer-CTC-queue',
+      queue.address
     )
 
     await AddressManager.setAddress(
       'CanonicalTransactionChain',
-      unwrapped_OVM_CanonicalTransactionChain.address
+      unwrapped_CanonicalTransactionChain.address
     )
 
-    OVM_CanonicalTransactionChain = new CanonicalTransactionChainContract(
-      unwrapped_OVM_CanonicalTransactionChain.address,
+    await AddressManager.setAddress(
+      'CanonicalTransactionChain',
+      unwrapped_CanonicalTransactionChain.address
+    )
+
+    CanonicalTransactionChain = new CanonicalTransactionChainContract(
+      unwrapped_CanonicalTransactionChain.address,
       getContractInterface('CanonicalTransactionChain'),
       sequencer
     )
 
-    const unwrapped_OVM_StateCommitmentChain =
-      await Factory__OVM_StateCommitmentChain.deploy(
+    const unwrapped_StateCommitmentChain =
+      await Factory__StateCommitmentChain.deploy(
         AddressManager.address,
         0, // fraudProofWindowSeconds
         0 // sequencerPublishWindowSeconds
       )
 
-    await unwrapped_OVM_StateCommitmentChain.init()
-
-    await AddressManager.setAddress(
-      'OVM_StateCommitmentChain',
-      unwrapped_OVM_StateCommitmentChain.address
-    )
+    //    await unwrapped_StateCommitmentChain.init()
 
     await AddressManager.setAddress(
       'StateCommitmentChain',
-      unwrapped_OVM_StateCommitmentChain.address
+      unwrapped_StateCommitmentChain.address
     )
 
-    OVM_StateCommitmentChain = new Contract(
-      unwrapped_OVM_StateCommitmentChain.address,
+    StateCommitmentChain = new Contract(
+      unwrapped_StateCommitmentChain.address,
       getContractInterface('StateCommitmentChain'),
       sequencer
     )
-
+    const factory2 = getContractFactory('ChainStorageContainer')
+    const ChainStorageContainer = await factory2
+      .connect(signer)
+      .deploy(AddressManager.address, 'StateCommitmentChain')
+    await AddressManager.setAddress(
+      'ChainStorageContainer-SCC-batches',
+      ChainStorageContainer.address
+    )
     l2Provider = new MockchainProvider(
-      OVM_CanonicalTransactionChain.address,
-      OVM_StateCommitmentChain.address
+      CanonicalTransactionChain.address,
+      StateCommitmentChain.address
     )
   })
 
@@ -270,20 +279,15 @@ describe('BatchSubmitter', () => {
 
   describe('TransactionBatchSubmitter', () => {
     describe('submitNextBatch', () => {
-      const enqueuedElements: Array<{
-        blockNumber: number
-        timestamp: number
-      }> = []
-
       let batchSubmitter
       beforeEach(async () => {
         for (let i = 1; i < 15; i++) {
-          await OVM_CanonicalTransactionChain.enqueue(
+          await CanonicalTransactionChain.enqueue(
             '0x' + '01'.repeat(20),
-            50_000,
+            500_000,
             '0x' + i.toString().repeat(64),
             {
-              gasLimit: 1_000_000,
+              gasLimit: 40000000,
             }
           )
         }
@@ -293,7 +297,7 @@ describe('BatchSubmitter', () => {
       it('should submit a sequencer batch correctly', async () => {
         l2Provider.setNumBlocksToReturn(5)
         const nextQueueElement = await getQueueElement(
-          OVM_CanonicalTransactionChain
+          CanonicalTransactionChain
         )
         l2Provider.setL2BlockData(
           {
@@ -341,7 +345,7 @@ describe('BatchSubmitter', () => {
         } as any)
         // Turn blocks 3-5 into sequencer txs
         const nextQueueElement = await getQueueElement(
-          OVM_CanonicalTransactionChain,
+          CanonicalTransactionChain,
           2
         )
         l2Provider.setL2BlockData(
@@ -451,22 +455,26 @@ describe('BatchSubmitter', () => {
     let stateBatchSubmitter
     beforeEach(async () => {
       for (let i = 1; i < 15; i++) {
-        await OVM_CanonicalTransactionChain.enqueue(
+        const tx = await CanonicalTransactionChain.enqueue(
           '0x' + '01'.repeat(20),
-          50_000,
+          500_000,
           '0x' + i.toString().repeat(64),
           {
             gasLimit: 1_000_000,
           }
         )
+        expect(
+          await (
+            await l1ProviderReal.waitForTransaction(tx.hash, 1)
+          ).status
+        ).to.eq(1)
       }
 
       txBatchSubmitter = await createBatchSubmitter(0)
 
       l2Provider.setNumBlocksToReturn(5)
-      const nextQueueElement = await getQueueElement(
-        OVM_CanonicalTransactionChain
-      )
+
+      const nextQueueElement = await getQueueElement(CanonicalTransactionChain)
 
       l2Provider.setL2BlockData(
         {
@@ -517,7 +525,6 @@ describe('BatchSubmitter', () => {
 
     describe('submitNextBatch', () => {
       it('should submit a state batch after a transaction batch', async () => {
-        console.log(stateBatchSubmitter)
         const receipt = await stateBatchSubmitter.submitNextBatch()
         expect(receipt).to.not.be.undefined
 

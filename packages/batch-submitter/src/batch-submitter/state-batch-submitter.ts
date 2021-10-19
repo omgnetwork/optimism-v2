@@ -3,7 +3,6 @@ import { Promise as bPromise } from 'bluebird'
 import { Contract, Signer, providers } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import { getContractInterface } from '@eth-optimism/contracts'
-import { getContractFactory } from 'old-contracts'
 import {
   L2Block,
   RollupInfo,

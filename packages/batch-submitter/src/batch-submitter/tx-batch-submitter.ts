@@ -2,8 +2,7 @@
 import { Promise as bPromise } from 'bluebird'
 import { ethers, Contract, providers, BigNumber } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider'
-import { getContractInterface } from 'old-contracts'
-import { getContractInterface as getNewContractInterface } from '@eth-optimism/contracts'
+import { getContractInterface } from '@eth-optimism/contracts'
 import {
   L2Block,
   RollupInfo,
@@ -114,13 +113,13 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     const unwrapped_OVM_CanonicalTransactionChain = new Contract(
       ctcAddress,
-      getContractInterface('OVM_CanonicalTransactionChain'),
+      getContractInterface('CanonicalTransactionChain'),
       this.l1Provider
     )
 
     this.chainContract = new CanonicalTransactionChainContract(
       unwrapped_OVM_CanonicalTransactionChain.address,
-      getContractInterface('OVM_CanonicalTransactionChain'),
+      getContractInterface('CanonicalTransactionChain'),
       this.l1Provider
     )
     this.logger.info('Initialized new CTC', {
@@ -605,7 +604,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   }> {
     const manager = new Contract(
       this.addressManagerAddress,
-      getNewContractInterface('Lib_AddressManager'),
+      getContractInterface('Lib_AddressManager'),
       this.l1Provider
     )
 
@@ -613,7 +612,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     const container = new Contract(
       addr,
-      getNewContractInterface('IChainStorageContainer'),
+      getContractInterface('IChainStorageContainer'),
       this.l1Provider
     )
 
