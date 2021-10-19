@@ -1,4 +1,3 @@
-import * as ynatm from '@eth-optimism/ynatm'
 import { Vault } from '../batch-submitter/batch-submitter'
 import {
   StaticJsonRpcProvider,
@@ -36,12 +35,7 @@ export const submitTransaction = async (
     gasPrice,
   }
   hooks.beforeSendTransaction(fullTx)
-  let txResponse
-  if (call.type === 'AppendStateBatch') {
-    txResponse = await vault.signer.sendTransaction(fullTx)
-  } else {
-    txResponse = await vault.signer.sendTransaction(fullTx)
-  }
+  const txResponse = await vault.signer.sendTransaction(fullTx)
   hooks.onTransactionResponse(txResponse)
   return provider.waitForTransaction(txResponse.hash, numConfirmations)
 }

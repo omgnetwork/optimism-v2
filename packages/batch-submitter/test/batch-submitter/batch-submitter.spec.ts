@@ -121,9 +121,7 @@ describe('BatchSubmitter', () => {
   })
 
   let AddressManager: Contract
-  //let Mock__ExecutionManager: MockContract
   let Mock__BondManager: MockContract
-  let Mock__StateCommitmentChain: MockContract
   before(async () => {
     AddressManager = await makeAddressManager()
     await AddressManager.setAddress(
@@ -164,7 +162,8 @@ describe('BatchSubmitter', () => {
         L2_GAS_DISCOUNT_DIVISOR,
         ENQUEUE_GAS_COST
       )
-    Factory__ChainStorageContainer = getContractFactory('ChainStorageContainer',
+    Factory__ChainStorageContainer = getContractFactory(
+      'ChainStorageContainer',
       signer
     ).connect(signer)
 
@@ -210,8 +209,6 @@ describe('BatchSubmitter', () => {
         0 // sequencerPublishWindowSeconds
       )
 
-    //    await unwrapped_StateCommitmentChain.init()
-
     await AddressManager.setAddress(
       'StateCommitmentChain',
       unwrapped_StateCommitmentChain.address
@@ -222,10 +219,10 @@ describe('BatchSubmitter', () => {
       getContractInterface('StateCommitmentChain'),
       sequencer
     )
-    const factory2 = getContractFactory('ChainStorageContainer')
-    const ChainStorageContainer = await factory2
-      .connect(signer)
-      .deploy(AddressManager.address, 'StateCommitmentChain')
+
+    const ChainStorageContainer = await Factory__ChainStorageContainer.connect(
+      signer
+    ).deploy(AddressManager.address, 'StateCommitmentChain')
     await AddressManager.setAddress(
       'ChainStorageContainer-SCC-batches',
       ChainStorageContainer.address

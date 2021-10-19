@@ -29,10 +29,9 @@ packages/boba/gas-price-oracle/data
 
 # boba_examples
 boba_examples/init-fund-l2/yarn.lock
+# hashicorp vault policy
 packages/boba/vault/test/append-sequencer-batch.hcl
 packages/boba/vault/test/append-state-batch-proposer.hcl
-# regensis
-
 # regenesis
 packages/regenesis-surgery/deployment
 packages/regenesis-surgery/state-dump
