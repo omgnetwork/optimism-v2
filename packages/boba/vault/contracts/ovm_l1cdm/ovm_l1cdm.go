@@ -26,6 +26,15 @@ var (
 	_ = event.NewSubscription
 )
 
+// IL1CrossDomainMessengerL2MessageInclusionProof is an auto generated low-level Go binding around an user-defined struct.
+type IL1CrossDomainMessengerL2MessageInclusionProof struct {
+	StateRoot            [32]byte
+	StateRootBatchHeader Lib_OVMCodecChainBatchHeader
+	StateRootProof       Lib_OVMCodecChainInclusionProof
+	StateTrieWitness     []byte
+	StorageTrieWitness   []byte
+}
+
 // Lib_OVMCodecChainBatchHeader is an auto generated low-level Go binding around an user-defined struct.
 type Lib_OVMCodecChainBatchHeader struct {
 	BatchIndex        *big.Int
@@ -41,17 +50,8 @@ type Lib_OVMCodecChainInclusionProof struct {
 	Siblings [][32]byte
 }
 
-// iOVM_L1CrossDomainMessengerL2MessageInclusionProof is an auto generated low-level Go binding around an user-defined struct.
-type iOVM_L1CrossDomainMessengerL2MessageInclusionProof struct {
-	StateRoot            [32]byte
-	StateRootBatchHeader Lib_OVMCodecChainBatchHeader
-	StateRootProof       Lib_OVMCodecChainInclusionProof
-	StateTrieWitness     []byte
-	StorageTrieWitness   []byte
-}
-
 // OvmL1cdmABI is the input ABI used to generate the binding from.
-const OvmL1cdmABI = "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"msgHash\",\"type\":\"bytes32\"}],\"name\":\"FailedRelayedMessage\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"_xDomainCalldataHash\",\"type\":\"bytes32\"}],\"name\":\"MessageAllowed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"_xDomainCalldataHash\",\"type\":\"bytes32\"}],\"name\":\"MessageBlocked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"Paused\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"msgHash\",\"type\":\"bytes32\"}],\"name\":\"RelayedMessage\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"message\",\"type\":\"bytes\"}],\"name\":\"SentMessage\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"Unpaused\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_xDomainCalldataHash\",\"type\":\"bytes32\"}],\"name\":\"allowMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_xDomainCalldataHash\",\"type\":\"bytes32\"}],\"name\":\"blockMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"blockedMessages\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_libAddressManager\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"libAddressManager\",\"outputs\":[{\"internalType\":\"contractLib_AddressManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pause\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"paused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_sender\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_message\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_messageNonce\",\"type\":\"uint256\"},{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"batchIndex\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"batchRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"batchSize\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"prevTotalElements\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"extraData\",\"type\":\"bytes\"}],\"internalType\":\"structLib_OVMCodec.ChainBatchHeader\",\"name\":\"stateRootBatchHeader\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structLib_OVMCodec.ChainInclusionProof\",\"name\":\"stateRootProof\",\"type\":\"tuple\"},{\"internalType\":\"bytes\",\"name\":\"stateTrieWitness\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"storageTrieWitness\",\"type\":\"bytes\"}],\"internalType\":\"structiOVM_L1CrossDomainMessenger.L2MessageInclusionProof\",\"name\":\"_proof\",\"type\":\"tuple\"}],\"name\":\"relayMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"relayedMessages\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_sender\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_message\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_queueIndex\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"_gasLimit\",\"type\":\"uint32\"}],\"name\":\"replayMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"name\":\"resolve\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_message\",\"type\":\"bytes\"},{\"internalType\":\"uint32\",\"name\":\"_gasLimit\",\"type\":\"uint32\"}],\"name\":\"sendMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"successfulMessages\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"xDomainMessageSender\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const OvmL1cdmABI = "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"msgHash\",\"type\":\"bytes32\"}],\"name\":\"FailedRelayedMessage\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"_xDomainCalldataHash\",\"type\":\"bytes32\"}],\"name\":\"MessageAllowed\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"_xDomainCalldataHash\",\"type\":\"bytes32\"}],\"name\":\"MessageBlocked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"Paused\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"msgHash\",\"type\":\"bytes32\"}],\"name\":\"RelayedMessage\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"message\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"messageNonce\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"gasLimit\",\"type\":\"uint256\"}],\"name\":\"SentMessage\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"Unpaused\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_xDomainCalldataHash\",\"type\":\"bytes32\"}],\"name\":\"allowMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_xDomainCalldataHash\",\"type\":\"bytes32\"}],\"name\":\"blockMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"blockedMessages\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"failedMessages\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_libAddressManager\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"libAddressManager\",\"outputs\":[{\"internalType\":\"contractLib_AddressManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pause\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"paused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_sender\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_message\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_messageNonce\",\"type\":\"uint256\"},{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"stateRoot\",\"type\":\"bytes32\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"batchIndex\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"batchRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"batchSize\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"prevTotalElements\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"extraData\",\"type\":\"bytes\"}],\"internalType\":\"structLib_OVMCodec.ChainBatchHeader\",\"name\":\"stateRootBatchHeader\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structLib_OVMCodec.ChainInclusionProof\",\"name\":\"stateRootProof\",\"type\":\"tuple\"},{\"internalType\":\"bytes\",\"name\":\"stateTrieWitness\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"storageTrieWitness\",\"type\":\"bytes\"}],\"internalType\":\"structIL1CrossDomainMessenger.L2MessageInclusionProof\",\"name\":\"_proof\",\"type\":\"tuple\"}],\"name\":\"relayMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"relayedMessages\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_sender\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_message\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_queueIndex\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"_oldGasLimit\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"_newGasLimit\",\"type\":\"uint32\"}],\"name\":\"replayMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"name\":\"resolve\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_message\",\"type\":\"bytes\"},{\"internalType\":\"uint32\",\"name\":\"_gasLimit\",\"type\":\"uint32\"}],\"name\":\"sendMessage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"successfulMessages\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"xDomainMessageSender\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // OvmL1cdm is an auto generated Go binding around an Ethereum contract.
 type OvmL1cdm struct {
@@ -219,6 +219,32 @@ func (_OvmL1cdm *OvmL1cdmSession) BlockedMessages(arg0 [32]byte) (bool, error) {
 // Solidity: function blockedMessages(bytes32 ) view returns(bool)
 func (_OvmL1cdm *OvmL1cdmCallerSession) BlockedMessages(arg0 [32]byte) (bool, error) {
 	return _OvmL1cdm.Contract.BlockedMessages(&_OvmL1cdm.CallOpts, arg0)
+}
+
+// FailedMessages is a free data retrieval call binding the contract method 0xa4e7f8bd.
+//
+// Solidity: function failedMessages(bytes32 ) view returns(bool)
+func (_OvmL1cdm *OvmL1cdmCaller) FailedMessages(opts *bind.CallOpts, arg0 [32]byte) (bool, error) {
+	var (
+		ret0 = new(bool)
+	)
+	out := ret0
+	err := _OvmL1cdm.contract.Call(opts, out, "failedMessages", arg0)
+	return *ret0, err
+}
+
+// FailedMessages is a free data retrieval call binding the contract method 0xa4e7f8bd.
+//
+// Solidity: function failedMessages(bytes32 ) view returns(bool)
+func (_OvmL1cdm *OvmL1cdmSession) FailedMessages(arg0 [32]byte) (bool, error) {
+	return _OvmL1cdm.Contract.FailedMessages(&_OvmL1cdm.CallOpts, arg0)
+}
+
+// FailedMessages is a free data retrieval call binding the contract method 0xa4e7f8bd.
+//
+// Solidity: function failedMessages(bytes32 ) view returns(bool)
+func (_OvmL1cdm *OvmL1cdmCallerSession) FailedMessages(arg0 [32]byte) (bool, error) {
+	return _OvmL1cdm.Contract.FailedMessages(&_OvmL1cdm.CallOpts, arg0)
 }
 
 // LibAddressManager is a free data retrieval call binding the contract method 0x299ca478.
@@ -490,21 +516,21 @@ func (_OvmL1cdm *OvmL1cdmTransactorSession) Pause() (*types.Transaction, error) 
 // RelayMessage is a paid mutator transaction binding the contract method 0xd7fd19dd.
 //
 // Solidity: function relayMessage(address _target, address _sender, bytes _message, uint256 _messageNonce, (bytes32,(uint256,bytes32,uint256,uint256,bytes),(uint256,bytes32[]),bytes,bytes) _proof) returns()
-func (_OvmL1cdm *OvmL1cdmTransactor) RelayMessage(opts *bind.TransactOpts, _target common.Address, _sender common.Address, _message []byte, _messageNonce *big.Int, _proof iOVM_L1CrossDomainMessengerL2MessageInclusionProof) (*types.Transaction, error) {
+func (_OvmL1cdm *OvmL1cdmTransactor) RelayMessage(opts *bind.TransactOpts, _target common.Address, _sender common.Address, _message []byte, _messageNonce *big.Int, _proof IL1CrossDomainMessengerL2MessageInclusionProof) (*types.Transaction, error) {
 	return _OvmL1cdm.contract.Transact(opts, "relayMessage", _target, _sender, _message, _messageNonce, _proof)
 }
 
 // RelayMessage is a paid mutator transaction binding the contract method 0xd7fd19dd.
 //
 // Solidity: function relayMessage(address _target, address _sender, bytes _message, uint256 _messageNonce, (bytes32,(uint256,bytes32,uint256,uint256,bytes),(uint256,bytes32[]),bytes,bytes) _proof) returns()
-func (_OvmL1cdm *OvmL1cdmSession) RelayMessage(_target common.Address, _sender common.Address, _message []byte, _messageNonce *big.Int, _proof iOVM_L1CrossDomainMessengerL2MessageInclusionProof) (*types.Transaction, error) {
+func (_OvmL1cdm *OvmL1cdmSession) RelayMessage(_target common.Address, _sender common.Address, _message []byte, _messageNonce *big.Int, _proof IL1CrossDomainMessengerL2MessageInclusionProof) (*types.Transaction, error) {
 	return _OvmL1cdm.Contract.RelayMessage(&_OvmL1cdm.TransactOpts, _target, _sender, _message, _messageNonce, _proof)
 }
 
 // RelayMessage is a paid mutator transaction binding the contract method 0xd7fd19dd.
 //
 // Solidity: function relayMessage(address _target, address _sender, bytes _message, uint256 _messageNonce, (bytes32,(uint256,bytes32,uint256,uint256,bytes),(uint256,bytes32[]),bytes,bytes) _proof) returns()
-func (_OvmL1cdm *OvmL1cdmTransactorSession) RelayMessage(_target common.Address, _sender common.Address, _message []byte, _messageNonce *big.Int, _proof iOVM_L1CrossDomainMessengerL2MessageInclusionProof) (*types.Transaction, error) {
+func (_OvmL1cdm *OvmL1cdmTransactorSession) RelayMessage(_target common.Address, _sender common.Address, _message []byte, _messageNonce *big.Int, _proof IL1CrossDomainMessengerL2MessageInclusionProof) (*types.Transaction, error) {
 	return _OvmL1cdm.Contract.RelayMessage(&_OvmL1cdm.TransactOpts, _target, _sender, _message, _messageNonce, _proof)
 }
 
@@ -529,25 +555,25 @@ func (_OvmL1cdm *OvmL1cdmTransactorSession) RenounceOwnership() (*types.Transact
 	return _OvmL1cdm.Contract.RenounceOwnership(&_OvmL1cdm.TransactOpts)
 }
 
-// ReplayMessage is a paid mutator transaction binding the contract method 0x706ceab6.
+// ReplayMessage is a paid mutator transaction binding the contract method 0x6f1c8d47.
 //
-// Solidity: function replayMessage(address _target, address _sender, bytes _message, uint256 _queueIndex, uint32 _gasLimit) returns()
-func (_OvmL1cdm *OvmL1cdmTransactor) ReplayMessage(opts *bind.TransactOpts, _target common.Address, _sender common.Address, _message []byte, _queueIndex *big.Int, _gasLimit uint32) (*types.Transaction, error) {
-	return _OvmL1cdm.contract.Transact(opts, "replayMessage", _target, _sender, _message, _queueIndex, _gasLimit)
+// Solidity: function replayMessage(address _target, address _sender, bytes _message, uint256 _queueIndex, uint32 _oldGasLimit, uint32 _newGasLimit) returns()
+func (_OvmL1cdm *OvmL1cdmTransactor) ReplayMessage(opts *bind.TransactOpts, _target common.Address, _sender common.Address, _message []byte, _queueIndex *big.Int, _oldGasLimit uint32, _newGasLimit uint32) (*types.Transaction, error) {
+	return _OvmL1cdm.contract.Transact(opts, "replayMessage", _target, _sender, _message, _queueIndex, _oldGasLimit, _newGasLimit)
 }
 
-// ReplayMessage is a paid mutator transaction binding the contract method 0x706ceab6.
+// ReplayMessage is a paid mutator transaction binding the contract method 0x6f1c8d47.
 //
-// Solidity: function replayMessage(address _target, address _sender, bytes _message, uint256 _queueIndex, uint32 _gasLimit) returns()
-func (_OvmL1cdm *OvmL1cdmSession) ReplayMessage(_target common.Address, _sender common.Address, _message []byte, _queueIndex *big.Int, _gasLimit uint32) (*types.Transaction, error) {
-	return _OvmL1cdm.Contract.ReplayMessage(&_OvmL1cdm.TransactOpts, _target, _sender, _message, _queueIndex, _gasLimit)
+// Solidity: function replayMessage(address _target, address _sender, bytes _message, uint256 _queueIndex, uint32 _oldGasLimit, uint32 _newGasLimit) returns()
+func (_OvmL1cdm *OvmL1cdmSession) ReplayMessage(_target common.Address, _sender common.Address, _message []byte, _queueIndex *big.Int, _oldGasLimit uint32, _newGasLimit uint32) (*types.Transaction, error) {
+	return _OvmL1cdm.Contract.ReplayMessage(&_OvmL1cdm.TransactOpts, _target, _sender, _message, _queueIndex, _oldGasLimit, _newGasLimit)
 }
 
-// ReplayMessage is a paid mutator transaction binding the contract method 0x706ceab6.
+// ReplayMessage is a paid mutator transaction binding the contract method 0x6f1c8d47.
 //
-// Solidity: function replayMessage(address _target, address _sender, bytes _message, uint256 _queueIndex, uint32 _gasLimit) returns()
-func (_OvmL1cdm *OvmL1cdmTransactorSession) ReplayMessage(_target common.Address, _sender common.Address, _message []byte, _queueIndex *big.Int, _gasLimit uint32) (*types.Transaction, error) {
-	return _OvmL1cdm.Contract.ReplayMessage(&_OvmL1cdm.TransactOpts, _target, _sender, _message, _queueIndex, _gasLimit)
+// Solidity: function replayMessage(address _target, address _sender, bytes _message, uint256 _queueIndex, uint32 _oldGasLimit, uint32 _newGasLimit) returns()
+func (_OvmL1cdm *OvmL1cdmTransactorSession) ReplayMessage(_target common.Address, _sender common.Address, _message []byte, _queueIndex *big.Int, _oldGasLimit uint32, _newGasLimit uint32) (*types.Transaction, error) {
+	return _OvmL1cdm.Contract.ReplayMessage(&_OvmL1cdm.TransactOpts, _target, _sender, _message, _queueIndex, _oldGasLimit, _newGasLimit)
 }
 
 // SendMessage is a paid mutator transaction binding the contract method 0x3dbb202b.
@@ -667,10 +693,15 @@ type OvmL1cdmFailedRelayedMessage struct {
 
 // FilterFailedRelayedMessage is a free log retrieval operation binding the contract event 0x99d0e048484baa1b1540b1367cb128acd7ab2946d1ed91ec10e3c85e4bf51b8f.
 //
-// Solidity: event FailedRelayedMessage(bytes32 msgHash)
-func (_OvmL1cdm *OvmL1cdmFilterer) FilterFailedRelayedMessage(opts *bind.FilterOpts) (*OvmL1cdmFailedRelayedMessageIterator, error) {
+// Solidity: event FailedRelayedMessage(bytes32 indexed msgHash)
+func (_OvmL1cdm *OvmL1cdmFilterer) FilterFailedRelayedMessage(opts *bind.FilterOpts, msgHash [][32]byte) (*OvmL1cdmFailedRelayedMessageIterator, error) {
 
-	logs, sub, err := _OvmL1cdm.contract.FilterLogs(opts, "FailedRelayedMessage")
+	var msgHashRule []interface{}
+	for _, msgHashItem := range msgHash {
+		msgHashRule = append(msgHashRule, msgHashItem)
+	}
+
+	logs, sub, err := _OvmL1cdm.contract.FilterLogs(opts, "FailedRelayedMessage", msgHashRule)
 	if err != nil {
 		return nil, err
 	}
@@ -679,10 +710,15 @@ func (_OvmL1cdm *OvmL1cdmFilterer) FilterFailedRelayedMessage(opts *bind.FilterO
 
 // WatchFailedRelayedMessage is a free log subscription operation binding the contract event 0x99d0e048484baa1b1540b1367cb128acd7ab2946d1ed91ec10e3c85e4bf51b8f.
 //
-// Solidity: event FailedRelayedMessage(bytes32 msgHash)
-func (_OvmL1cdm *OvmL1cdmFilterer) WatchFailedRelayedMessage(opts *bind.WatchOpts, sink chan<- *OvmL1cdmFailedRelayedMessage) (event.Subscription, error) {
+// Solidity: event FailedRelayedMessage(bytes32 indexed msgHash)
+func (_OvmL1cdm *OvmL1cdmFilterer) WatchFailedRelayedMessage(opts *bind.WatchOpts, sink chan<- *OvmL1cdmFailedRelayedMessage, msgHash [][32]byte) (event.Subscription, error) {
 
-	logs, sub, err := _OvmL1cdm.contract.WatchLogs(opts, "FailedRelayedMessage")
+	var msgHashRule []interface{}
+	for _, msgHashItem := range msgHash {
+		msgHashRule = append(msgHashRule, msgHashItem)
+	}
+
+	logs, sub, err := _OvmL1cdm.contract.WatchLogs(opts, "FailedRelayedMessage", msgHashRule)
 	if err != nil {
 		return nil, err
 	}
@@ -716,7 +752,7 @@ func (_OvmL1cdm *OvmL1cdmFilterer) WatchFailedRelayedMessage(opts *bind.WatchOpt
 
 // ParseFailedRelayedMessage is a log parse operation binding the contract event 0x99d0e048484baa1b1540b1367cb128acd7ab2946d1ed91ec10e3c85e4bf51b8f.
 //
-// Solidity: event FailedRelayedMessage(bytes32 msgHash)
+// Solidity: event FailedRelayedMessage(bytes32 indexed msgHash)
 func (_OvmL1cdm *OvmL1cdmFilterer) ParseFailedRelayedMessage(log types.Log) (*OvmL1cdmFailedRelayedMessage, error) {
 	event := new(OvmL1cdmFailedRelayedMessage)
 	if err := _OvmL1cdm.contract.UnpackLog(event, "FailedRelayedMessage", log); err != nil {
@@ -1371,10 +1407,15 @@ type OvmL1cdmRelayedMessage struct {
 
 // FilterRelayedMessage is a free log retrieval operation binding the contract event 0x4641df4a962071e12719d8c8c8e5ac7fc4d97b927346a3d7a335b1f7517e133c.
 //
-// Solidity: event RelayedMessage(bytes32 msgHash)
-func (_OvmL1cdm *OvmL1cdmFilterer) FilterRelayedMessage(opts *bind.FilterOpts) (*OvmL1cdmRelayedMessageIterator, error) {
+// Solidity: event RelayedMessage(bytes32 indexed msgHash)
+func (_OvmL1cdm *OvmL1cdmFilterer) FilterRelayedMessage(opts *bind.FilterOpts, msgHash [][32]byte) (*OvmL1cdmRelayedMessageIterator, error) {
 
-	logs, sub, err := _OvmL1cdm.contract.FilterLogs(opts, "RelayedMessage")
+	var msgHashRule []interface{}
+	for _, msgHashItem := range msgHash {
+		msgHashRule = append(msgHashRule, msgHashItem)
+	}
+
+	logs, sub, err := _OvmL1cdm.contract.FilterLogs(opts, "RelayedMessage", msgHashRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1383,10 +1424,15 @@ func (_OvmL1cdm *OvmL1cdmFilterer) FilterRelayedMessage(opts *bind.FilterOpts) (
 
 // WatchRelayedMessage is a free log subscription operation binding the contract event 0x4641df4a962071e12719d8c8c8e5ac7fc4d97b927346a3d7a335b1f7517e133c.
 //
-// Solidity: event RelayedMessage(bytes32 msgHash)
-func (_OvmL1cdm *OvmL1cdmFilterer) WatchRelayedMessage(opts *bind.WatchOpts, sink chan<- *OvmL1cdmRelayedMessage) (event.Subscription, error) {
+// Solidity: event RelayedMessage(bytes32 indexed msgHash)
+func (_OvmL1cdm *OvmL1cdmFilterer) WatchRelayedMessage(opts *bind.WatchOpts, sink chan<- *OvmL1cdmRelayedMessage, msgHash [][32]byte) (event.Subscription, error) {
 
-	logs, sub, err := _OvmL1cdm.contract.WatchLogs(opts, "RelayedMessage")
+	var msgHashRule []interface{}
+	for _, msgHashItem := range msgHash {
+		msgHashRule = append(msgHashRule, msgHashItem)
+	}
+
+	logs, sub, err := _OvmL1cdm.contract.WatchLogs(opts, "RelayedMessage", msgHashRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1420,7 +1466,7 @@ func (_OvmL1cdm *OvmL1cdmFilterer) WatchRelayedMessage(opts *bind.WatchOpts, sin
 
 // ParseRelayedMessage is a log parse operation binding the contract event 0x4641df4a962071e12719d8c8c8e5ac7fc4d97b927346a3d7a335b1f7517e133c.
 //
-// Solidity: event RelayedMessage(bytes32 msgHash)
+// Solidity: event RelayedMessage(bytes32 indexed msgHash)
 func (_OvmL1cdm *OvmL1cdmFilterer) ParseRelayedMessage(log types.Log) (*OvmL1cdmRelayedMessage, error) {
 	event := new(OvmL1cdmRelayedMessage)
 	if err := _OvmL1cdm.contract.UnpackLog(event, "RelayedMessage", log); err != nil {
@@ -1498,28 +1544,42 @@ func (it *OvmL1cdmSentMessageIterator) Close() error {
 
 // OvmL1cdmSentMessage represents a SentMessage event raised by the OvmL1cdm contract.
 type OvmL1cdmSentMessage struct {
-	Message []byte
-	Raw     types.Log // Blockchain specific contextual infos
+	Target       common.Address
+	Sender       common.Address
+	Message      []byte
+	MessageNonce *big.Int
+	GasLimit     *big.Int
+	Raw          types.Log // Blockchain specific contextual infos
 }
 
-// FilterSentMessage is a free log retrieval operation binding the contract event 0x0ee9ffdb2334d78de97ffb066b23a352a4d35180cefb36589d663fbb1eb6f326.
+// FilterSentMessage is a free log retrieval operation binding the contract event 0xcb0f7ffd78f9aee47a248fae8db181db6eee833039123e026dcbff529522e52a.
 //
-// Solidity: event SentMessage(bytes message)
-func (_OvmL1cdm *OvmL1cdmFilterer) FilterSentMessage(opts *bind.FilterOpts) (*OvmL1cdmSentMessageIterator, error) {
+// Solidity: event SentMessage(address indexed target, address sender, bytes message, uint256 messageNonce, uint256 gasLimit)
+func (_OvmL1cdm *OvmL1cdmFilterer) FilterSentMessage(opts *bind.FilterOpts, target []common.Address) (*OvmL1cdmSentMessageIterator, error) {
 
-	logs, sub, err := _OvmL1cdm.contract.FilterLogs(opts, "SentMessage")
+	var targetRule []interface{}
+	for _, targetItem := range target {
+		targetRule = append(targetRule, targetItem)
+	}
+
+	logs, sub, err := _OvmL1cdm.contract.FilterLogs(opts, "SentMessage", targetRule)
 	if err != nil {
 		return nil, err
 	}
 	return &OvmL1cdmSentMessageIterator{contract: _OvmL1cdm.contract, event: "SentMessage", logs: logs, sub: sub}, nil
 }
 
-// WatchSentMessage is a free log subscription operation binding the contract event 0x0ee9ffdb2334d78de97ffb066b23a352a4d35180cefb36589d663fbb1eb6f326.
+// WatchSentMessage is a free log subscription operation binding the contract event 0xcb0f7ffd78f9aee47a248fae8db181db6eee833039123e026dcbff529522e52a.
 //
-// Solidity: event SentMessage(bytes message)
-func (_OvmL1cdm *OvmL1cdmFilterer) WatchSentMessage(opts *bind.WatchOpts, sink chan<- *OvmL1cdmSentMessage) (event.Subscription, error) {
+// Solidity: event SentMessage(address indexed target, address sender, bytes message, uint256 messageNonce, uint256 gasLimit)
+func (_OvmL1cdm *OvmL1cdmFilterer) WatchSentMessage(opts *bind.WatchOpts, sink chan<- *OvmL1cdmSentMessage, target []common.Address) (event.Subscription, error) {
 
-	logs, sub, err := _OvmL1cdm.contract.WatchLogs(opts, "SentMessage")
+	var targetRule []interface{}
+	for _, targetItem := range target {
+		targetRule = append(targetRule, targetItem)
+	}
+
+	logs, sub, err := _OvmL1cdm.contract.WatchLogs(opts, "SentMessage", targetRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1551,9 +1611,9 @@ func (_OvmL1cdm *OvmL1cdmFilterer) WatchSentMessage(opts *bind.WatchOpts, sink c
 	}), nil
 }
 
-// ParseSentMessage is a log parse operation binding the contract event 0x0ee9ffdb2334d78de97ffb066b23a352a4d35180cefb36589d663fbb1eb6f326.
+// ParseSentMessage is a log parse operation binding the contract event 0xcb0f7ffd78f9aee47a248fae8db181db6eee833039123e026dcbff529522e52a.
 //
-// Solidity: event SentMessage(bytes message)
+// Solidity: event SentMessage(address indexed target, address sender, bytes message, uint256 messageNonce, uint256 gasLimit)
 func (_OvmL1cdm *OvmL1cdmFilterer) ParseSentMessage(log types.Log) (*OvmL1cdmSentMessage, error) {
 	event := new(OvmL1cdmSentMessage)
 	if err := _OvmL1cdm.contract.UnpackLog(event, "SentMessage", log); err != nil {

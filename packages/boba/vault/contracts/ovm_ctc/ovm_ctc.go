@@ -1,21 +1,18 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
-// Added:
-// func (_OvmCtc *OvmCtcTransactor) RawAppendSequencerBatch(opts *bind.TransactOpts, calldata []byte) (*types.Transaction, error) {
-// 	return _OvmCtc.contract.RawTransact(opts, calldata)
-// }
 
 package ovm_ctc
 
 import (
+	"math/big"
+	"strings"
+
 	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/event"
-	"math/big"
-	"strings"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -29,21 +26,6 @@ var (
 	_ = event.NewSubscription
 )
 
-// Lib_OVMCodecChainBatchHeader is an auto generated low-level Go binding around an user-defined struct.
-type Lib_OVMCodecChainBatchHeader struct {
-	BatchIndex        *big.Int
-	BatchRoot         [32]byte
-	BatchSize         *big.Int
-	PrevTotalElements *big.Int
-	ExtraData         []byte
-}
-
-// Lib_OVMCodecChainInclusionProof is an auto generated low-level Go binding around an user-defined struct.
-type Lib_OVMCodecChainInclusionProof struct {
-	Index    *big.Int
-	Siblings [][32]byte
-}
-
 // Lib_OVMCodecQueueElement is an auto generated low-level Go binding around an user-defined struct.
 type Lib_OVMCodecQueueElement struct {
 	TransactionHash [32]byte
@@ -51,28 +33,8 @@ type Lib_OVMCodecQueueElement struct {
 	BlockNumber     *big.Int
 }
 
-// Lib_OVMCodecTransaction is an auto generated low-level Go binding around an user-defined struct.
-type Lib_OVMCodecTransaction struct {
-	Timestamp     *big.Int
-	BlockNumber   *big.Int
-	L1QueueOrigin uint8
-	L1TxOrigin    common.Address
-	Entrypoint    common.Address
-	GasLimit      *big.Int
-	Data          []byte
-}
-
-// Lib_OVMCodecTransactionChainElement is an auto generated low-level Go binding around an user-defined struct.
-type Lib_OVMCodecTransactionChainElement struct {
-	IsSequenced bool
-	QueueIndex  *big.Int
-	Timestamp   *big.Int
-	BlockNumber *big.Int
-	TxData      []byte
-}
-
 // OvmCtcABI is the input ABI used to generate the binding from.
-const OvmCtcABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_libAddressManager\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_forceInclusionPeriodSeconds\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_forceInclusionPeriodBlocks\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_maxTransactionGasLimit\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_startingQueueIndex\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_numQueueElements\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_totalElements\",\"type\":\"uint256\"}],\"name\":\"QueueBatchAppended\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_startingQueueIndex\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_numQueueElements\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_totalElements\",\"type\":\"uint256\"}],\"name\":\"SequencerBatchAppended\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_batchIndex\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"_batchRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_batchSize\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_prevTotalElements\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"_extraData\",\"type\":\"bytes\"}],\"name\":\"TransactionBatchAppended\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_l1TxOrigin\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_gasLimit\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"_data\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_queueIndex\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_timestamp\",\"type\":\"uint256\"}],\"name\":\"TransactionEnqueued\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"L2_GAS_DISCOUNT_DIVISOR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MAX_ROLLUP_TX_SIZE\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MIN_ROLLUP_TX_GAS\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"appendQueueBatch\",\"outputs\":[],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"appendSequencerBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"batches\",\"outputs\":[{\"internalType\":\"contractiOVM_ChainStorageContainer\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_gasLimit\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_data\",\"type\":\"bytes\"}],\"name\":\"enqueue\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"forceInclusionPeriodBlocks\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"forceInclusionPeriodSeconds\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLastBlockNumber\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLastTimestamp\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getNextQueueIndex\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getNumPendingQueueElements\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"getQueueElement\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"transactionHash\",\"type\":\"bytes32\"},{\"internalType\":\"uint40\",\"name\":\"timestamp\",\"type\":\"uint40\"},{\"internalType\":\"uint40\",\"name\":\"blockNumber\",\"type\":\"uint40\"}],\"internalType\":\"structLib_OVMCodec.QueueElement\",\"name\":\"_element\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getQueueLength\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getTotalBatches\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_totalBatches\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getTotalElements\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_totalElements\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"libAddressManager\",\"outputs\":[{\"internalType\":\"contractLib_AddressManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxTransactionGasLimit\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"queue\",\"outputs\":[{\"internalType\":\"contractiOVM_ChainStorageContainer\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"name\":\"resolve\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"},{\"internalType\":\"enumLib_OVMCodec.QueueOrigin\",\"name\":\"l1QueueOrigin\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"l1TxOrigin\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"entrypoint\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"gasLimit\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"internalType\":\"structLib_OVMCodec.Transaction\",\"name\":\"_transaction\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"bool\",\"name\":\"isSequenced\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"queueIndex\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"txData\",\"type\":\"bytes\"}],\"internalType\":\"structLib_OVMCodec.TransactionChainElement\",\"name\":\"_txChainElement\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"batchIndex\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"batchRoot\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"batchSize\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"prevTotalElements\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"extraData\",\"type\":\"bytes\"}],\"internalType\":\"structLib_OVMCodec.ChainBatchHeader\",\"name\":\"_batchHeader\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"siblings\",\"type\":\"bytes32[]\"}],\"internalType\":\"structLib_OVMCodec.ChainInclusionProof\",\"name\":\"_inclusionProof\",\"type\":\"tuple\"}],\"name\":\"verifyTransaction\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const OvmCtcABI = "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_libAddressManager\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_maxTransactionGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_l2GasDiscountDivisor\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_enqueueGasCost\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"l2GasDiscountDivisor\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"enqueueGasCost\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"enqueueL2GasPrepaid\",\"type\":\"uint256\"}],\"name\":\"L2GasParamsUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_startingQueueIndex\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_numQueueElements\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_totalElements\",\"type\":\"uint256\"}],\"name\":\"QueueBatchAppended\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_startingQueueIndex\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_numQueueElements\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_totalElements\",\"type\":\"uint256\"}],\"name\":\"SequencerBatchAppended\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_batchIndex\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"_batchRoot\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_batchSize\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_prevTotalElements\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"_extraData\",\"type\":\"bytes\"}],\"name\":\"TransactionBatchAppended\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_l1TxOrigin\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_gasLimit\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"_data\",\"type\":\"bytes\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_queueIndex\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_timestamp\",\"type\":\"uint256\"}],\"name\":\"TransactionEnqueued\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"MAX_ROLLUP_TX_SIZE\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MIN_ROLLUP_TX_GAS\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"appendSequencerBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"batches\",\"outputs\":[{\"internalType\":\"contractIChainStorageContainer\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_gasLimit\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_data\",\"type\":\"bytes\"}],\"name\":\"enqueue\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"enqueueGasCost\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"enqueueL2GasPrepaid\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLastBlockNumber\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLastTimestamp\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getNextQueueIndex\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getNumPendingQueueElements\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_index\",\"type\":\"uint256\"}],\"name\":\"getQueueElement\",\"outputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"transactionHash\",\"type\":\"bytes32\"},{\"internalType\":\"uint40\",\"name\":\"timestamp\",\"type\":\"uint40\"},{\"internalType\":\"uint40\",\"name\":\"blockNumber\",\"type\":\"uint40\"}],\"internalType\":\"structLib_OVMCodec.QueueElement\",\"name\":\"_element\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getQueueLength\",\"outputs\":[{\"internalType\":\"uint40\",\"name\":\"\",\"type\":\"uint40\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getTotalBatches\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_totalBatches\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getTotalElements\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_totalElements\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"l2GasDiscountDivisor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"libAddressManager\",\"outputs\":[{\"internalType\":\"contractLib_AddressManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxTransactionGasLimit\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"queue\",\"outputs\":[{\"internalType\":\"contractIChainStorageContainer\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"name\":\"resolve\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_l2GasDiscountDivisor\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_enqueueGasCost\",\"type\":\"uint256\"}],\"name\":\"setGasParams\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]"
 
 // OvmCtc is an auto generated Go binding around an Ethereum contract.
 type OvmCtc struct {
@@ -216,32 +178,6 @@ func (_OvmCtc *OvmCtcTransactorRaw) Transact(opts *bind.TransactOpts, method str
 	return _OvmCtc.Contract.contract.Transact(opts, method, params...)
 }
 
-// L2GASDISCOUNTDIVISOR is a free data retrieval call binding the contract method 0xc2cf696f.
-//
-// Solidity: function L2_GAS_DISCOUNT_DIVISOR() view returns(uint256)
-func (_OvmCtc *OvmCtcCaller) L2GASDISCOUNTDIVISOR(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _OvmCtc.contract.Call(opts, out, "L2_GAS_DISCOUNT_DIVISOR")
-	return *ret0, err
-}
-
-// L2GASDISCOUNTDIVISOR is a free data retrieval call binding the contract method 0xc2cf696f.
-//
-// Solidity: function L2_GAS_DISCOUNT_DIVISOR() view returns(uint256)
-func (_OvmCtc *OvmCtcSession) L2GASDISCOUNTDIVISOR() (*big.Int, error) {
-	return _OvmCtc.Contract.L2GASDISCOUNTDIVISOR(&_OvmCtc.CallOpts)
-}
-
-// L2GASDISCOUNTDIVISOR is a free data retrieval call binding the contract method 0xc2cf696f.
-//
-// Solidity: function L2_GAS_DISCOUNT_DIVISOR() view returns(uint256)
-func (_OvmCtc *OvmCtcCallerSession) L2GASDISCOUNTDIVISOR() (*big.Int, error) {
-	return _OvmCtc.Contract.L2GASDISCOUNTDIVISOR(&_OvmCtc.CallOpts)
-}
-
 // MAXROLLUPTXSIZE is a free data retrieval call binding the contract method 0x876ed5cb.
 //
 // Solidity: function MAX_ROLLUP_TX_SIZE() view returns(uint256)
@@ -294,30 +230,6 @@ func (_OvmCtc *OvmCtcCallerSession) MINROLLUPTXGAS() (*big.Int, error) {
 	return _OvmCtc.Contract.MINROLLUPTXGAS(&_OvmCtc.CallOpts)
 }
 
-// AppendQueueBatch is a free data retrieval call binding the contract method 0xfacdc5da.
-//
-// Solidity: function appendQueueBatch(uint256 ) pure returns()
-func (_OvmCtc *OvmCtcCaller) AppendQueueBatch(opts *bind.CallOpts, arg0 *big.Int) error {
-	var ()
-	out := &[]interface{}{}
-	err := _OvmCtc.contract.Call(opts, out, "appendQueueBatch", arg0)
-	return err
-}
-
-// AppendQueueBatch is a free data retrieval call binding the contract method 0xfacdc5da.
-//
-// Solidity: function appendQueueBatch(uint256 ) pure returns()
-func (_OvmCtc *OvmCtcSession) AppendQueueBatch(arg0 *big.Int) error {
-	return _OvmCtc.Contract.AppendQueueBatch(&_OvmCtc.CallOpts, arg0)
-}
-
-// AppendQueueBatch is a free data retrieval call binding the contract method 0xfacdc5da.
-//
-// Solidity: function appendQueueBatch(uint256 ) pure returns()
-func (_OvmCtc *OvmCtcCallerSession) AppendQueueBatch(arg0 *big.Int) error {
-	return _OvmCtc.Contract.AppendQueueBatch(&_OvmCtc.CallOpts, arg0)
-}
-
 // Batches is a free data retrieval call binding the contract method 0xcfdf677e.
 //
 // Solidity: function batches() view returns(address)
@@ -344,56 +256,56 @@ func (_OvmCtc *OvmCtcCallerSession) Batches() (common.Address, error) {
 	return _OvmCtc.Contract.Batches(&_OvmCtc.CallOpts)
 }
 
-// ForceInclusionPeriodBlocks is a free data retrieval call binding the contract method 0x138387a4.
+// EnqueueGasCost is a free data retrieval call binding the contract method 0xe654b1fb.
 //
-// Solidity: function forceInclusionPeriodBlocks() view returns(uint256)
-func (_OvmCtc *OvmCtcCaller) ForceInclusionPeriodBlocks(opts *bind.CallOpts) (*big.Int, error) {
+// Solidity: function enqueueGasCost() view returns(uint256)
+func (_OvmCtc *OvmCtcCaller) EnqueueGasCost(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
 	out := ret0
-	err := _OvmCtc.contract.Call(opts, out, "forceInclusionPeriodBlocks")
+	err := _OvmCtc.contract.Call(opts, out, "enqueueGasCost")
 	return *ret0, err
 }
 
-// ForceInclusionPeriodBlocks is a free data retrieval call binding the contract method 0x138387a4.
+// EnqueueGasCost is a free data retrieval call binding the contract method 0xe654b1fb.
 //
-// Solidity: function forceInclusionPeriodBlocks() view returns(uint256)
-func (_OvmCtc *OvmCtcSession) ForceInclusionPeriodBlocks() (*big.Int, error) {
-	return _OvmCtc.Contract.ForceInclusionPeriodBlocks(&_OvmCtc.CallOpts)
+// Solidity: function enqueueGasCost() view returns(uint256)
+func (_OvmCtc *OvmCtcSession) EnqueueGasCost() (*big.Int, error) {
+	return _OvmCtc.Contract.EnqueueGasCost(&_OvmCtc.CallOpts)
 }
 
-// ForceInclusionPeriodBlocks is a free data retrieval call binding the contract method 0x138387a4.
+// EnqueueGasCost is a free data retrieval call binding the contract method 0xe654b1fb.
 //
-// Solidity: function forceInclusionPeriodBlocks() view returns(uint256)
-func (_OvmCtc *OvmCtcCallerSession) ForceInclusionPeriodBlocks() (*big.Int, error) {
-	return _OvmCtc.Contract.ForceInclusionPeriodBlocks(&_OvmCtc.CallOpts)
+// Solidity: function enqueueGasCost() view returns(uint256)
+func (_OvmCtc *OvmCtcCallerSession) EnqueueGasCost() (*big.Int, error) {
+	return _OvmCtc.Contract.EnqueueGasCost(&_OvmCtc.CallOpts)
 }
 
-// ForceInclusionPeriodSeconds is a free data retrieval call binding the contract method 0xc139eb15.
+// EnqueueL2GasPrepaid is a free data retrieval call binding the contract method 0x0b3dfa97.
 //
-// Solidity: function forceInclusionPeriodSeconds() view returns(uint256)
-func (_OvmCtc *OvmCtcCaller) ForceInclusionPeriodSeconds(opts *bind.CallOpts) (*big.Int, error) {
+// Solidity: function enqueueL2GasPrepaid() view returns(uint256)
+func (_OvmCtc *OvmCtcCaller) EnqueueL2GasPrepaid(opts *bind.CallOpts) (*big.Int, error) {
 	var (
 		ret0 = new(*big.Int)
 	)
 	out := ret0
-	err := _OvmCtc.contract.Call(opts, out, "forceInclusionPeriodSeconds")
+	err := _OvmCtc.contract.Call(opts, out, "enqueueL2GasPrepaid")
 	return *ret0, err
 }
 
-// ForceInclusionPeriodSeconds is a free data retrieval call binding the contract method 0xc139eb15.
+// EnqueueL2GasPrepaid is a free data retrieval call binding the contract method 0x0b3dfa97.
 //
-// Solidity: function forceInclusionPeriodSeconds() view returns(uint256)
-func (_OvmCtc *OvmCtcSession) ForceInclusionPeriodSeconds() (*big.Int, error) {
-	return _OvmCtc.Contract.ForceInclusionPeriodSeconds(&_OvmCtc.CallOpts)
+// Solidity: function enqueueL2GasPrepaid() view returns(uint256)
+func (_OvmCtc *OvmCtcSession) EnqueueL2GasPrepaid() (*big.Int, error) {
+	return _OvmCtc.Contract.EnqueueL2GasPrepaid(&_OvmCtc.CallOpts)
 }
 
-// ForceInclusionPeriodSeconds is a free data retrieval call binding the contract method 0xc139eb15.
+// EnqueueL2GasPrepaid is a free data retrieval call binding the contract method 0x0b3dfa97.
 //
-// Solidity: function forceInclusionPeriodSeconds() view returns(uint256)
-func (_OvmCtc *OvmCtcCallerSession) ForceInclusionPeriodSeconds() (*big.Int, error) {
-	return _OvmCtc.Contract.ForceInclusionPeriodSeconds(&_OvmCtc.CallOpts)
+// Solidity: function enqueueL2GasPrepaid() view returns(uint256)
+func (_OvmCtc *OvmCtcCallerSession) EnqueueL2GasPrepaid() (*big.Int, error) {
+	return _OvmCtc.Contract.EnqueueL2GasPrepaid(&_OvmCtc.CallOpts)
 }
 
 // GetLastBlockNumber is a free data retrieval call binding the contract method 0x5ae6256d.
@@ -604,6 +516,32 @@ func (_OvmCtc *OvmCtcCallerSession) GetTotalElements() (*big.Int, error) {
 	return _OvmCtc.Contract.GetTotalElements(&_OvmCtc.CallOpts)
 }
 
+// L2GasDiscountDivisor is a free data retrieval call binding the contract method 0xccf987c8.
+//
+// Solidity: function l2GasDiscountDivisor() view returns(uint256)
+func (_OvmCtc *OvmCtcCaller) L2GasDiscountDivisor(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _OvmCtc.contract.Call(opts, out, "l2GasDiscountDivisor")
+	return *ret0, err
+}
+
+// L2GasDiscountDivisor is a free data retrieval call binding the contract method 0xccf987c8.
+//
+// Solidity: function l2GasDiscountDivisor() view returns(uint256)
+func (_OvmCtc *OvmCtcSession) L2GasDiscountDivisor() (*big.Int, error) {
+	return _OvmCtc.Contract.L2GasDiscountDivisor(&_OvmCtc.CallOpts)
+}
+
+// L2GasDiscountDivisor is a free data retrieval call binding the contract method 0xccf987c8.
+//
+// Solidity: function l2GasDiscountDivisor() view returns(uint256)
+func (_OvmCtc *OvmCtcCallerSession) L2GasDiscountDivisor() (*big.Int, error) {
+	return _OvmCtc.Contract.L2GasDiscountDivisor(&_OvmCtc.CallOpts)
+}
+
 // LibAddressManager is a free data retrieval call binding the contract method 0x299ca478.
 //
 // Solidity: function libAddressManager() view returns(address)
@@ -708,32 +646,6 @@ func (_OvmCtc *OvmCtcCallerSession) Resolve(_name string) (common.Address, error
 	return _OvmCtc.Contract.Resolve(&_OvmCtc.CallOpts, _name)
 }
 
-// VerifyTransaction is a free data retrieval call binding the contract method 0x4de569ce.
-//
-// Solidity: function verifyTransaction((uint256,uint256,uint8,address,address,uint256,bytes) _transaction, (bool,uint256,uint256,uint256,bytes) _txChainElement, (uint256,bytes32,uint256,uint256,bytes) _batchHeader, (uint256,bytes32[]) _inclusionProof) view returns(bool)
-func (_OvmCtc *OvmCtcCaller) VerifyTransaction(opts *bind.CallOpts, _transaction Lib_OVMCodecTransaction, _txChainElement Lib_OVMCodecTransactionChainElement, _batchHeader Lib_OVMCodecChainBatchHeader, _inclusionProof Lib_OVMCodecChainInclusionProof) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _OvmCtc.contract.Call(opts, out, "verifyTransaction", _transaction, _txChainElement, _batchHeader, _inclusionProof)
-	return *ret0, err
-}
-
-// VerifyTransaction is a free data retrieval call binding the contract method 0x4de569ce.
-//
-// Solidity: function verifyTransaction((uint256,uint256,uint8,address,address,uint256,bytes) _transaction, (bool,uint256,uint256,uint256,bytes) _txChainElement, (uint256,bytes32,uint256,uint256,bytes) _batchHeader, (uint256,bytes32[]) _inclusionProof) view returns(bool)
-func (_OvmCtc *OvmCtcSession) VerifyTransaction(_transaction Lib_OVMCodecTransaction, _txChainElement Lib_OVMCodecTransactionChainElement, _batchHeader Lib_OVMCodecChainBatchHeader, _inclusionProof Lib_OVMCodecChainInclusionProof) (bool, error) {
-	return _OvmCtc.Contract.VerifyTransaction(&_OvmCtc.CallOpts, _transaction, _txChainElement, _batchHeader, _inclusionProof)
-}
-
-// VerifyTransaction is a free data retrieval call binding the contract method 0x4de569ce.
-//
-// Solidity: function verifyTransaction((uint256,uint256,uint8,address,address,uint256,bytes) _transaction, (bool,uint256,uint256,uint256,bytes) _txChainElement, (uint256,bytes32,uint256,uint256,bytes) _batchHeader, (uint256,bytes32[]) _inclusionProof) view returns(bool)
-func (_OvmCtc *OvmCtcCallerSession) VerifyTransaction(_transaction Lib_OVMCodecTransaction, _txChainElement Lib_OVMCodecTransactionChainElement, _batchHeader Lib_OVMCodecChainBatchHeader, _inclusionProof Lib_OVMCodecChainInclusionProof) (bool, error) {
-	return _OvmCtc.Contract.VerifyTransaction(&_OvmCtc.CallOpts, _transaction, _txChainElement, _batchHeader, _inclusionProof)
-}
-
 // AppendSequencerBatch is a paid mutator transaction binding the contract method 0xd0f89344.
 //
 // Solidity: function appendSequencerBatch() returns()
@@ -795,6 +707,162 @@ func (_OvmCtc *OvmCtcSession) Enqueue(_target common.Address, _gasLimit *big.Int
 // Solidity: function enqueue(address _target, uint256 _gasLimit, bytes _data) returns()
 func (_OvmCtc *OvmCtcTransactorSession) Enqueue(_target common.Address, _gasLimit *big.Int, _data []byte) (*types.Transaction, error) {
 	return _OvmCtc.Contract.Enqueue(&_OvmCtc.TransactOpts, _target, _gasLimit, _data)
+}
+
+// SetGasParams is a paid mutator transaction binding the contract method 0xedcc4a45.
+//
+// Solidity: function setGasParams(uint256 _l2GasDiscountDivisor, uint256 _enqueueGasCost) returns()
+func (_OvmCtc *OvmCtcTransactor) SetGasParams(opts *bind.TransactOpts, _l2GasDiscountDivisor *big.Int, _enqueueGasCost *big.Int) (*types.Transaction, error) {
+	return _OvmCtc.contract.Transact(opts, "setGasParams", _l2GasDiscountDivisor, _enqueueGasCost)
+}
+
+// SetGasParams is a paid mutator transaction binding the contract method 0xedcc4a45.
+//
+// Solidity: function setGasParams(uint256 _l2GasDiscountDivisor, uint256 _enqueueGasCost) returns()
+func (_OvmCtc *OvmCtcSession) SetGasParams(_l2GasDiscountDivisor *big.Int, _enqueueGasCost *big.Int) (*types.Transaction, error) {
+	return _OvmCtc.Contract.SetGasParams(&_OvmCtc.TransactOpts, _l2GasDiscountDivisor, _enqueueGasCost)
+}
+
+// SetGasParams is a paid mutator transaction binding the contract method 0xedcc4a45.
+//
+// Solidity: function setGasParams(uint256 _l2GasDiscountDivisor, uint256 _enqueueGasCost) returns()
+func (_OvmCtc *OvmCtcTransactorSession) SetGasParams(_l2GasDiscountDivisor *big.Int, _enqueueGasCost *big.Int) (*types.Transaction, error) {
+	return _OvmCtc.Contract.SetGasParams(&_OvmCtc.TransactOpts, _l2GasDiscountDivisor, _enqueueGasCost)
+}
+
+// OvmCtcL2GasParamsUpdatedIterator is returned from FilterL2GasParamsUpdated and is used to iterate over the raw logs and unpacked data for L2GasParamsUpdated events raised by the OvmCtc contract.
+type OvmCtcL2GasParamsUpdatedIterator struct {
+	Event *OvmCtcL2GasParamsUpdated // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *OvmCtcL2GasParamsUpdatedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(OvmCtcL2GasParamsUpdated)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(OvmCtcL2GasParamsUpdated)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *OvmCtcL2GasParamsUpdatedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *OvmCtcL2GasParamsUpdatedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// OvmCtcL2GasParamsUpdated represents a L2GasParamsUpdated event raised by the OvmCtc contract.
+type OvmCtcL2GasParamsUpdated struct {
+	L2GasDiscountDivisor *big.Int
+	EnqueueGasCost       *big.Int
+	EnqueueL2GasPrepaid  *big.Int
+	Raw                  types.Log // Blockchain specific contextual infos
+}
+
+// FilterL2GasParamsUpdated is a free log retrieval operation binding the contract event 0xc6ed75e96b8b18b71edc1a6e82a9d677f8268c774a262c624eeb2cf0a8b3e07e.
+//
+// Solidity: event L2GasParamsUpdated(uint256 l2GasDiscountDivisor, uint256 enqueueGasCost, uint256 enqueueL2GasPrepaid)
+func (_OvmCtc *OvmCtcFilterer) FilterL2GasParamsUpdated(opts *bind.FilterOpts) (*OvmCtcL2GasParamsUpdatedIterator, error) {
+
+	logs, sub, err := _OvmCtc.contract.FilterLogs(opts, "L2GasParamsUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return &OvmCtcL2GasParamsUpdatedIterator{contract: _OvmCtc.contract, event: "L2GasParamsUpdated", logs: logs, sub: sub}, nil
+}
+
+// WatchL2GasParamsUpdated is a free log subscription operation binding the contract event 0xc6ed75e96b8b18b71edc1a6e82a9d677f8268c774a262c624eeb2cf0a8b3e07e.
+//
+// Solidity: event L2GasParamsUpdated(uint256 l2GasDiscountDivisor, uint256 enqueueGasCost, uint256 enqueueL2GasPrepaid)
+func (_OvmCtc *OvmCtcFilterer) WatchL2GasParamsUpdated(opts *bind.WatchOpts, sink chan<- *OvmCtcL2GasParamsUpdated) (event.Subscription, error) {
+
+	logs, sub, err := _OvmCtc.contract.WatchLogs(opts, "L2GasParamsUpdated")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(OvmCtcL2GasParamsUpdated)
+				if err := _OvmCtc.contract.UnpackLog(event, "L2GasParamsUpdated", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseL2GasParamsUpdated is a log parse operation binding the contract event 0xc6ed75e96b8b18b71edc1a6e82a9d677f8268c774a262c624eeb2cf0a8b3e07e.
+//
+// Solidity: event L2GasParamsUpdated(uint256 l2GasDiscountDivisor, uint256 enqueueGasCost, uint256 enqueueL2GasPrepaid)
+func (_OvmCtc *OvmCtcFilterer) ParseL2GasParamsUpdated(log types.Log) (*OvmCtcL2GasParamsUpdated, error) {
+	event := new(OvmCtcL2GasParamsUpdated)
+	if err := _OvmCtc.contract.UnpackLog(event, "L2GasParamsUpdated", log); err != nil {
+		return nil, err
+	}
+	return event, nil
 }
 
 // OvmCtcQueueBatchAppendedIterator is returned from FilterQueueBatchAppended and is used to iterate over the raw logs and unpacked data for QueueBatchAppended events raised by the OvmCtc contract.
@@ -1294,10 +1362,24 @@ type OvmCtcTransactionEnqueued struct {
 
 // FilterTransactionEnqueued is a free log retrieval operation binding the contract event 0x4b388aecf9fa6cc92253704e5975a6129a4f735bdbd99567df4ed0094ee4ceb5.
 //
-// Solidity: event TransactionEnqueued(address _l1TxOrigin, address _target, uint256 _gasLimit, bytes _data, uint256 _queueIndex, uint256 _timestamp)
-func (_OvmCtc *OvmCtcFilterer) FilterTransactionEnqueued(opts *bind.FilterOpts) (*OvmCtcTransactionEnqueuedIterator, error) {
+// Solidity: event TransactionEnqueued(address indexed _l1TxOrigin, address indexed _target, uint256 _gasLimit, bytes _data, uint256 indexed _queueIndex, uint256 _timestamp)
+func (_OvmCtc *OvmCtcFilterer) FilterTransactionEnqueued(opts *bind.FilterOpts, _l1TxOrigin []common.Address, _target []common.Address, _queueIndex []*big.Int) (*OvmCtcTransactionEnqueuedIterator, error) {
 
-	logs, sub, err := _OvmCtc.contract.FilterLogs(opts, "TransactionEnqueued")
+	var _l1TxOriginRule []interface{}
+	for _, _l1TxOriginItem := range _l1TxOrigin {
+		_l1TxOriginRule = append(_l1TxOriginRule, _l1TxOriginItem)
+	}
+	var _targetRule []interface{}
+	for _, _targetItem := range _target {
+		_targetRule = append(_targetRule, _targetItem)
+	}
+
+	var _queueIndexRule []interface{}
+	for _, _queueIndexItem := range _queueIndex {
+		_queueIndexRule = append(_queueIndexRule, _queueIndexItem)
+	}
+
+	logs, sub, err := _OvmCtc.contract.FilterLogs(opts, "TransactionEnqueued", _l1TxOriginRule, _targetRule, _queueIndexRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1306,10 +1388,24 @@ func (_OvmCtc *OvmCtcFilterer) FilterTransactionEnqueued(opts *bind.FilterOpts) 
 
 // WatchTransactionEnqueued is a free log subscription operation binding the contract event 0x4b388aecf9fa6cc92253704e5975a6129a4f735bdbd99567df4ed0094ee4ceb5.
 //
-// Solidity: event TransactionEnqueued(address _l1TxOrigin, address _target, uint256 _gasLimit, bytes _data, uint256 _queueIndex, uint256 _timestamp)
-func (_OvmCtc *OvmCtcFilterer) WatchTransactionEnqueued(opts *bind.WatchOpts, sink chan<- *OvmCtcTransactionEnqueued) (event.Subscription, error) {
+// Solidity: event TransactionEnqueued(address indexed _l1TxOrigin, address indexed _target, uint256 _gasLimit, bytes _data, uint256 indexed _queueIndex, uint256 _timestamp)
+func (_OvmCtc *OvmCtcFilterer) WatchTransactionEnqueued(opts *bind.WatchOpts, sink chan<- *OvmCtcTransactionEnqueued, _l1TxOrigin []common.Address, _target []common.Address, _queueIndex []*big.Int) (event.Subscription, error) {
 
-	logs, sub, err := _OvmCtc.contract.WatchLogs(opts, "TransactionEnqueued")
+	var _l1TxOriginRule []interface{}
+	for _, _l1TxOriginItem := range _l1TxOrigin {
+		_l1TxOriginRule = append(_l1TxOriginRule, _l1TxOriginItem)
+	}
+	var _targetRule []interface{}
+	for _, _targetItem := range _target {
+		_targetRule = append(_targetRule, _targetItem)
+	}
+
+	var _queueIndexRule []interface{}
+	for _, _queueIndexItem := range _queueIndex {
+		_queueIndexRule = append(_queueIndexRule, _queueIndexItem)
+	}
+
+	logs, sub, err := _OvmCtc.contract.WatchLogs(opts, "TransactionEnqueued", _l1TxOriginRule, _targetRule, _queueIndexRule)
 	if err != nil {
 		return nil, err
 	}
@@ -1343,7 +1439,7 @@ func (_OvmCtc *OvmCtcFilterer) WatchTransactionEnqueued(opts *bind.WatchOpts, si
 
 // ParseTransactionEnqueued is a log parse operation binding the contract event 0x4b388aecf9fa6cc92253704e5975a6129a4f735bdbd99567df4ed0094ee4ceb5.
 //
-// Solidity: event TransactionEnqueued(address _l1TxOrigin, address _target, uint256 _gasLimit, bytes _data, uint256 _queueIndex, uint256 _timestamp)
+// Solidity: event TransactionEnqueued(address indexed _l1TxOrigin, address indexed _target, uint256 _gasLimit, bytes _data, uint256 indexed _queueIndex, uint256 _timestamp)
 func (_OvmCtc *OvmCtcFilterer) ParseTransactionEnqueued(log types.Log) (*OvmCtcTransactionEnqueued, error) {
 	event := new(OvmCtcTransactionEnqueued)
 	if err := _OvmCtc.contract.UnpackLog(event, "TransactionEnqueued", log); err != nil {
