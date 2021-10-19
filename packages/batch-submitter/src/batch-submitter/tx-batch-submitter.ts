@@ -233,7 +233,10 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       calldata: batchParams,
       l1tipHeight,
     })
-    const nonce = await getTransactionCount(this.l1Provider, this.vault.address)
+    const nonce = await getTransactionCount(
+      this.l1Provider,
+      this.vault.account_address
+    )
 
     return this.submitAppendSequencerBatch(batchParams, nonce)
   }

@@ -177,7 +177,10 @@ export class StateBatchSubmitter extends BatchSubmitter {
     this.logger.debug('Submitting batch.', { calldata })
 
     // Generate the transaction we will repeatedly submit
-    const nonce = await getTransactionCount(this.l1Provider, this.vault.address)
+    const nonce = await getTransactionCount(
+      this.l1Provider,
+      this.vault.account_address
+    )
     const submitTransaction = (): Promise<TransactionReceipt> => {
       const appendStateBatch = (
         appendStateBatchArg: Function,

@@ -557,8 +557,8 @@ describe('Batch Submitter with Ganache', () => {
 const createVaultWithSigner = async (signer: Signer): Promise<Vault> => {
   return {
     signer,
-    address: await signer.getAddress(),
-    token: undefined,
-    vault_addr: undefined,
+    account_address: await signer.getAddress(),
+    authentication_token: undefined,
+    vault_url: undefined,
   }
 }

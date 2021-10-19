@@ -44,9 +44,9 @@ export const submitToVault = async (
 
   if (call.type === 'AppendStateBatch') {
     const url =
-      vault.vault_addr +
+      vault.vault_url +
       '/v1/immutability-eth-plugin/wallets/proposer/accounts/' +
-      vault.address +
+      vault.account_address +
       '/ovm/appendStateBatch'
     const requestInit = {
       method: 'PUT',
@@ -69,9 +69,9 @@ export const submitToVault = async (
     return data.data.transaction_hash
   } else if (call.type === 'AppendSequencerBatch') {
     const url =
-      vault.vault_addr +
+      vault.vault_url +
       '/v1/immutability-eth-plugin/wallets/sequencer/accounts/' +
-      vault.address +
+      vault.account_address +
       '/ovm/appendSequencerBatch'
     const requestInit = {
       method: 'PUT',
@@ -117,12 +117,12 @@ const transformContexts = (contexts: BatchContext[]): any => {
 const getToken = (vault: Vault): string => {
   const env = process.env
   if (env.AWS_SINK_JWT_TOKEN_PATH === undefined) {
-    return vault.token
+    return vault.authentication_token
   } else {
     if (fs.existsSync(env.AWS_SINK_JWT_TOKEN_PATH)) {
       return fs.readFileSync(env.AWS_SINK_JWT_TOKEN_PATH, 'utf-8')
     } else {
-      return vault.token
+      return vault.authentication_token
     }
   }
 }

@@ -148,9 +148,9 @@ describe('submitTransactionWithYNATM', async () => {
 const createBatchSigner = async (signer: Signer): Promise<Vault> => {
   return {
     signer,
-    address: undefined,
-    token: undefined,
-    vault_addr: undefined,
+    account_address: undefined,
+    authentication_token: undefined,
+    vault_url: undefined,
   }
 }
 

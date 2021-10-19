@@ -18,9 +18,9 @@ import { getBalance } from './provider-helper'
 
 export interface Vault {
   // one or the other, not both!
-  address: string
-  vault_addr: string
-  token: string
+  account_address: string
+  vault_url: string
+  authentication_token: string
   // we allow this signer
   // for the sake of unit tests-so all paths are tested
   // except the minimal vault integration in vault.ts
@@ -95,7 +95,7 @@ export abstract class BatchSubmitter {
 
     this.logger.info('Readying to submit next batch...', {
       l2ChainId: this.l2ChainId,
-      batchSubmitterAddress: this.vault.address,
+      batchSubmitterAddress: this.vault.account_address,
     })
 
     if (this.syncing === true) {
@@ -113,7 +113,7 @@ export abstract class BatchSubmitter {
   }
 
   protected async _hasEnoughETHToCoverGasCosts(): Promise<boolean> {
-    const address = this.vault.address
+    const address = this.vault.account_address
     const balance = await getBalance(this.l1Provider, address)
     const ether = utils.formatEther(balance)
     const num = parseFloat(ether)

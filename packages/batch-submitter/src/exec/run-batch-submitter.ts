@@ -150,9 +150,9 @@ export const run = async () => {
         DEBUG_IMPERSONATE_SEQUENCER_ADDRESS,
       ])
       return {
-        address: undefined,
-        vault_addr: undefined,
-        token: undefined,
+        account_address: undefined,
+        vault_url: undefined,
+        authentication_token: undefined,
         signer: undefined,
       }
     }
@@ -163,9 +163,9 @@ export const run = async () => {
     if (SEQUENCER_ADDRESS) {
       logger.info('Sequencer in Vault')
       return {
-        address: SEQUENCER_ADDRESS,
-        token: SEQUENCER_TOKEN,
-        vault_addr: VAULT_ADDR,
+        account_address: SEQUENCER_ADDRESS,
+        vault_url: VAULT_ADDR,
+        authentication_token: SEQUENCER_TOKEN,
         signer: undefined,
       }
     } else {
@@ -186,9 +186,9 @@ export const run = async () => {
         DEBUG_IMPERSONATE_PROPOSER_ADDRESS,
       ])
       return {
-        address: undefined,
-        vault_addr: undefined,
-        token: undefined,
+        account_address: undefined,
+        vault_url: undefined,
+        authentication_token: undefined,
         signer: undefined,
       }
     }
@@ -199,9 +199,9 @@ export const run = async () => {
     if (PROPOSER_ADDRESS) {
       logger.info('Proposer in Vault')
       return {
-        address: PROPOSER_ADDRESS,
-        token: PROPOSER_TOKEN,
-        vault_addr: VAULT_ADDR,
+        account_address: PROPOSER_ADDRESS,
+        vault_url: VAULT_ADDR,
+        authentication_token: PROPOSER_TOKEN,
         signer: undefined,
       }
     }
@@ -358,8 +358,8 @@ export const run = async () => {
   const sequencerVault: Vault = await getSequencerSigner()
   let proposerVault: Vault = await getProposerSigner()
 
-  const sequencerAddress = sequencerVault.address
-  const proposerAddress = proposerVault.address
+  const sequencerAddress = sequencerVault.account_address
+  const proposerAddress = proposerVault.account_address
   // If the sequencer & proposer are the same, use a single wallet
   if (sequencerAddress === proposerAddress) {
     proposerVault = sequencerVault
