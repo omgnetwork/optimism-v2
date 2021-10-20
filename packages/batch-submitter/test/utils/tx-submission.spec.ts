@@ -1,25 +1,52 @@
 import { expect } from '../setup'
+import ServerMock from 'mock-http-server'
 import { ethers as hardhatEthers } from 'hardhat'
 import { ethers, BigNumber, Signer } from 'ethers'
 import {
   AppendSequencerBatch,
   submitTransactionWithYNATM,
 } from '../../src/utils/tx-submission'
-import { Vault, ResubmissionConfig } from '../../src'
+import {
+  Vault,
+  ResubmissionConfig,
+  BatchContext,
+  AppendSequencerBatchParams,
+} from '../../src'
 import {
   TransactionReceipt,
   TransactionResponse,
 } from '@ethersproject/abstract-provider'
 import { StaticJsonRpcProvider } from '@ethersproject/providers'
-import { sign } from 'crypto'
 
 const nullFunction = () => undefined
 const nullHooks = {
   beforeSendTransaction: nullFunction,
   onTransactionResponse: nullFunction,
 }
-
+const DUMMY_HASH = 'dummy hash'
+const path =
+  '/v1/immutability-eth-plugin/wallets/sequencer/accounts/0x654321/ovm/appendSequencerBatch'
+const fullUrl = 'http://localhost:9000' + path
 describe('submitTransactionWithYNATM', async () => {
+  const httpServer = new ServerMock({ host: 'localhost', port: 9000 })
+  beforeEach((done) => {
+    httpServer.start(done)
+    httpServer.on({
+      method: 'PUT',
+      path,
+      reply: {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          data: { transaction_hash: DUMMY_HASH },
+        }),
+      },
+    })
+  })
+
+  afterEach((done) => {
+    httpServer.stop(done)
+  })
   it('calls sendTransaction, waitForTransaction, and hooks with correct inputs', async () => {
     const called = {
       sendTransaction: false,
@@ -27,27 +54,17 @@ describe('submitTransactionWithYNATM', async () => {
       beforeSendTransaction: false,
       onTransactionResponse: false,
     }
-    const dummyHash = 'dummy hash'
     const data = 'we here though'
     const numConfirmations = 3
     const tx = {
       data,
     } as ethers.PopulatedTransaction
-    const sendTransaction = async (
-      _tx: ethers.PopulatedTransaction
-    ): Promise<TransactionResponse> => {
-      called.sendTransaction = true
-      expect(_tx.data).to.equal(tx.data)
-      return {
-        hash: dummyHash,
-      } as TransactionResponse
-    }
     const waitForTransaction = async (
       hash: string,
       _numConfirmations: number
     ): Promise<TransactionReceipt> => {
       called.waitForTransaction = true
-      expect(hash).to.equal(dummyHash)
+      expect(hash).to.equal(DUMMY_HASH)
       expect(_numConfirmations).to.equal(numConfirmations)
       return {
         to: '',
@@ -56,20 +73,28 @@ describe('submitTransactionWithYNATM', async () => {
       } as TransactionReceipt
     }
     const signer = {
-      sendTransaction,
+      getAddress: async () => '0x654321',
     } as Signer
     const provider = {
       getGasPrice: async () => ethers.BigNumber.from(0),
       waitForTransaction,
     } as StaticJsonRpcProvider
     const hooks = {
-      beforeSendTransaction: (submittingTx: ethers.PopulatedTransaction) => {
+      beforeSendTransaction: (dataAtVaultIntegration: any) => {
         called.beforeSendTransaction = true
-        expect(submittingTx.data).to.equal(tx.data)
+        expect(dataAtVaultIntegration.url).to.equal(fullUrl)
+        expect(dataAtVaultIntegration.requestInit.method).to.equal('PUT')
+        expect(dataAtVaultIntegration.requestInit.headers).to.eql({
+          'X-Vault-Request': 'true',
+          'X-Vault-Token': 'this is fake',
+        })
+        expect(dataAtVaultIntegration.requestInit.body).to.equal(
+          '{"nonce":0,"gas_price":0,"should_start_at_element":1,"total_elements_to_append":1,"contexts":["{\\"num_sequenced_transactions\\":0,\\"num_subsequent_queue_transactions\\":1,\\"timestamp\\":1234,\\"block_number\\":42}"],"transactions":[]}'
+        )
       },
-      onTransactionResponse: (txResponse: TransactionResponse) => {
+      onTransactionResponse: (txResponse: any) => {
         called.onTransactionResponse = true
-        expect(txResponse.hash).to.equal(dummyHash)
+        expect(txResponse).to.eql({ data: { transaction_hash: DUMMY_HASH } })
       },
     }
     const config: ResubmissionConfig = {
@@ -79,14 +104,13 @@ describe('submitTransactionWithYNATM', async () => {
       gasRetryIncrement: 1,
     }
     await submitTransactionWithYNATM(
-      appendSequencerBatch(mockAppendSequncerBatchFun, data, 0),
-      await createBatchSigner(signer),
+      appendSequencerBatch(0),
+      await createVaultSigner(signer),
       provider,
       config,
       numConfirmations,
       hooks
     )
-    expect(called.sendTransaction).to.be.true
     expect(called.waitForTransaction).to.be.true
     expect(called.beforeSendTransaction).to.be.true
     expect(called.onTransactionResponse).to.be.true
@@ -96,14 +120,10 @@ describe('submitTransactionWithYNATM', async () => {
     // Make transactions take longer to be included
     // than our resubmission timeout
     const resubmissionTimeout = 100
-    const txReceiptDelay = resubmissionTimeout * 3
-    const data = 'hello world!'
-    let lastGasPrice = BigNumber.from(0)
+    const txReceiptDelay = resubmissionTimeout * 2
+    const l1ProviderReal = hardhatEthers.provider
+    let lastGasPrice = (await l1ProviderReal.getGasPrice()).div(2)
     // Create a transaction which has a gas price that we will watch increment
-    const tx = {
-      gasPrice: lastGasPrice.add(1),
-      data,
-    } as ethers.PopulatedTransaction
     const sendTransaction = async (
       _tx: ethers.PopulatedTransaction
     ): Promise<TransactionResponse> => {
@@ -115,29 +135,51 @@ describe('submitTransactionWithYNATM', async () => {
       } as TransactionResponse
     }
     const waitForTransaction = async (
-      hash: string,
+      _hash: string,
       _numConfirmations: number
     ): Promise<TransactionReceipt> => {
       await new Promise((r) => setTimeout(r, txReceiptDelay))
       return {} as TransactionReceipt
     }
     const signer = {
-      getGasPrice: async () => ethers.BigNumber.from(0),
       sendTransaction,
+      getAddress: async () => '0x654321',
     } as Signer
+    httpServer.on({
+      method: 'PUT',
+      path,
+      reply: {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        body: async (req, reply) => {
+          const body = JSON.parse(req.body)
+          const tx = {
+            gasPrice: body.gas_price,
+            data: 'hello world!',
+          } as ethers.PopulatedTransaction
+          const resp = await signer.sendTransaction(tx)
+          reply(
+            JSON.stringify({
+              data: { transaction_hash: resp.hash },
+            })
+          )
+        },
+      },
+    })
     const l1Provider = {
-      getGasPrice: async () => ethers.BigNumber.from(0),
+      //1gwei = 1000000000wei
+      getGasPrice: async () => ethers.BigNumber.from(1000000000),
       waitForTransaction,
     } as StaticJsonRpcProvider
     const config: ResubmissionConfig = {
       resubmissionTimeout,
-      minGasPriceInGwei: 0,
+      minGasPriceInGwei: 0, // is set inside the method
       maxGasPriceInGwei: 1000,
       gasRetryIncrement: 1,
     }
     await submitTransactionWithYNATM(
-      appendSequencerBatch(mockAppendSequncerBatchFun, data, 0),
-      await createBatchSigner(signer),
+      appendSequencerBatch(0),
+      await createVaultSigner(signer),
       l1Provider,
       config,
       0,
@@ -145,31 +187,32 @@ describe('submitTransactionWithYNATM', async () => {
     )
   })
 })
-const createBatchSigner = async (signer: Signer): Promise<Vault> => {
+const createVaultSigner = async (signer: Signer): Promise<Vault> => {
   return {
-    signer,
-    account_address: undefined,
-    authentication_token: undefined,
-    vault_url: undefined,
+    account_address: await signer.getAddress(),
+    authentication_token: 'this is fake',
+    vault_url: 'http://localhost:9000',
   }
 }
 
-const mockAppendSequncerBatchFun = async (
-  data: string
-): Promise<ethers.PopulatedTransaction> => {
-  return {
-    data,
-  } as ethers.PopulatedTransaction
-}
+const appendSequencerBatch = (nonce: number): AppendSequencerBatch => {
+  const batchContexts = []
+  const batchContext: BatchContext = {
+    numSequencedTransactions: 0,
+    numSubsequentQueueTransactions: 1,
+    timestamp: 1234,
+    blockNumber: 42,
+  }
+  batchContexts.push(batchContext)
 
-const appendSequencerBatch = (
-  appendSequencerBatchArg: Function,
-  batchParamsArg: any,
-  nonce: number
-): AppendSequencerBatch => {
+  const asbp: AppendSequencerBatchParams = {
+    shouldStartAtElement: 1,
+    totalElementsToAppend: 1,
+    contexts: batchContexts,
+    transactions: [],
+  }
   return {
-    appendSequencerBatch: appendSequencerBatchArg,
-    batchParams: batchParamsArg,
+    batchParams: asbp,
     type: 'AppendSequencerBatch',
     nonce,
     address: undefined,

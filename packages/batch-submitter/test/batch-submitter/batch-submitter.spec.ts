@@ -579,7 +579,6 @@ describe('Batch Submitter with Ganache', () => {
 })
 const createVaultWithSigner = async (signer: Signer): Promise<Vault> => {
   return {
-    signer: undefined,
     account_address: await signer.getAddress(),
     authentication_token: 'this is fake',
     vault_url: 'http://localhost:9000',
@@ -642,7 +641,6 @@ const mockVaultAppendStateBatch = async (
     body.batch,
     body.should_start_at_element
   )
-  console.log(tx)
   const fullTx = {
     ...tx,
     gasPrice: 16922503,

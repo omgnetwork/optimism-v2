@@ -250,11 +250,9 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     nonce: number
   ): Promise<TransactionReceipt> {
     const appendSequencerBatch = (
-      appendSequencerBatchArg: Function,
       batchParamsArg: any
     ): AppendSequencerBatch => {
       return {
-        appendSequencerBatch: appendSequencerBatchArg,
         batchParams: batchParamsArg,
         type: 'AppendSequencerBatch',
         address: this.chainContract.address,
@@ -264,10 +262,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     const submitTransaction = (): Promise<TransactionReceipt> => {
       return this.transactionSubmitter.submitTransaction(
-        appendSequencerBatch(
-          this.chainContract.customPopulateTransaction.appendSequencerBatch,
-          batchParams
-        ),
+        appendSequencerBatch(batchParams),
         this._makeHooks('appendSequencerBatch')
       )
     }

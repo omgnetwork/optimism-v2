@@ -21,10 +21,6 @@ export interface Vault {
   account_address: string
   vault_url: string
   authentication_token: string
-  // we allow this signer
-  // for the sake of unit tests-so all paths are tested
-  // except the minimal vault integration in vault.ts
-  signer: Signer
 }
 /* Internal Imports */
 import { TxSubmissionHooks, AppendStateBatch } from '..'

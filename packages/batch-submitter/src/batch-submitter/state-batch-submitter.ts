@@ -183,12 +183,10 @@ export class StateBatchSubmitter extends BatchSubmitter {
     )
     const submitTransaction = (): Promise<TransactionReceipt> => {
       const appendStateBatch = (
-        appendStateBatchArg: Function,
         batchArg: any[],
         offsetStartsAtIndexArg: number
       ): AppendStateBatch => {
         return {
-          appendStateBatch: appendStateBatchArg,
           batch: batchArg,
           offsetStartsAtIndex: offsetStartsAtIndexArg,
           nonce,
@@ -197,11 +195,7 @@ export class StateBatchSubmitter extends BatchSubmitter {
         }
       }
       return this.transactionSubmitter.submitTransaction(
-        appendStateBatch(
-          this.chainContract.populateTransaction.appendStateBatch,
-          batch,
-          offsetStartsAtIndex
-        ),
+        appendStateBatch(batch, offsetStartsAtIndex),
         this._makeHooks('appendStateBatch')
       )
     }

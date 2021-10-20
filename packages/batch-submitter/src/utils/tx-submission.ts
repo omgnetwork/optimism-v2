@@ -11,7 +11,6 @@ import {
   VaultTransactionResponse,
   VaultPopulatedTransaction,
 } from '../batch-submitter/vault'
-import { submitTransaction } from './spec-only-submission'
 export interface ResubmissionConfig {
   resubmissionTimeout: number
   minGasPriceInGwei: number
@@ -20,7 +19,6 @@ export interface ResubmissionConfig {
 }
 
 export interface AppendStateBatch {
-  appendStateBatch: Function
   batch: any[]
   offsetStartsAtIndex: number
   nonce: number
@@ -29,7 +27,6 @@ export interface AppendStateBatch {
 }
 
 export interface AppendSequencerBatch {
-  appendSequencerBatch: Function
   batchParams: any
   type: 'AppendSequencerBatch'
   address: string
@@ -65,19 +62,8 @@ export const submitTransactionWithYNATM = async (
   const sendTxAndWaitForReceipt = async (
     gasPrice
   ): Promise<TransactionReceipt> => {
-    if (vault.signer !== undefined) {
-      return submitTransaction(
-        call,
-        vault,
-        provider,
-        numConfirmations,
-        hooks,
-        gasPrice
-      )
-    } else {
-      const transactionHash = await submitToVault(call, vault, hooks, gasPrice)
-      return provider.waitForTransaction(transactionHash, numConfirmations)
-    }
+    const transactionHash = await submitToVault(call, vault, hooks, gasPrice)
+    return provider.waitForTransaction(transactionHash, numConfirmations)
   }
   const minGasPrice = await getGasPriceInGwei(provider)
   const receipt = await ynatm.send({
