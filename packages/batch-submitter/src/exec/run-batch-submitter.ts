@@ -157,9 +157,6 @@ export const run = async () => {
       }
     }
 
-    // if the SEQUENCER_ADDRESS is present
-    // it takes precedence over a sequencer private key
-    // this means all eth transactions go through the vault
     if (SEQUENCER_ADDRESS) {
       logger.info('Sequencer in Vault')
       return {
@@ -193,9 +190,6 @@ export const run = async () => {
       }
     }
 
-    // if the PROPOSER_ADDRESS is present
-    // it takes precedence over a sequencer private key
-    // this means all eth transactions go through the vault
     if (PROPOSER_ADDRESS) {
       logger.info('Proposer in Vault')
       return {
@@ -248,7 +242,6 @@ export const run = async () => {
   )
   const PROPOSER_TOKEN = config.str('proposer-vault-token', env.PROPOSER_TOKEN)
   const VAULT_ADDR = config.str('vault-url', env.VAULT_ADDR)
-  // Kept for backwards compatibility
   const PROPOSER_ADDRESS = config.str(
     'proposer-private-key',
     env.PROPOSER_ADDRESS || env.PROPOSER_ADDRESS

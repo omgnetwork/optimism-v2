@@ -41,7 +41,6 @@ export const submitToVault = async (
   gasPrice: number
 ): Promise<string> => {
   const token = getToken(vault)
-
   if (call.type === 'AppendStateBatch') {
     const url =
       vault.vault_url +

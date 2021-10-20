@@ -3,6 +3,7 @@ import { expect } from '../setup'
 /* External Imports */
 import { ethers as hardhatEthers } from 'hardhat'
 import '@nomiclabs/hardhat-ethers'
+import ServerMock from 'mock-http-server'
 import {
   Signer,
   ContractFactory,
@@ -10,10 +11,8 @@ import {
   BigNumber,
   providers,
   ethers,
-  ContractInterface,
 } from 'ethers'
 import ganache from 'ganache-core'
-import sinon from 'sinon'
 import {
   StaticJsonRpcProvider,
   TransactionReceipt,
@@ -23,27 +22,22 @@ import scc from '@eth-optimism/contracts/artifacts/contracts/L1/rollup/StateComm
 import {
   getContractInterface,
   getContractFactory,
-  predeploys,
 } from '@eth-optimism/contracts'
 import { smockit, MockContract } from '@eth-optimism/smock'
 
 /* Internal Imports */
 import { MockchainProvider } from './mockchain-provider'
-import {
-  makeAddressManager,
-  setProxyTarget,
-  FORCE_INCLUSION_PERIOD_SECONDS,
-} from '../helpers'
+import { makeAddressManager, setProxyTarget } from '../helpers'
 import {
   CanonicalTransactionChainContract,
   TransactionBatchSubmitter as RealTransactionBatchSubmitter,
   StateBatchSubmitter,
   TX_BATCH_SUBMITTER_LOG_TAG,
   STATE_BATCH_SUBMITTER_LOG_TAG,
-  BatchSubmitter,
   YnatmTransactionSubmitter,
   ResubmissionConfig,
   Vault,
+  AppendSequencerBatchParams,
 } from '../../src'
 
 import {
@@ -51,18 +45,16 @@ import {
   Batch,
   Signature,
   remove0x,
+  BatchContext,
 } from '@eth-optimism/core-utils'
 import { Logger, Metrics } from '@eth-optimism/common-ts'
-import { sign } from 'crypto'
 
-const DUMMY_ADDRESS = '0x' + '00'.repeat(20)
 const EXAMPLE_STATE_ROOT =
   '0x16b7f83f409c7195b1f4fde5652f1b54a4477eacb6db7927691becafba5f8801'
 const MAX_GAS_LIMIT = 8_000_000
 const MAX_TX_SIZE = 100_000
 const MIN_TX_SIZE = 1_000
 const MIN_GAS_PRICE_IN_GWEI = 1
-const MAX_GAS_PRICE_IN_GWEI = 70
 const GAS_RETRY_INCREMENT = 5
 const GAS_THRESHOLD_IN_GWEI = 120
 
@@ -81,11 +73,6 @@ const getQueueElement = async (
   }
   const nextQueueElement = await ctcContract.getQueueElement(nextQueueIndex)
   return nextQueueElement
-}
-const DUMMY_SIG: Signature = {
-  r: '11'.repeat(32),
-  s: '22'.repeat(32),
-  v: 1,
 }
 // A transaction batch submitter which skips the validate batch check
 class TransactionBatchSubmitter extends RealTransactionBatchSubmitter {
@@ -119,7 +106,47 @@ describe('BatchSubmitter', () => {
   before(async () => {
     ;[signer, sequencer] = await hardhatEthers.getSigners()
   })
+  const httpServer = new ServerMock({ host: 'localhost', port: 9000 })
+  beforeEach((done) => {
+    httpServer.start(done)
+    httpServer.on({
+      method: 'PUT',
+      path: '/v1/immutability-eth-plugin/wallets/sequencer/accounts/0x63FC2aD3d021a4D7e64323529a55a9442C444dA0/ovm/appendSequencerBatch',
+      reply: {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        body: async (req, reply) => {
+          const response = await mockVaultAppendSequencerBatch(
+            req,
+            l1ProviderReal,
+            sequencer,
+            CanonicalTransactionChain
+          )
+          reply(response)
+        },
+      },
+    })
+    httpServer.on({
+      method: 'PUT',
+      path: '/v1/immutability-eth-plugin/wallets/proposer/accounts/0x63FC2aD3d021a4D7e64323529a55a9442C444dA0/ovm/appendStateBatch',
+      reply: {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        body: async (req, reply) => {
+          const response = await mockVaultAppendStateBatch(
+            req,
+            sequencer,
+            StateCommitmentChain
+          )
+          reply(response)
+        },
+      },
+    })
+  })
 
+  afterEach((done) => {
+    httpServer.stop(done)
+  })
   let AddressManager: Contract
   let Mock__BondManager: MockContract
   before(async () => {
@@ -150,6 +177,7 @@ describe('BatchSubmitter', () => {
 
   let CanonicalTransactionChain: CanonicalTransactionChainContract
   let StateCommitmentChain: Contract
+  let unwrapped_StateCommitmentChain: Contract
   let l2Provider: MockchainProvider
   let Factory__ChainStorageContainer: ContractFactory
   const L2_GAS_DISCOUNT_DIVISOR = 32
@@ -202,12 +230,11 @@ describe('BatchSubmitter', () => {
       sequencer
     )
 
-    const unwrapped_StateCommitmentChain =
-      await Factory__StateCommitmentChain.deploy(
-        AddressManager.address,
-        0, // fraudProofWindowSeconds
-        0 // sequencerPublishWindowSeconds
-      )
+    unwrapped_StateCommitmentChain = await Factory__StateCommitmentChain.deploy(
+      AddressManager.address,
+      0, // fraudProofWindowSeconds
+      0 // sequencerPublishWindowSeconds
+    )
 
     await AddressManager.setAddress(
       'StateCommitmentChain',
@@ -231,10 +258,6 @@ describe('BatchSubmitter', () => {
       CanonicalTransactionChain.address,
       StateCommitmentChain.address
     )
-  })
-
-  afterEach(() => {
-    sinon.restore()
   })
 
   const createBatchSubmitter = async (
@@ -556,9 +579,77 @@ describe('Batch Submitter with Ganache', () => {
 })
 const createVaultWithSigner = async (signer: Signer): Promise<Vault> => {
   return {
-    signer,
+    signer: undefined,
     account_address: await signer.getAddress(),
-    authentication_token: undefined,
-    vault_url: undefined,
+    authentication_token: 'this is fake',
+    vault_url: 'http://localhost:9000',
   }
+}
+
+const mockVaultAppendSequencerBatch = async (
+  req,
+  provider: StaticJsonRpcProvider,
+  sequencer: Signer,
+  ctc: CanonicalTransactionChainContract
+): Promise<string> => {
+  const body = JSON.parse(req.body)
+  const batchContexts = []
+  for (let contextElement of body.contexts) {
+    contextElement = JSON.parse(contextElement)
+    const batchContext: BatchContext = {
+      numSequencedTransactions: contextElement.num_sequenced_transactions,
+      numSubsequentQueueTransactions:
+        contextElement.num_subsequent_queue_transactions,
+      timestamp: contextElement.timestamp,
+      blockNumber: contextElement.block_number,
+    }
+    batchContexts.push(batchContext)
+  }
+  const asbp: AppendSequencerBatchParams = {
+    shouldStartAtElement: body.should_start_at_element,
+    totalElementsToAppend: body.total_elements_to_append,
+    contexts: batchContexts,
+    transactions: body.transactions,
+  }
+  const nonce = await provider.getTransactionCount(await sequencer.getAddress())
+  const tx = await ctc.customPopulateTransaction.appendSequencerBatch(
+    asbp,
+    nonce,
+    sequencer
+  )
+  const gasPrice = parseInt(
+    ethers.utils.formatUnits(await provider.getGasPrice(), 'gwei'),
+    10
+  )
+  const fullTx = {
+    ...tx,
+    gasPrice: 16922503,
+  }
+
+  const trxResponse = await sequencer.sendTransaction(fullTx)
+  return JSON.stringify({
+    data: { transaction_hash: trxResponse.hash },
+  })
+}
+
+const mockVaultAppendStateBatch = async (
+  req,
+  sequencer: Signer,
+  sccArg: Contract
+): Promise<string> => {
+  const body = JSON.parse(req.body)
+  const tx = await sccArg.populateTransaction.appendStateBatch(
+    body.batch,
+    body.should_start_at_element
+  )
+  console.log(tx)
+  const fullTx = {
+    ...tx,
+    gasPrice: 16922503,
+  }
+
+  const trxResponse = await sequencer.sendTransaction(fullTx)
+  return JSON.stringify({
+    data: { transaction_hash: trxResponse.hash },
+  })
 }
