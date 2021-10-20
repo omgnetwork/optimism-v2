@@ -41,7 +41,6 @@ import {
 import { WebWalletError } from 'services/errorService'
 
 //Base contracts
-import AddressManagerJson   from '../deployment/artifacts-base/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json'
 import L1StandardBridgeJson from '../deployment/artifacts-base/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2StandardBridgeJson from '../deployment/artifacts-base/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
 
@@ -49,7 +48,7 @@ import L2StandardBridgeJson from '../deployment/artifacts-base/contracts/L2/mess
 import L1LPJson from '../deployment/artifacts-boba/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
 import L2LPJson from '../deployment/artifacts-boba/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 
-//Standard ERC20 jsons - should be very similar?
+//Standard ERC20 jsons
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
 import L2ERC20Json from '../deployment/artifacts-base/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
 
@@ -59,9 +58,6 @@ import OMGJson from '../deployment/contracts/OMG.json'
 //BOBA L2 Contracts
 import L2ERC721Json    from '../deployment/artifacts-boba/contracts/ERC721Genesis.sol/ERC721Genesis.json'
 import L2ERC721RegJson from '../deployment/artifacts-boba/contracts/ERC721Registry.sol/ERC721Registry.json'
-
-import L2TokenPoolJson from '../deployment/artifacts-boba/contracts/TokenPool.sol/TokenPool.json'
-import AtomicSwapJson  from '../deployment/artifacts-boba/contracts/AtomicSwap.sol/AtomicSwap.json'
 
 // DAO
 import Boba from "../deployment/artifacts-boba/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json" 
@@ -78,6 +74,7 @@ import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import addressAxiosInstance from 'api/addressAxios'
 import addressOMGXAxiosInstance from 'api/addressOMGXAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
+import { sortRawTokens } from 'util/common'
 
 //All the current addresses for fallback purposes, or live network
 const localAddresses = require(`../deployment/local/addresses.json`)
@@ -305,7 +302,7 @@ class NetworkService {
 
     try {
 
-      console.log('Loading OMGX contract addresses')
+      console.log('Loading BOBA contract addresses')
 
       if (masterSystemConfig === 'local') {
 
@@ -361,40 +358,45 @@ class NetworkService {
       console.log('NS: this.chainID:', this.chainID)
       console.log('NS: this.networkName:', this.networkName)
 
+      // defines the set of possible networks along with chainId for L1 and L2
+      const nw = getAllNetworks()
+      const L1ChainId = nw[masterSystemConfig]['L1']['chainId'];
+      const L2ChainId = nw[masterSystemConfig]['L2']['chainId'];
+
       //there are numerous possible chains we could be on
       //either local, rinkeby etc
       //and then, also, either L1 or L2
 
       //at this point, we only know whether we want to be on local or rinkeby etc
-      if (masterSystemConfig === 'local' && network.chainId === 31338) {
+      if (masterSystemConfig === 'local' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //local deployment, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'local' && network.chainId === 31337) {
+      } else if (masterSystemConfig === 'local' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //local deployment, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 4) {
+      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby' && network.chainId === 420) {
+      } else if (masterSystemConfig === 'rinkeby' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === 4) {
+      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L1
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === 29) {
+      } else if (masterSystemConfig === 'rinkeby_integration' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === 1) {
+      } else if (masterSystemConfig === 'mainnet' && network.chainId === L1ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L1'
-      } else if (masterSystemConfig === 'mainnet' && network.chainId === 288) {
+      } else if (masterSystemConfig === 'mainnet' && network.chainId === L2ChainId) {
         //ok, that's reasonable
         //rinkeby, L2
         this.L1orL2 = 'L2'
@@ -404,9 +406,6 @@ class NetworkService {
         return 'wrongnetwork'
       }
 
-      // defines the set of possible networks
-      const nw = getAllNetworks()
-
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[masterSystemConfig]['L1']['rpcUrl']
       )
@@ -414,17 +413,18 @@ class NetworkService {
         nw[masterSystemConfig]['L2']['rpcUrl']
       )
 
-      this.AddressManager = new ethers.Contract(
-        addresses.AddressManager,
-        AddressManagerJson.abi,
-        this.L1Provider
-      )
-      //console.log("this.AddressManager",this.AddressManager)
+      // this.AddressManager = new ethers.Contract(
+      //   addresses.AddressManager,
+      //   AddressManagerJson.abi,
+      //   this.L1Provider
+      // )
+      // console.log("this.AddressManager",this.AddressManager)
+      // console.log(addresses)
 
-      this.L1MessengerAddress = await this.AddressManager.getAddress('Proxy__L1CrossDomainMessenger')
+      this.L1MessengerAddress = addresses.Proxy__L1CrossDomainMessenger
       console.log('L1MessengerAddress set to:', this.L1MessengerAddress)
 
-      this.L2MessengerAddress = await this.AddressManager.getAddress('L2CrossDomainMessenger')
+      //this.L2MessengerAddress = await this.AddressManager.getAddress('L2CrossDomainMessenger')
       console.log('L2MessengerAddress set to:', this.L2MessengerAddress)
 
       if(addresses.hasOwnProperty('Proxy__L1CrossDomainMessengerFast')) {
@@ -434,24 +434,24 @@ class NetworkService {
         console.log('L1FastMessengerAddress NOT SET')
       }
       
-      //The L1 Standard Bridge 
-      this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
-      console.log('L1StandardBridgeAddress:', this.L1StandardBridgeAddress)
+      // //The L1 Standard Bridge 
+      // this.L1StandardBridgeAddress = await this.AddressManager.getAddress('Proxy__L1StandardBridge')
+      // console.log('L1StandardBridgeAddress:', this.L1StandardBridgeAddress)
       
+      if (addresses.hasOwnProperty('Proxy__L1StandardBridge')) {
+        this.L1StandardBridgeAddress = addresses.Proxy__L1StandardBridge
+        console.log('L1StandardBridgeAddress set to:',this.L1StandardBridgeAddress)
+      }
+      else {
+        console.log('L1StandardBridgeAddress NOT SET')
+      }
+
       this.L1StandardBridgeContract = new ethers.Contract(
         this.L1StandardBridgeAddress,
         L1StandardBridgeJson.abi,
         this.provider.getSigner()
       )
       console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
-
-      // if (addresses.hasOwnProperty('Proxy__L1StandardBridge')) {
-      //   this.L1StandardBridgeAddress = addresses.Proxy__L1StandardBridge
-      //   console.log('L1StandardBridgeAddress set to:',this.L1StandardBridgeAddress)
-      // }
-      // else {
-      //   console.log('L1StandardBridgeAddress NOT SET')
-      // }
 
       if (addresses.hasOwnProperty('TOKENS')) {
         this.tokenAddresses = addresses.TOKENS
@@ -462,9 +462,11 @@ class NetworkService {
       }
 
       if (addresses.hasOwnProperty('Proxy__L1LiquidityPool')) {
+        console.log('Proxy__L1LiquidityPool set to:',addresses.Proxy__L1LiquidityPool)
         this.L1LPAddress = addresses.Proxy__L1LiquidityPool
       }
       if (addresses.hasOwnProperty('Proxy__L2LiquidityPool')) {
+        console.log('Proxy__L2LiquidityPool set to:',addresses.Proxy__L2LiquidityPool)
         this.L2LPAddress = addresses.Proxy__L2LiquidityPool
       }
 
@@ -503,18 +505,18 @@ class NetworkService {
       //console.log("L2_ETH_Contract:", this.L2_ETH_Contract.address)
 
       /*The test token*/
-      if(addresses.TOKENS && addresses.TOKENS.TEST.L1 !== null) {
+      if(addresses.TOKENS && addresses.TOKENS.BOBA.L1 !== null) {
         this.L1_TEST_Contract = new ethers.Contract(
-          addresses.TOKENS.TEST.L1,
+          addresses.TOKENS.BOBA.L1,
           L1ERC20Json.abi,
           this.provider.getSigner()
         )
       }
       //console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
 
-      if(addresses.TOKENS && addresses.TOKENS.TEST.L2 !== null) {
+      if(addresses.TOKENS && addresses.TOKENS.BOBA.L2 !== null) {
         this.L2_TEST_Contract = new ethers.Contract(
-          addresses.TOKENS.TEST.L2,
+          addresses.TOKENS.BOBA.L2,
           L2ERC20Json.abi,
           this.provider.getSigner()
         )
@@ -534,9 +536,10 @@ class NetworkService {
 
       // Liquidity pools
 
-      console.log('this.L1LPAddress:',this.L1LPAddress)
+      //console.log('this.L1LPAddress:',this.L1LPAddress)
 
       if(this.L1LPAddress !== null) {
+        console.log('Setting up contract for L1LP at:',this.L1LPAddress)
         this.L1LPContract = new ethers.Contract(
           this.L1LPAddress,
           L1LPJson.abi,
@@ -545,6 +548,7 @@ class NetworkService {
       }
 
       if(this.L2LPAddress !== null) {
+        console.log('Setting up contract for L2LP at:',this.L2LPAddress)
         this.L2LPContract = new ethers.Contract(
           this.L2LPAddress,
           L2LPJson.abi,
@@ -588,11 +592,11 @@ class NetworkService {
         },
         l2: {
           provider: this.L2Provider,
-          messengerAddress: this.L2MessengerAddress, //intentional?
+          messengerAddress: this.L2MessengerAddress,
         },
       })
 
-      if( masterSystemConfig === 'rinkeby' || masterSystemConfig === 'local' ) {
+      if( /*masterSystemConfig === 'rinkeby' || */ masterSystemConfig === 'local' ) {
 
         this.boba = new ethers.Contract(
           addresses.TOKENS.BOBA.L2,
@@ -657,7 +661,7 @@ class NetworkService {
 
   }
 
-  /* Yes, this almost complete dupicates async switchChain( layer )
+  /* Yes, this almost complete duplicates async switchChain( layer )
   but that's safest for now */
   async correctChain( targetLayer ) {
 
@@ -714,6 +718,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
+    if( this.masterSystemConfig === 'rinkeby' ) return
 
     console.log("Getting transactions...")
 
@@ -883,6 +888,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
+    if( this.masterSystemConfig === 'rinkeby' ) return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
@@ -1192,6 +1198,8 @@ class NetworkService {
 
   //Move ETH from L1 to L2 using the standard deposit system
   depositETHL2 = async (value_Wei_String) => {
+
+    console.log("this.L1StandardBridgeContract:",this.L1StandardBridgeContract)
 
     updateSignatureStatus_depositTRAD(false)
     
@@ -1671,8 +1679,6 @@ class NetworkService {
       return acc;
     }, [this.L1_ETH_Address]);
 
-    console.log("tokenAddressList",tokenAddressList)
-
     const L1LPContract = new ethers.Contract(
       this.L1LPAddress,
       L1LPJson.abi,
@@ -1712,7 +1718,7 @@ class NetworkService {
     
     const L1LPInfo = await Promise.all(L1LPInfoPromise)
 
-    L1LPInfo.forEach((token) => {
+    sortRawTokens(L1LPInfo).forEach((token) => {
       poolInfo[token.tokenAddress.toLowerCase()] = {
         symbol: token.tokenSymbol,
         name: token.tokenName,
@@ -1763,7 +1769,7 @@ class NetworkService {
     }, [{
       L1: this.L1_ETH_Address,
       L2: this.L2_ETH_Address
-    }]);
+    }])
 
     const L2LPContract = new ethers.Contract(
       this.L2LPAddress,
@@ -1803,7 +1809,7 @@ class NetworkService {
 
     const L2LPInfo = await Promise.all(L2LPInfoPromise)
 
-    L2LPInfo.forEach((token) => {
+    sortRawTokens(L2LPInfo).forEach((token) => {
       poolInfo[token.tokenAddress.toLowerCase()] = {
         symbol: token.tokenSymbol,
         name: token.tokenName,
@@ -2256,6 +2262,7 @@ class NetworkService {
   async getDaoBalance() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
 
     try {
@@ -2271,6 +2278,7 @@ class NetworkService {
   async getDaoVotes() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
     
     try {
@@ -2310,6 +2318,7 @@ class NetworkService {
   async getProposalThreshold() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
 
     try {
@@ -2361,6 +2370,7 @@ class NetworkService {
   async fetchProposals() {
 
     if( this.masterSystemConfig === 'mainnet' ) return
+    if( this.masterSystemConfig === 'rinkeby' ) return
     if( this.L1orL2 !== 'L2' ) return
 
     const delegateCheck = await this.delegate.attach(this.delegator.address)
@@ -2442,7 +2452,6 @@ class NetworkService {
   //Cast vote for proposal
   async castProposalVote({id, userVote}) {
     try {
-
       const delegateCheck = await this.delegate.attach(this.delegator.address);
       let res = delegateCheck.castVote(id, userVote)
       return res
