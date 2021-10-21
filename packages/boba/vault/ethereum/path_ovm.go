@@ -10,6 +10,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"strconv"
 	"strings"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
@@ -394,11 +396,14 @@ func (b *PluginBackend) pathOvmClearPendingTransactions(ctx context.Context, req
 		return nil, fmt.Errorf("invalid chain ID")
 	}
 
-	// client, err := ethclient.Dial(config.getRPCURL())
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//client.TransactionCount()
+	client, err := ethclient.Dial(config.getRPCURL())
+
+	// c, err := rpc.DialContext(ctx, config.getRPCURL())
+	// var result hexutil.Uint64
+	// errr := c.CallContext(ctx, &result, "eth_blockNumber")
+	if err != nil {
+		return nil, err
+	}
 	walletJSON, err := readWallet(ctx, req, name)
 	if err != nil {
 		return nil, err
@@ -408,67 +413,47 @@ func (b *PluginBackend) pathOvmClearPendingTransactions(ctx context.Context, req
 	if err != nil {
 		return nil, err
 	}
+	pendingNonce, err := client.PendingNonceAt(ctx, account.Address)
+	latestNonce, err := client.NonceAt(ctx, account.Address, nil)
+	if pendingNonce > latestNonce {
+		fmt.Print("Detected pending transactions. Clearing all transactions!")
 
-	callOpts := &bind.CallOpts{}
+		if err != nil {
+			return nil, err
+		}
+		transactionParams, err := b.getData(client, account.Address, data)
+		if err != nil {
+			return nil, err
+		}
+		var txDataToSign []byte
+		var txHashes = make([]string, latestNonce-pendingNonce)
+		for i := pendingNonce; i < latestNonce; i++ {
+			tx := types.NewTransaction(i, *transactionParams.Address, big.NewInt(0), 0, nil, txDataToSign)
+			signedTx, err := wallet.SignTx(*account, tx, chainID)
+			if err != nil {
+				return nil, err
+			}
+			err = client.SendTransaction(context.Background(), signedTx)
+			if err != nil {
+				return nil, err
+			}
+			txHashes[0] = signedTx.Hash().Hex()
+		}
 
-	transactOpts, err := b.NewWalletTransactor(chainID, wallet, account)
-	if err != nil {
-		return nil, err
+		return &logical.Response{
+			Data: map[string]interface{}{
+				"transaction_hashes": txHashes,
+			},
+		}, nil
+	} else {
+		fmt.Print("No pending transactions.")
+		var nilSlice []string
+		return &logical.Response{
+			Data: map[string]interface{}{
+				"transaction_hashes": nilSlice,
+			},
+		}, nil
 	}
-	// transactOpts needs gas etc. Use supplied gas_price
-	gasPriceRaw := data.Get("gas_price").(string)
-	if gasPriceRaw == "" {
-		return nil, fmt.Errorf("invalid gas_price")
-	}
-	transactOpts.GasPrice = util.ValidNumber(gasPriceRaw)
-
-	// //transactOpts needs nonce. Use supplied nonce
-	nonceRaw := data.Get("nonce").(string)
-	if nonceRaw == "" {
-		return nil, fmt.Errorf("invalid nonce")
-	}
-
-	encodedData, err := encode(data)
-	if err != nil {
-		return nil, err
-	}
-
-	json_abi := `[{
-      "inputs": [],
-      "name": "appendSequencerBatch",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }]`
-
-	abi, _ := abi.JSON(strings.NewReader(json_abi))
-	packed, _ := abi.Pack("appendSequencerBatch")
-	callData := append(packed, common.FromHex(encodedData)...)
-	transactOpts.GasLimit = 0
-	ctcSession := &ovm_ctc.OvmCtcSession{
-		//Contract:     instance,  // Generic contract caller binding to set the session for
-		CallOpts:     *callOpts, // Call options to use throughout this session
-		TransactOpts: *transactOpts,
-	}
-
-	tx, err := ctcSession.RawAppendSequencerBatch(callData)
-	if err != nil {
-		return nil, err
-	}
-
-	var signedTxBuff bytes.Buffer
-	tx.EncodeRLP(&signedTxBuff)
-	return &logical.Response{
-		Data: map[string]interface{}{
-			//"contract":           contractAddress.Hex(),
-			"transaction_hash":   tx.Hash().Hex(),
-			"signed_transaction": hexutil.Encode(signedTxBuff.Bytes()),
-			"from":               account.Address.Hex(),
-			"nonce":              tx.Nonce(),
-			"gas_price":          tx.GasPrice(),
-			"gas_limit":          tx.Gas(),
-		},
-	}, nil
 }
 
 func encode(data *framework.FieldData) (string, error) {

@@ -26,12 +26,18 @@ tee append-sequencer-batch.hcl <<EOF
 path "immutability-eth-plugin/wallets/$WALLET_NAME/accounts/$ACCOUNT0/ovm/appendSequencerBatch" {
     capabilities = ["create", "update"]
 }
+path "immutability-eth-plugin/wallets/$WALLET_NAME/accounts/$ACCOUNT0/ovm/clearPendingTransactions" {
+    capabilities = ["create", "update"]
+}
 EOF
 
 vault policy write append-sequencer-batch append-sequencer-batch.hcl
 
 tee append-state-batch-proposer.hcl <<EOF
 path "immutability-eth-plugin/wallets/$WALLET_NAME_2/accounts/$ACCOUNT1/ovm/appendStateBatch" {
+    capabilities = ["create", "update"]
+}
+path "immutability-eth-plugin/wallets/$WALLET_NAME_2/accounts/$ACCOUNT1/ovm/clearPendingTransactions" {
     capabilities = ["create", "update"]
 }
 EOF
