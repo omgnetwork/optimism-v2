@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.9;
 
 /* Library Imports */
 import { Lib_RLPReader } from "../rlp/Lib_RLPReader.sol";
@@ -21,19 +21,14 @@ library Lib_CrossDomainUtils {
         address _sender,
         bytes memory _message,
         uint256 _messageNonce
-    )
-        internal
-        pure
-        returns (
-            bytes memory
-        )
-    {
-        return abi.encodeWithSignature(
-            "relayMessage(address,address,bytes,uint256)",
-            _target,
-            _sender,
-            _message,
-            _messageNonce
-        );
+    ) internal pure returns (bytes memory) {
+        return
+            abi.encodeWithSignature(
+                "relayMessage(address,address,bytes,uint256)",
+                _target,
+                _sender,
+                _message,
+                _messageNonce
+            );
     }
 }

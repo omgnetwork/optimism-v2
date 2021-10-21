@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.9;
 
 /* Library Imports */
 import { Lib_PredeployAddresses } from "../../libraries/constants/Lib_PredeployAddresses.sol";
@@ -48,7 +48,12 @@ contract OVM_ETH is L2StandardERC20 {
         revert("OVM_ETH: increaseAllowance is disabled pending further community discussion.");
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue) public virtual override returns (bool) {
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        public
+        virtual
+        override
+        returns (bool)
+    {
         revert("OVM_ETH: decreaseAllowance is disabled pending further community discussion.");
     }
 }

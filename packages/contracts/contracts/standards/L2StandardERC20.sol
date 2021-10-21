@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.9;
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./IL2StandardERC20.sol";
@@ -30,7 +30,7 @@ contract L2StandardERC20 is IL2StandardERC20, ERC20 {
         _decimals = decimals_;
     }
 
-    modifier onlyL2Bridge {
+    modifier onlyL2Bridge() {
         require(msg.sender == l2Bridge, "Only L2 Bridge can mint and burn");
         _;
     }

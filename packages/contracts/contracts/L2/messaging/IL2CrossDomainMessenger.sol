@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.9;
 
 /* Interface Imports */
 import { ICrossDomainMessenger } from "../../libraries/bridge/ICrossDomainMessenger.sol";
@@ -8,7 +8,6 @@ import { ICrossDomainMessenger } from "../../libraries/bridge/ICrossDomainMessen
  * @title IL2CrossDomainMessenger
  */
 interface IL2CrossDomainMessenger is ICrossDomainMessenger {
-
     /********************
      * Public Functions *
      ********************/

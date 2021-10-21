@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.9;
 
 /* Library Imports */
 import { Lib_OVMCodec } from "../../libraries/codec/Lib_OVMCodec.sol";
@@ -11,7 +11,6 @@ import { ICrossDomainMessenger } from "../../libraries/bridge/ICrossDomainMessen
  * @title IL1CrossDomainMessenger
  */
 interface IL1CrossDomainMessenger is ICrossDomainMessenger {
-
     /*******************
      * Data Structures *
      *******************/
@@ -23,7 +22,6 @@ interface IL1CrossDomainMessenger is ICrossDomainMessenger {
         bytes stateTrieWitness;
         bytes storageTrieWitness;
     }
-
 
     /********************
      * Public Functions *
