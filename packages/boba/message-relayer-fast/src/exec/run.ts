@@ -102,7 +102,7 @@ const main = async () => {
   }
 
   const loggerOptions: LoggerOptions = {
-    name: 'GasPriceOracle',
+    name: 'Message_Relayer_Fast',
   }
   const logger = new Logger(loggerOptions)
   const l1Provider = new providers.StaticJsonRpcProvider(L1_NODE_WEB3_URL)
