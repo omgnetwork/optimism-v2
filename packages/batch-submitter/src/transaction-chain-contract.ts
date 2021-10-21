@@ -31,14 +31,12 @@ export class CanonicalTransactionChainContract extends Contract {
         from: await this.signer.getAddress(),
         data,
       })
-      const safeGasLimit = gasLimit
-        .mul(ethers.BigNumber.from(11))
-        .div(ethers.BigNumber.from(10))
+
       return {
         nonce,
         to,
         data,
-        gasLimit: safeGasLimit,
+        gasLimit,
       }
     },
   }

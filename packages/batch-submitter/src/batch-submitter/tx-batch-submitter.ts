@@ -34,7 +34,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   protected chainContract: CanonicalTransactionChainContract
   protected l2ChainId: number
   protected syncing: boolean
-  private disableQueueBatchAppend: boolean
   private autoFixBatchOptions: AutoFixBatchOptions
   private transactionSubmitter: TransactionSubmitter
   private gasThresholdInGwei: number
@@ -55,7 +54,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     blockOffset: number,
     logger: Logger,
     metrics: Metrics,
-    disableQueueBatchAppend: boolean,
     autoFixBatchOptions: AutoFixBatchOptions = {
       fixDoublePlayedDeposits: false,
       fixMonotonicity: false,
@@ -78,7 +76,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       logger,
       metrics
     )
-    this.disableQueueBatchAppend = disableQueueBatchAppend
     this.autoFixBatchOptions = autoFixBatchOptions
     this.gasThresholdInGwei = gasThresholdInGwei
     this.transactionSubmitter = transactionSubmitter
@@ -137,11 +134,8 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
         'Syncing mode enabled! Skipping batch submission and clearing queue elements',
         { pendingQueueElements }
       )
-
-      if (!this.disableQueueBatchAppend) {
-        return this.submitAppendQueueBatch()
-      }
     }
+
     this.logger.info('Syncing mode enabled but queue is empty. Skipping...')
     return
   }
@@ -201,8 +195,12 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
       return
     }
 
-    const [batchParams, wasBatchTruncated] =
-      await this._generateSequencerBatchParams(startBlock, endBlock)
+    const params = await this._generateSequencerBatchParams(startBlock, endBlock)
+    if (!params) {
+      throw new Error(`Cannot create sequencer batch with params start ${startBlock} and end ${endBlock}`)
+    }
+
+    const [batchParams, wasBatchTruncated] = params
     const batchSizeInBytes = encodeAppendSequencerBatch(batchParams).length / 2
     this.logger.debug('Sequencer batch generated', {
       batchSizeInBytes,
@@ -215,22 +213,9 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     if (!wasBatchTruncated && !this._shouldSubmitBatch(batchSizeInBytes)) {
       return
     }
-
-    if (batchParams.totalElementsToAppend === 0) {
-      this.logger.error('Will not submit tx_chain batch with 0 elements')
-      return
-    }
-
     this.metrics.numTxPerBatch.observe(endBlock - startBlock)
     const l1tipHeight = await this.signer.provider.getBlockNumber()
-    this.logger.info('Submitting tx_chain batch', {
-      startBlock,
-      endBlock,
-      l1tipHeight,
-      batchStart: batchParams.shouldStartAtElement,
-      batchElements: batchParams.totalElementsToAppend,
-    })
-    this.logger.info('Submitting batch.', {
+    this.logger.debug('Submitting batch.', {
       calldata: batchParams,
       l1tipHeight,
     })
@@ -241,20 +226,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   /*********************
    * Private Functions *
    ********************/
-
-  private async submitAppendQueueBatch(): Promise<TransactionReceipt> {
-    const tx = await this.chainContract.populateTransaction.appendQueueBatch(
-      ethers.constants.MaxUint256 // Completely empty the queue by appending (up to) an enormous number of queue elements.
-    )
-    const submitTransaction = (): Promise<TransactionReceipt> => {
-      return this.transactionSubmitter.submitTransaction(
-        tx,
-        this._makeHooks('appendQueueBatch')
-      )
-    }
-    // Empty the queue with a huge `appendQueueBatch(..)` call
-    return this._submitAndLogTx(submitTransaction, 'Cleared queue!')
-  }
 
   private async submitAppendSequencerBatch(
     batchParams: AppendSequencerBatchParams
@@ -353,7 +324,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           idx,
           ele,
         })
-        this._enableAutoFixBatchOptions(1)
         return false
       }
       if (ele.blockNumber < lastBlockNumber) {
@@ -361,7 +331,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
           idx,
           ele,
         })
-        this._enableAutoFixBatchOptions(1)
         return false
       }
       lastTimestamp = ele.timestamp
@@ -388,11 +357,10 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
     // TODO: Verify queue element hash equality. The queue element hash can be computed with:
     // keccak256( abi.encode( msg.sender, _target, _gasLimit, _data))
-    this._enableAutoFixBatchOptions(0)
+
     // Check timestamp & blockNumber equality
     if (timestamp !== queueElement.timestamp) {
       isEqual = false
-      this._enableAutoFixBatchOptions(2)
       logEqualityError(
         'Timestamp',
         queueIndex,
@@ -402,7 +370,6 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
     }
     if (blockNumber !== queueElement.blockNumber) {
       isEqual = false
-      this._enableAutoFixBatchOptions(1)
       logEqualityError(
         'Block Number',
         queueIndex,
@@ -485,7 +452,7 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
             break
           }
         }
-        // fixedBatch.push(ele)
+        fixedBatch.push(ele)
         if (!ele.isSequencerTx) {
           nextQueueIndex++
         }
@@ -778,31 +745,5 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
 
   private _isSequencerTx(block: L2Block): boolean {
     return block.transactions[0].queueOrigin === QueueOrigin.Sequencer
-  }
-
-  private _enableAutoFixBatchOptions(type: number) {
-    if (type === 0) {
-      this.autoFixBatchOptions = {
-        fixDoublePlayedDeposits: false,
-        fixMonotonicity: false,
-        fixSkippedDeposits: false,
-      }
-    }
-    if (type === 1) {
-      this.logger.warn('Enabled autoFixBatchOptions - fixMonotonicity')
-      this.autoFixBatchOptions = {
-        fixDoublePlayedDeposits: false,
-        fixMonotonicity: true,
-        fixSkippedDeposits: false,
-      }
-    }
-    if (type === 2) {
-      this.logger.warn('Enabled autoFixBatchOptions - fixSkippedDeposits')
-      this.autoFixBatchOptions = {
-        fixDoublePlayedDeposits: false,
-        fixMonotonicity: false,
-        fixSkippedDeposits: true,
-      }
-    }
   }
 }
