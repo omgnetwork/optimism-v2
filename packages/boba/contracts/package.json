@@ -1,7 +1,7 @@
 {
   "name": "@boba/contracts",
   "version": "0.0.1",
-  "description": "BOBA Smart Contracts and Deployer HTTP Server",
+  "description": "BOBA Smart Contracts",
   "private": true,
   "author": "OMG",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "lint:contracts": "yarn solhint -f table contracts/**/*.sol"
   },
   "devDependencies": {
-    "@eth-optimism/core-utils": "^0.5.1",
+    "@eth-optimism/core-utils": "^0.6.0",
     "@ethersproject/providers": "^5.0.24",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@types/jest": "^26.0.22",
