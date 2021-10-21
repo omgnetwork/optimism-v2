@@ -1,6 +1,6 @@
 {
   "name": "@eth-optimism/replica-healthcheck",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "main": "dist/index",
   "files": [
@@ -13,7 +13,7 @@
     "clean": "rimraf ./dist ./tsconfig.build.tsbuildinfo",
     "lint": "yarn run lint:fix && yarn run lint:check",
     "lint:fix": "yarn lint:check --fix",
-    "lint:check": "eslint . --ext js,jsx,ts,tsx",
+    "lint:check": "eslint .",
     "build": "tsc -p tsconfig.build.json",
     "pre-commit": "lint-staged",
     "test": "ts-mocha test/*.spec.ts",
@@ -26,11 +26,11 @@
     "supertest": "^6.1.4",
     "ts-mocha": "^8.0.0",
     "ts-node": "^10.0.0",
-    "typescript": "^4.3.2"
+    "typescript": "^4.3.5"
   },
   "dependencies": {
     "@eth-optimism/common-ts": "0.1.5",
-    "@eth-optimism/core-utils": "^0.5.1",
+    "@eth-optimism/core-utils": "^0.6.0",
     "ethers": "^5.4.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
