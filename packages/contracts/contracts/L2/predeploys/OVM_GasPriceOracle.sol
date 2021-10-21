@@ -124,9 +124,11 @@ contract OVM_GasPriceOracle is Ownable {
    * posting both transaction and state roots to L1 given larger
    * batch sizes.
    * 4 gas for 0 byte
-   * https://github.com/ethereum/go-ethereum/blob/9ada4a2e2c415e6b0b51c50e901336872e028872/params/protocol_params.go#L33
+   * https://github.com/ethereum/go-ethereum/blob/
+   *    9ada4a2e2c415e6b0b51c50e901336872e028872/params/protocol_params.go#L33
    * 16 gas for non zero byte
-   * https://github.com/ethereum/go-ethereum/blob/9ada4a2e2c415e6b0b51c50e901336872e028872/params/protocol_params.go#L87
+   * https://github.com/ethereum/go-ethereum/blob/
+   *    9ada4a2e2c415e6b0b51c50e901336872e028872/params/protocol_params.go#L87
    * This will need to be updated if calldata gas prices change
    * Account for the transaction being unsigned
    * Padding is added to account for lack of signature on transaction

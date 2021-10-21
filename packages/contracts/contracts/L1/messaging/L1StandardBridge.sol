@@ -75,6 +75,7 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
    */
   receive() external payable onlyEOA {
     _initiateETHDeposit(msg.sender, msg.sender, 200_000, bytes(''));
+    /* for the record.... _initiateETHDeposit(msg.sender, msg.sender, 1_300_000, bytes('')); */
   }
 
   /**

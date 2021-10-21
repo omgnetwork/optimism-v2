@@ -42,8 +42,7 @@
     "prepublishOnly": "yarn copyfiles -u 1 -e \"**/test-*/**/*\" \"contracts/**/*\" ./",
     "postpublish": "rimraf chugsplash L1 L2 libraries standards",
     "prepack": "yarn prepublishOnly",
-    "postpack": "yarn postpublish",
-    "pre-commit": "lint-staged"
+    "postpack": "yarn postpublish"
   },
   "dependencies": {
     "@eth-optimism/core-utils": "^0.6.0",
