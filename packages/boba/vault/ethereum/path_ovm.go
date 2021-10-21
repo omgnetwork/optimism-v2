@@ -98,7 +98,7 @@ func OvmPaths(b *PluginBackend) []*framework.Path {
 		},
 		{
 			Pattern:         ContractPath(ovm, "appendSequencerBatch"),
-			HelpSynopsis:    "Submits the state batch",
+			HelpSynopsis:    "Submits the batch of transactions",
 			HelpDescription: "Allows the sequencer to submit the state root batch.",
 			Fields: map[string]*framework.FieldSchema{
 				"name":    {Type: framework.TypeString, Description: "Name of the wallet."},
@@ -136,6 +136,19 @@ func OvmPaths(b *PluginBackend) []*framework.Path {
 			ExistenceCheck: pathExistenceCheck,
 			Callbacks: map[logical.Operation]framework.OperationFunc{
 				logical.CreateOperation: b.pathOvmAppendSequencerBatch,
+			},
+		},
+		{
+			Pattern:         ContractPath(ovm, "clearPendingTransactions"),
+			HelpSynopsis:    "Clears all pending transactions",
+			HelpDescription: "Allows the sequencer to submit the state root batch.",
+			Fields: map[string]*framework.FieldSchema{
+				"name":    {Type: framework.TypeString, Description: "Name of the wallet."},
+				"address": {Type: framework.TypeString, Description: "The address in the wallet."},
+			},
+			ExistenceCheck: pathExistenceCheck,
+			Callbacks: map[logical.Operation]framework.OperationFunc{
+				logical.CreateOperation: b.pathOvmClearPendingTransactions,
 			},
 		},
 	}
@@ -353,6 +366,101 @@ func (b *PluginBackend) pathOvmAppendSequencerBatch(ctx context.Context, req *lo
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"contract":           contractAddress.Hex(),
+			"transaction_hash":   tx.Hash().Hex(),
+			"signed_transaction": hexutil.Encode(signedTxBuff.Bytes()),
+			"from":               account.Address.Hex(),
+			"nonce":              tx.Nonce(),
+			"gas_price":          tx.GasPrice(),
+			"gas_limit":          tx.Gas(),
+		},
+	}, nil
+}
+
+func (b *PluginBackend) pathOvmClearPendingTransactions(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+
+	config, err := b.configured(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	address := data.Get("address").(string)
+	name := data.Get("name").(string)
+	accountJSON, err := readAccount(ctx, req, name, address)
+	if err != nil || accountJSON == nil {
+		return nil, fmt.Errorf("error reading address")
+	}
+
+	chainID := util.ValidNumber(config.ChainID)
+	if chainID == nil {
+		return nil, fmt.Errorf("invalid chain ID")
+	}
+
+	// client, err := ethclient.Dial(config.getRPCURL())
+	// if err != nil {
+	// 	return nil, err
+	// }
+	//client.TransactionCount()
+	walletJSON, err := readWallet(ctx, req, name)
+	if err != nil {
+		return nil, err
+	}
+
+	wallet, account, err := getWalletAndAccount(*walletJSON, accountJSON.Index)
+	if err != nil {
+		return nil, err
+	}
+
+	callOpts := &bind.CallOpts{}
+
+	transactOpts, err := b.NewWalletTransactor(chainID, wallet, account)
+	if err != nil {
+		return nil, err
+	}
+	// transactOpts needs gas etc. Use supplied gas_price
+	gasPriceRaw := data.Get("gas_price").(string)
+	if gasPriceRaw == "" {
+		return nil, fmt.Errorf("invalid gas_price")
+	}
+	transactOpts.GasPrice = util.ValidNumber(gasPriceRaw)
+
+	// //transactOpts needs nonce. Use supplied nonce
+	nonceRaw := data.Get("nonce").(string)
+	if nonceRaw == "" {
+		return nil, fmt.Errorf("invalid nonce")
+	}
+
+	encodedData, err := encode(data)
+	if err != nil {
+		return nil, err
+	}
+
+	json_abi := `[{
+      "inputs": [],
+      "name": "appendSequencerBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }]`
+
+	abi, _ := abi.JSON(strings.NewReader(json_abi))
+	packed, _ := abi.Pack("appendSequencerBatch")
+	callData := append(packed, common.FromHex(encodedData)...)
+	transactOpts.GasLimit = 0
+	ctcSession := &ovm_ctc.OvmCtcSession{
+		//Contract:     instance,  // Generic contract caller binding to set the session for
+		CallOpts:     *callOpts, // Call options to use throughout this session
+		TransactOpts: *transactOpts,
+	}
+
+	tx, err := ctcSession.RawAppendSequencerBatch(callData)
+	if err != nil {
+		return nil, err
+	}
+
+	var signedTxBuff bytes.Buffer
+	tx.EncodeRLP(&signedTxBuff)
+	return &logical.Response{
+		Data: map[string]interface{}{
+			//"contract":           contractAddress.Hex(),
 			"transaction_hash":   tx.Hash().Hex(),
 			"signed_transaction": hexutil.Encode(signedTxBuff.Bytes()),
 			"from":               account.Address.Hex(),

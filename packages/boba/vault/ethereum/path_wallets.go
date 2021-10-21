@@ -17,7 +17,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	hdwallet "github.com/immutability-io/go-ethereum-hdwallet"
+	hdwallet "github.com/miguelmota/go-ethereum-hdwallet"
 	"github.com/tyler-smith/go-bip39"
 
 	"github.com/hashicorp/vault/sdk/framework"
@@ -268,7 +268,7 @@ func (b *PluginBackend) getData(client *ethclient.Client, fromAddress common.Add
 func (b *PluginBackend) NewWalletTransactor(chainID *big.Int, wallet *hdwallet.Wallet, account *accounts.Account) (*bind.TransactOpts, error) {
 	return &bind.TransactOpts{
 		From: account.Address,
-		Signer: func(signer types.Signer, address common.Address, tx *types.Transaction) (*types.Transaction, error) {
+		Signer: func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
 			if address != account.Address {
 				return nil, errors.New("not authorized to sign this account")
 			}
