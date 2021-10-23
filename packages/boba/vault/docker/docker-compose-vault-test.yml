@@ -73,7 +73,7 @@ services:
        ./batches.sh
 
   vault:
-    image: boba/vault
+    image: bobanetwork/vault
     ports:
       - "8200:8900"
     build:
@@ -93,9 +93,9 @@ services:
       AWS_BOUND_IAM_PRINCIPAL_ARN: ""
       AWS_ROLE: ""
     volumes:
-      #- "/tmp/vault_auth:/vault/config:rw"
       - "./../packages/boba/vault/test:/vault/test"
-      #- "./vault/data/vault/config:/vault/config:rw"
+      # if you want to access Vaults configuration, uncomment this
+      # - "./vault/data/vault/config:/vault/config:rw"
     entrypoint:
       - "/bin/sh"
       - -ec

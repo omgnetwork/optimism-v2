@@ -96,6 +96,27 @@ export const submitToVault = async (
   }
 }
 
+export const clearPendingTransactions = async (
+  vault: Vault
+): Promise<string[]> => {
+  const token = getToken(vault)
+  const url =
+    vault.vault_url +
+    '/v1/immutability-eth-plugin/wallets/proposer/accounts/' +
+    vault.account_address +
+    '/ovm/appendStateBatch'
+  const requestInit = {
+    method: 'PUT',
+    headers: {
+      'X-Vault-Request': 'true',
+      'X-Vault-Token': token,
+    },
+  }
+  const response = await fetch(url, requestInit)
+  const data = await response.json()
+  return data.transaction_hashes
+}
+
 //needs to be stringyfied so that Vault can consume it
 const transformContexts = (contexts: BatchContext[]): any => {
   const apiContexts: any = []

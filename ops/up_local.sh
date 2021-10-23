@@ -60,3 +60,4 @@ else
     -f $DIR/$DOCKERFILE \
     up --no-build -V
 fi
+

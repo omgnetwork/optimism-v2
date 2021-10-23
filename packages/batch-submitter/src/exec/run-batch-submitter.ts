@@ -24,6 +24,7 @@ import {
   YnatmTransactionSubmitter,
   ResubmissionConfig,
 } from '../utils'
+import { clearPendingTransactions } from '../batch-submitter/vault'
 
 interface RequiredEnvVars {
   // The HTTP provider URL for L1.
@@ -425,6 +426,17 @@ export const run = async () => {
   const loop = async (
     func: () => Promise<TransactionReceipt>
   ): Promise<void> => {
+    // Clear all pending transactions
+    if (clearPendingTxs) {
+      const transaction_hashes = await clearPendingTransactions(sequencerVault)
+      logger.info('Detecting pending transactions inside Vault.')
+      transaction_hashes.forEach(async (hash) => {
+        await l1Provider.waitForTransaction(
+          hash,
+          requiredEnvVars.NUM_CONFIRMATIONS
+        )
+      })
+    }
     while (true) {
       try {
         await func()

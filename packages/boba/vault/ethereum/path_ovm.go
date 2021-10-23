@@ -10,6 +10,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/big"
 	"strconv"
 	"strings"
@@ -379,6 +380,7 @@ func (b *PluginBackend) pathOvmAppendSequencerBatch(ctx context.Context, req *lo
 }
 
 func (b *PluginBackend) pathOvmClearPendingTransactions(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+	log.Print("Clearing pending transactions.")
 
 	config, err := b.configured(ctx, req)
 	if err != nil {
@@ -416,19 +418,26 @@ func (b *PluginBackend) pathOvmClearPendingTransactions(ctx context.Context, req
 	pendingNonce, err := client.PendingNonceAt(ctx, account.Address)
 	latestNonce, err := client.NonceAt(ctx, account.Address, nil)
 	if pendingNonce > latestNonce {
-		fmt.Print("Detected pending transactions. Clearing all transactions!")
+		log.Print("Detected pending transactions. Clearing all transactions!")
 
 		if err != nil {
 			return nil, err
 		}
-		transactionParams, err := b.getData(client, account.Address, data)
-		if err != nil {
-			return nil, err
-		}
+
+		// transactionParams := &TransactionParams{
+		// 	Address: &address,
+		// }
+		// log.Print(fmt.Sprintf("latestNonce for Integer: %d\n", latestNonce))
+		// log.Print(fmt.Sprintf("latestNonce for Integer: %d\n", pendingNonce))
+
 		var txDataToSign []byte
-		var txHashes = make([]string, latestNonce-pendingNonce)
-		for i := pendingNonce; i < latestNonce; i++ {
-			tx := types.NewTransaction(i, *transactionParams.Address, big.NewInt(0), 0, nil, txDataToSign)
+		var txHashes = make([]string, pendingNonce-latestNonce)
+		//address := common.HexToAddress(data.Get("address").(string))
+		to := common.HexToAddress(data.Get("address").(string))
+		for i := latestNonce; i <= pendingNonce; i++ {
+			// how to set the correct gas and gas price from pending transaction?!
+			tx := types.NewTransaction(i, to, big.NewInt(0), 21000, nil, txDataToSign)
+			log.Print(fmt.Sprintf("NewTransaction %v\n", tx))
 			signedTx, err := wallet.SignTx(*account, tx, chainID)
 			if err != nil {
 				return nil, err
@@ -446,7 +455,7 @@ func (b *PluginBackend) pathOvmClearPendingTransactions(ctx context.Context, req
 			},
 		}, nil
 	} else {
-		fmt.Print("No pending transactions.")
+		log.Print("No pending transactions for this account.")
 		var nilSlice []string
 		return &logical.Response{
 			Data: map[string]interface{}{
