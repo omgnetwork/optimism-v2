@@ -17,7 +17,6 @@ import { getContractInterface } from '@eth-optimism/contracts'
 import { getBalance } from './provider-helper'
 
 export interface Vault {
-  // one or the other, not both!
   account_address: string
   vault_url: string
   authentication_token: string
