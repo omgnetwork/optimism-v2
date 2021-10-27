@@ -13,7 +13,6 @@ const validateDummyTransaction = () => {
     configs.addressOvmEth !== undefined &&
     configs.dummyEthAmount !== undefined &&
     configs.dummyWathcherTimeoutMins !== undefined &&
-    configs.l2DepositedERC20 !== undefined &&
     configs.l2GasLimit !== undefined
   )
 }

@@ -23,7 +23,7 @@ export const monitoringHangTimeoutMins =
 
 export const addressOvmEth = '0x4200000000000000000000000000000000000006'
 export const l1AddressManager = process.env.L1_ADDRESS_MANAGER
-export const l2DepositedERC20 = process.env.L2_DEPOSITED_ERC20
+// export const l2DepositedERC20 = process.env.L2_DEPOSITED_ERC20
 
 export enum AppMethod {
   Monitoring = 'monitoring',

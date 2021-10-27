@@ -7,6 +7,7 @@ import logger from '../logger'
 export interface Layer {
   provider: Provider
   messengerAddress: string
+  blocksToFetch?: number
 }
 
 export interface WatcherOptions {
@@ -14,26 +15,30 @@ export interface WatcherOptions {
   l2: Layer
 }
 
-export class Watcher {
-  public NUM_BLOCKS_TO_FETCH: number = 10000
+const RELAYED_MESSAGE = ethers.utils.id(`RelayedMessage(bytes32)`)
+const FAILED_RELAYED_MESSAGE = ethers.utils.id(`FailedRelayedMessage(bytes32)`)
 
+export class Watcher {
   public l1: Layer
   public l2: Layer
+  public pollInterval = 3000
+  public blocksToFetch = 1500
+  public pollForPending = true
 
-  constructor(opts: WatcherOptions) {
+  constructor (opts: WatcherOptions) {
     this.l1 = opts.l1
     this.l2 = opts.l2
   }
 
-  public async getMessageHashesFromL1Tx(l1TxHash: string): Promise<string[]> {
+  public async getMessageHashesFromL1Tx (l1TxHash: string): Promise<string[]> {
     return this.getMessageHashesFromTx(this.l1, l1TxHash)
   }
 
-  public async getMessageHashesFromL2Tx(l2TxHash: string): Promise<string[]> {
+  public async getMessageHashesFromL2Tx (l2TxHash: string): Promise<string[]> {
     return this.getMessageHashesFromTx(this.l2, l2TxHash)
   }
 
-  public async getL1TransactionReceipt(
+  public async getL1TransactionReceipt (
     l2ToL1MsgHash: string,
     pollForPending: boolean = true
   ): Promise<TransactionReceipt> {
@@ -41,7 +46,7 @@ export class Watcher {
     return this.getTransactionReceipt(this.l1, l2ToL1MsgHash, pollForPending)
   }
 
-  public async getL2TransactionReceipt(
+  public async getL2TransactionReceipt (
     l1ToL2MsgHash: string,
     pollForPending: boolean = true
   ): Promise<TransactionReceipt> {
@@ -49,115 +54,111 @@ export class Watcher {
     return this.getTransactionReceipt(this.l2, l1ToL2MsgHash, pollForPending)
   }
 
-  public async getMessageHashesFromTx(
+  public async getMessageHashesFromTx (
     layer: Layer,
     txHash: string
   ): Promise<string[]> {
     const receipt = await layer.provider.getTransactionReceipt(txHash)
-
     if (!receipt) {
-      logger.debug('No receipt for txHash', { txHash })
       return []
     }
 
     const msgHashes = []
-
-    logger.debug(
-      'Interate over ' + receipt.logs.length + ' of logs for txHash ' + txHash
+    const sentMessageEventId = ethers.utils.id(
+      'SentMessage(address,address,bytes,uint256,uint256)'
+    )
+    const l2CrossDomainMessengerRelayAbi = [
+      'function relayMessage(address _target,address _sender,bytes memory _message,uint256 _messageNonce)',
+    ]
+    const l2CrossDomainMessengerRelayinterface = new ethers.utils.Interface(
+      l2CrossDomainMessengerRelayAbi
     )
     for (const log of receipt.logs) {
-      logger.debug('log.address', {
-        address: log.address,
-        messengerAddress: layer.messengerAddress,
-      })
       if (
         log.address === layer.messengerAddress &&
-        log.topics[0] === ethers.utils.id('SentMessage(bytes)')
+        log.topics[0] === sentMessageEventId
       ) {
-        const [message] = ethers.utils.defaultAbiCoder.decode(
-          ['bytes'],
-          log.data
+        const [sender, message, messageNonce] =
+          ethers.utils.defaultAbiCoder.decode(
+            ['address', 'bytes', 'uint256'],
+            log.data
+          )
+
+        const [target] = ethers.utils.defaultAbiCoder.decode(
+          ['address'],
+          log.topics[1]
         )
-        msgHashes.push(ethers.utils.solidityKeccak256(['bytes'], [message]))
+
+        const encodedMessage =
+          l2CrossDomainMessengerRelayinterface.encodeFunctionData(
+            'relayMessage',
+            [target, sender, message, messageNonce]
+          )
+
+        msgHashes.push(
+          ethers.utils.solidityKeccak256(['bytes'], [encodedMessage])
+        )
       }
     }
     return msgHashes
   }
 
-  public async getTransactionReceipt(
+  public async getTransactionReceipt (
     layer: Layer,
     msgHash: string,
-    pollForPending: boolean = true
+    pollForPending?
   ): Promise<TransactionReceipt> {
-    logger.debug('Watcher::getTransactionReceipt')
-
-    const blockNumber = await layer.provider.getBlockNumber()
-    const startingBlock = Math.max(blockNumber - this.NUM_BLOCKS_TO_FETCH, 0)
-
-    logger.debug('Layer:', { layer })
-
-    logger.debug('Address: ' + layer.messengerAddress)
-    logger.debug('topic: ' + ethers.utils.id(`RelayedMessage(bytes32)`))
-    logger.debug('fromBlock: ' + startingBlock)
-
-    const filter = {
-      address: layer.messengerAddress,
-      topics: [ethers.utils.id(`RelayedMessage(bytes32)`)],
-      fromBlock: startingBlock,
+    if (typeof pollForPending !== 'boolean') {
+      pollForPending = this.pollForPending
     }
 
-    const logs = await layer.provider.getLogs(filter)
-    logger.debug('Looking for: ' + msgHash)
-    // logger.debug("Current logs:", logs)
+    let matches: ethers.providers.Log[] = []
 
-    const matches = logs.filter((log: any) => log.data === msgHash)
+    let blocksToFetch = layer.blocksToFetch
+    if (typeof blocksToFetch !== 'number') {
+      blocksToFetch = this.blocksToFetch
+    }
+
+    // scan for transaction with specified message
+    while (matches.length === 0) {
+      const blockNumber = await layer.provider.getBlockNumber()
+      const startingBlock = Math.max(blockNumber - blocksToFetch, 0)
+      const successFilter: ethers.providers.Filter = {
+        address: layer.messengerAddress,
+        topics: [RELAYED_MESSAGE],
+        fromBlock: startingBlock,
+      }
+      const failureFilter: ethers.providers.Filter = {
+        address: layer.messengerAddress,
+        topics: [FAILED_RELAYED_MESSAGE],
+        fromBlock: startingBlock,
+      }
+      const successLogs = await layer.provider.getLogs(successFilter)
+      const failureLogs = await layer.provider.getLogs(failureFilter)
+      const logs = successLogs.concat(failureLogs)
+      matches = logs.filter(
+        (log: ethers.providers.Log) => log.topics[1] === msgHash
+      )
+
+      // exit loop after first iteration if not polling
+      if (!pollForPending) {
+        break
+      }
+
+      // pause awhile before trying again
+      await new Promise((r) => setTimeout(r, this.pollInterval))
+    }
 
     // Message was relayed in the past
     if (matches.length > 0) {
       if (matches.length > 1) {
         throw Error(
-          ' Found multiple transactions relaying the same message hash.'
+          'Found multiple transactions relaying the same message hash.'
         )
       }
       return layer.provider.getTransactionReceipt(matches[0].transactionHash)
-    }
-
-    if (!pollForPending) {
+    } else {
       return Promise.resolve(undefined)
     }
-
-    // Message has yet to be relayed, poll until it is found
-    return new Promise(async (resolve, reject) => {
-      logger.debug(
-        'Watcher polling::layer.provider.getTransactionReceipt pre filter'
-      )
-
-      // check timeout
-      const timeout = setTimeout(() => {
-        layer.provider.off(filter)
-        reject(Error('Timeout'))
-      }, configs.dummyWathcherTimeoutMins * 60 * 1000)
-
-      // listener that triggers on filter event
-      layer.provider.on(filter, async (log: any) => {
-        logger.debug(
-          'Watcher polling::layer.provider.getTransactionReceipt post filter'
-        )
-        logger.debug(log)
-        if (log.data === msgHash) {
-          logger.debug('FOUND')
-          clearTimeout(timeout)
-          try {
-            const txReceipt = await layer.provider.getTransactionReceipt(
-              log.transactionHash
-            )
-            layer.provider.off(filter)
-            resolve(txReceipt)
-          } catch (e) {
-            reject(e)
-          }
-        }
-      })
-    })
   }
 }
