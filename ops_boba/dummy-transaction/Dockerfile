@@ -1,11 +1,10 @@
-FROM omgx/builder AS omgx_builder
+FROM bobanetwork/builder:latest AS builder
 FROM node:12-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
 
-COPY --from=omgx_builder /optimism/packages/omgx/contracts/artifacts ./artifacts
-COPY --from=omgx_builder /optimism/packages/omgx/contracts/artifacts-ovm ./artifacts-ovm
+COPY --from=builder /optimism/packages/boba/contracts/artifacts ./artifacts
 
 # Install app dependencies
 # Wildcard is used to ensure both package and package lock JSON are copied
