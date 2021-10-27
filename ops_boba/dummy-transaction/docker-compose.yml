@@ -1,0 +1,11 @@
+version: "3.4"
+
+services:
+  monitoring:
+    image: enyalabs/omgx-monitor:v1.3.8
+    env_file:
+      - .env
+    labels:
+      - "com.datadoghq.tags.env=production"
+      - "com.datadoghq.tags.service=omgx-monitor"
+      - "com.datadoghq.tags.version=v1.3.8"
