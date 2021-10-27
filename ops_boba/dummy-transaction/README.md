@@ -18,5 +18,5 @@
 2. run `npm start`
 
 ## How to deploy image
-1. Build new image: `docker build -t enyalabs/omgx-monitor:{version-number} .`
-2. Push new image to docker hub: `docker push enyalabs/omgx-monitor:{version-number}`
+1. Build new image: `docker build -t bobanetwork/boba-dummy-transaction:{version-number} .`
+2. Push new image to docker hub: `docker push bobanetwork/boba-dummy-transaction:{version-number}`
