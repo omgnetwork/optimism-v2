@@ -13,14 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-localStorage.removeItem("masterConfig")
+//localStorage.removeItem("masterConfig")
 //localStorage.removeItem("netLayer")
 
-let masterConfigCache = localStorage.getItem("masterConfig")
-
-if (masterConfigCache) {
-  masterConfigCache = JSON.parse(masterConfigCache)
-}
+require('dotenv').config()
 
 let netLayerCache = localStorage.getItem("netLayer")
 
@@ -30,7 +26,7 @@ if (netLayerCache) {
 
 const initialState = {
   walletMethod: null,
-  masterConfig: masterConfigCache ? masterConfigCache : 'rinkeby',
+  masterConfig: process.env.REACT_APP_CHAIN,
   blockexplorerURL: '',
   etherscan: '',
   minter: false,
@@ -44,12 +40,12 @@ function setupReducer (state = initialState, action) {
         ...state, 
         walletMethod: action.payload 
       }
-    case 'SETUP/NETWORK/SET':
-      localStorage.setItem("masterConfig", JSON.stringify(action.payload))
-      return { 
-      	...state, 
-        masterConfig: action.payload
-      }
+    // case 'SETUP/NETWORK/SET':
+    //   localStorage.setItem("masterConfig", JSON.stringify(action.payload))
+    //   return { 
+    //   	...state, 
+    //     masterConfig: action.payload
+    //   }
     case 'SETUP/LAYER/SET':
       localStorage.setItem("netLayer", JSON.stringify(action.payload))
       return { 
