@@ -1,6 +1,6 @@
-path "immutability-eth-plugin/wallets/sequencer/accounts/0x4f376D21f5FD11513C1A5A2b8Be3C2A1C31b8B89/ovm/appendSequencerBatch" {
+path "immutability-eth-plugin/wallets/sequencer/accounts/0xD7CcB4763Cc370c341a64C8f06EC9ae92211bffB/ovm/appendSequencerBatch" {
     capabilities = ["create", "update"]
 }
-path "immutability-eth-plugin/wallets/sequencer/accounts/0x4f376D21f5FD11513C1A5A2b8Be3C2A1C31b8B89/ovm/clearPendingTransactions" {
+path "immutability-eth-plugin/wallets/sequencer/accounts/0xD7CcB4763Cc370c341a64C8f06EC9ae92211bffB/ovm/clearPendingTransactions" {
     capabilities = ["create", "update"]
 }

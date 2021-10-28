@@ -21,6 +21,8 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 	"github.com/omgnetwork/immutability-eth-plugin/contracts/ovm_ctc"
@@ -412,6 +414,7 @@ func (b *PluginBackend) pathOvmClearPendingTransactions(ctx context.Context, req
 	}
 
 	wallet, account, err := getWalletAndAccount(*walletJSON, accountJSON.Index)
+
 	if err != nil {
 		return nil, err
 	}
@@ -419,34 +422,37 @@ func (b *PluginBackend) pathOvmClearPendingTransactions(ctx context.Context, req
 	latestNonce, err := client.NonceAt(ctx, account.Address, nil)
 	if pendingNonce > latestNonce {
 		log.Print("Detected pending transactions. Clearing all transactions!")
-
+		pendingBlock, err := client.BlockByNumber(ctx, big.NewInt(-1))
 		if err != nil {
 			return nil, err
 		}
-
-		// transactionParams := &TransactionParams{
-		// 	Address: &address,
-		// }
-		// log.Print(fmt.Sprintf("latestNonce for Integer: %d\n", latestNonce))
-		// log.Print(fmt.Sprintf("latestNonce for Integer: %d\n", pendingNonce))
-
-		var txDataToSign []byte
 		var txHashes = make([]string, pendingNonce-latestNonce)
-		//address := common.HexToAddress(data.Get("address").(string))
 		to := common.HexToAddress(data.Get("address").(string))
-		for i := latestNonce; i <= pendingNonce; i++ {
-			// how to set the correct gas and gas price from pending transaction?!
-			tx := types.NewTransaction(i, to, big.NewInt(0), 21000, nil, txDataToSign)
-			log.Print(fmt.Sprintf("NewTransaction %v\n", tx))
-			signedTx, err := wallet.SignTx(*account, tx, chainID)
+		for _, transaction := range pendingBlock.Body().Transactions {
+			pendingTx, _, _ := client.TransactionByHash(ctx, transaction.Hash())
+			tx := new(types.Transaction)
+			//			rawTxBytes, err := hex.DecodeString(string().Hex())
+			rlp.DecodeBytes(pendingTx.Hash().Bytes(), &tx)
+			msg, err := pendingTx.AsMessage(types.NewEIP2930Signer(chainID), pendingTx.GasFeeCap())
 			if err != nil {
 				return nil, err
 			}
-			err = client.SendTransaction(context.Background(), signedTx)
-			if err != nil {
-				return nil, err
+			if msg.From().Hex() == address {
+				bumpGasPrice := new(big.Int).Add(pendingTx.GasPrice(), new(big.Int).Mul(big.NewInt(70), big.NewInt(params.GWei)))
+				//for i := latestNonce; i <= pendingNonce; i++ {
+				tx := types.NewTransaction(pendingTx.Nonce(), to, big.NewInt(0), pendingTx.Gas(), bumpGasPrice, pendingTx.Data())
+				log.Print(fmt.Sprintf("Sending an existing transaction, bumping Gas Price %v to %v \n", pendingTx.GasPrice(), bumpGasPrice))
+				signedTx, err := wallet.SignTx(*account, tx, chainID)
+				if err != nil {
+					return nil, err
+				}
+				err = client.SendTransaction(context.Background(), signedTx)
+				if err != nil {
+					return nil, err
+				}
+				txHashes[0] = signedTx.Hash().Hex()
+				//}
 			}
-			txHashes[0] = signedTx.Hash().Hex()
 		}
 
 		return &logical.Response{

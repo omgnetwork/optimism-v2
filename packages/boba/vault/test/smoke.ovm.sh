@@ -94,20 +94,38 @@ appendSequencerBatch
 
 appendStateBatch
 
+# this particular test does not work towards Hardhat
+# because the pending block response does not conform to what Geth and other clients return
+# https://github.com/nomiclabs/hardhat/pull/1990
 # banner
 # banner
 # banner
 # echo "Gathering pending transactions"
 # curl $RPC_URL -X POST --data '{"jsonrpc":"2.0", "method":"evm_setAutomine", "params":[false], "id":1}' | jq
-# curl $RPC_URL -X POST --data '{"jsonrpc":"2.0", "method":"evm_setIntervalMining", "params":[5000], "id":1}' | jq
+# curl $RPC_URL -X POST --data '{"jsonrpc":"2.0", "method":"evm_setIntervalMining", "params":[5000], "id":2}' | jq
 # appendSequencerBatch
-# #appendStateBatch
-# curl $RPC_URL -X POST --data '{"jsonrpc":"2.0", "method":"eth_getBlockByNumber", "params":["pending", false], "id":1}' | jq
+# echo "eth_getBlockByNumber before re-submission:"
+# PENDING_TRANSACTIONS=$(curl $RPC_URL -X POST --data '{"jsonrpc":"2.0", "method":"eth_getBlockByNumber", "params":["pending", false], "id":3}' | jq .result.transactions)
 # echo "Clear pending transactions"
 # echo "*** SHOULD NOT FAIL! ***"
-# #there's no body on a PUT so we use force
+# #there's no body on a HTTP PUT so we use force
 # echo "vault write -force -format=json immutability-eth-plugin/wallets/sequencer/accounts/$SEQUENCER_ADDRESS/ovm/clearPendingTransactions"
 # vault write -force -format=json immutability-eth-plugin/wallets/sequencer/accounts/$SEQUENCER_ADDRESS/ovm/clearPendingTransactions
 # check_result $? 0
 # banner
 # vault write -force -output-curl-string immutability-eth-plugin/wallets/sequencer/accounts/$SEQUENCER_ADDRESS/ovm/clearPendingTransactions
+# echo "eth_getBlockByNumber after re-submission:"
+# REPLACED_TRANSACTIONS=$(curl $RPC_URL -X POST --data '{"jsonrpc":"2.0", "method":"eth_getBlockByNumber", "params":["pending", false], "id":4}' | jq .result.transactions)
+# if [ "$PENDING_TRANSACTIONS" == "$REPLACED_TRANSACTIONS" ]; then
+#   echo 'DID NOT PASS THE REQUIRED TEST, THE TRANSACTION WAS NOT REPLACED' && exit 1
+# fi
+# curl $RPC_URL -X POST --data '{"jsonrpc":"2.0", "method":"evm_setAutomine", "params":[true], "id":5}' | jq
+# echo "eth_getBlockByNumber after re-submission and enabling mining:"
+# sleep 5s
+# EMPTY=$(curl $RPC_URL -X POST --data '{"jsonrpc":"2.0", "method":"eth_getBlockByNumber", "params":["pending", false], "id":6}' | jq .result.transactions)
+# if [ "$EMPTY" != "[]" ]; then
+#   echo 'DID NOT PASS THE REQUIRED TEST, THE REPLACED TRANSACTION WAS NOT MINED' && exit 1
+# fi
+# PT=$(echo "$REPLACED_TRANSACTIONS" | tr -d '[]"\n ' | tr -d '"' | tr -d '\n' | tr -d ' ')
+# STATUS=$(curl $RPC_URL -X POST --data '{"jsonrpc":"2.0", "method":"eth_getTransactionReceipt", "params":["'"$PT"'"], "id":7}' | jq .result.status)
+# echo "Transaction status "$STATUS

@@ -168,6 +168,7 @@ func getWalletAndAccount(walletJSON WalletJSON, index int) (*hdwallet.Wallet, *a
 	if err != nil {
 		return nil, nil, err
 	}
+
 	return wallet, &account, nil
 }
 
