@@ -1,0 +1,25 @@
+specVersion: 0.0.2
+description: TokenPool for BOBA
+repository: https://github.com/omgnetwork/optimism-v2/boba_examples/subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: TokenPool
+    network: boba
+    source:
+      address: '0x82B178EE692572e21D73d5F1ebC1c7c438Fc52DD'
+      abi: TokenPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - TokenPool
+      abis:
+        - name: TokenPool
+          file: ./abis/TokenPool.json
+      eventHandlers:
+        - event: RequestToken(address,uint256,uint256)
+          handler: handleRequestToken
+      file: ./src/mapping.ts

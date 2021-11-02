@@ -1,0 +1,22 @@
+{
+  "name": "boba-tokenpool",
+  "version": "0.1.0",
+  "scripts": {
+    "create:subgraph": "graph create --node https://graph.rinkeby.boba.network:8020 boba/TokenPool",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy:subgraph": "graph deploy boba/TokenPool --ipfs https://graph.rinkeby.boba.network:5001 --node https://graph.rinkeby.boba.network:8020"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.20.1",
+    "@graphprotocol/graph-ts": "^0.20.0"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-register": "^6.26.0",
+    "truffle": "^5.0.4",
+    "truffle-contract": "^4.0.5",
+    "truffle-hdwallet-provider": "^1.0.4",
+    "@openzeppelin/contracts": "3.4.1"
+  }
+}

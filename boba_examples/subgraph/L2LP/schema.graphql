@@ -1,0 +1,47 @@
+type AddLiquidityEvent @entity {
+  id: ID!
+  sender: Bytes
+  amount: String
+  token: Bytes
+}
+
+type ClientDepositL2Event @entity {
+  id: ID!
+  sender: Bytes
+  amount: String
+  token: Bytes
+}
+
+type ClientPayL2Event @entity {
+  id: ID!
+  sender: Bytes
+  amount: String
+  userRewardFee: String
+  ownerRewardFee: String
+  totalFee: String
+  token: Bytes
+}
+
+type OwnerRecoverFeeEvent @entity {
+  id: ID!
+  sender: Bytes
+  receiver: Bytes
+  amount: String
+  token: Bytes
+}
+
+type WithdrawLiquidityEvent @entity {
+  id: ID!
+  sender: Bytes
+  receiver: Bytes
+  amount: String
+  token: Bytes
+}
+
+type WithdrawRewardEvent @entity {
+  id: ID!
+  sender: Bytes
+  receiver: Bytes
+  amount: String
+  token: Bytes
+}

@@ -1,0 +1,35 @@
+specVersion: 0.0.2
+description: L2 Liquidity Pool for Boba
+repository: https://github.com/omgnetwork/optimism-v2/boba_examples/subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: L2LP
+    network: boba
+    source:
+      address: '0xEd3417AE90fA0BfE15Fab8b949a9a459F9f4ef26'
+      abi: L2LP
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - L2LP
+      abis:
+        - name: L2LP
+          file: ./abis/L2LP.json
+      eventHandlers:
+        - event: AddLiquidity(address,uint256,address)
+          handler: handleAddLiquidity
+        - event: ClientDepositL2(address,uint256,address)
+          handler: handleClientDepositL2
+        - event: ClientPayL2(address,uint256,uint256,uint256,uint256,address)
+          handler: handleClientPayL2
+        - event: OwnerRecoverFee(address,address,uint256,address)
+          handler: handleOwnerRecoverFee
+        - event: WithdrawLiquidity(address,address,uint256,address)
+          handler: handleWithdrawLiquidity
+        - event: WithdrawReward(address,address,uint256,address)
+          handler: handleWithdrawReward
+      file: ./src/mapping.ts

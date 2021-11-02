@@ -1,0 +1,6 @@
+type TokenPool @entity {
+  id: ID!
+  sender: Bytes
+  amount: String
+  timestamp: String
+}
