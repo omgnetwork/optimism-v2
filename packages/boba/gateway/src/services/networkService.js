@@ -1115,25 +1115,36 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTx = await this.L1StandardBridgeContract.depositETH(
-        this.L2GasLimit,
-        utils.formatBytes32String(new Date().getTime().toString()),
-        {
-          value: value_Wei_String
-        }
-      )
+      console.log("value_Wei_String",value_Wei_String)
+      console.log("value_Wei_String",ethers.utils.parseEther('0.1').toHexString())
 
-      //at this point the tx has been submitted, and we are waiting...
-      await depositTx.wait()
+      /* NEED TO CONVERT value_Wei_String to value_Wei_HEX_String... sigh... */
 
-      const block = await this.L1Provider.getTransaction(depositTx.hash)
+      const ethValueFloatString = ethers.utils.formatEther(value_Wei_String)
+      const ethValueHexWeiString = ethers.utils.parseEther(ethValueFloatString).toHexString()
+
+      const transactionParameters = {
+        from: this.account,
+        to: allAddresses.L1StandardBridgeAddress,
+        value: ethValueHexWeiString
+      }
+
+      const depositTxHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [transactionParameters],
+      })
+
+      console.log(' depositTxHash:', depositTxHash)
+      /*need to fix the Hash delay so we can monitor the transaction*/
+
+      const block = await this.L1Provider.getTransaction(depositTxHash)
       console.log(' block:', block)
 
       //closes the Deposit modal
       updateSignatureStatus_depositTRAD(true)
 
       const [msgHash] = await this.watcher.getMessageHashesFromL1Tx(
-        depositTx.hash
+        depositTxHash
       )
       console.log(' got L1->L2 message hash', msgHash)
 
@@ -1147,7 +1158,7 @@ class NetworkService {
 
       const data = {
         "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTx.hash,
+        "hash": depositTxHash,
         "l1Tol2": false, //since we are going L2->L1
         "startTime": time_start,
         "endTime": time_stop,
