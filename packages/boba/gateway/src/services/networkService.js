@@ -1103,6 +1103,14 @@ class NetworkService {
     }
   }
 
+  delay = (delayInms) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(2)
+      }, delayInms)
+    })
+  }
+
   //Move ETH from L1 to L2 using the standard deposit system
   depositETHL2 = async (value_Wei_String) => {
 
@@ -1137,7 +1145,19 @@ class NetworkService {
       console.log(' depositTxHash:', depositTxHash)
       /*need to fix the Hash delay so we can monitor the transaction*/
 
-      const block = await this.L1Provider.getTransaction(depositTxHash)
+      let block
+
+      for (let attempt = 1; attempt <= 100; attempt++) {
+        const l1blk = await this.L1Provider.getTransaction(depositTxHash)
+        if (l1blk) {
+          block = l1blk
+          break
+        }
+        console.log("Waiting for L1 confirmation of tx Hash:", depositTxHash, "Attempt:", attempt)
+        await this.delay(5000)
+      }
+
+      //const block = await this.L1Provider.getTransaction(depositTxHash)
       console.log(' block:', block)
 
       //closes the Deposit modal
