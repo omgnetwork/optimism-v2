@@ -1159,7 +1159,7 @@ class NetworkService {
       const data = {
         "key": process.env.REACT_APP_SPEED_CHECK,
         "hash": depositTxHash,
-        "l1Tol2": false, //since we are going L2->L1
+        "l1Tol2": true, //since we are going L1->L2
         "startTime": time_start,
         "endTime": time_stop,
         "block": block.blockNumber,
