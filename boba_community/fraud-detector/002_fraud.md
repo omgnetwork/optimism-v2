@@ -126,6 +126,3 @@ verifier_dtl_1     | {"level":30,"time":1636134645380,"highestSyncedL1Block":135
 ...
 
 ```
-
-
-
