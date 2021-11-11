@@ -20,7 +20,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash';
 
-import { getFarmInfo, getFee } from 'actions/farmAction'
+import { getFarmInfo /*, getL1Fee, getL2Fee */} from 'actions/farmAction'
 
 import ListFarm from 'components/listFarm/listFarm'
 import Tabs from 'components/tabs/Tabs'
@@ -41,8 +41,10 @@ class Farm extends React.Component {
     super(props)
 
     const {
-      totalFeeRate,
-      userRewardFeeRate,
+      // totalL1FeeRate,
+      // userL1RewardFeeRate,
+      // totalL2FeeRate,
+      // userL2RewardFeeRate,
       poolInfo,
       userInfo,
     } = this.props.farm
@@ -62,8 +64,10 @@ class Farm extends React.Component {
     }
 
     this.state = {
-      totalFeeRate,
-      userRewardFeeRate,
+      // totalL1FeeRate,
+      // userL1RewardFeeRate,
+      // totalL2FeeRate,
+      // userL2RewardFeeRate,
       poolInfo,
       userInfo,
       layer1,
@@ -80,12 +84,21 @@ class Farm extends React.Component {
 
   componentDidMount() {
 
-    const { totalFeeRate, userRewardFeeRate } = this.props.farm
+    // const { 
+    //   totalL1FeeRate, userL1RewardFeeRate,
+    //   totalL2FeeRate, userL2RewardFeeRate  
+    // } = this.props.farm
 
-    if (!totalFeeRate || !userRewardFeeRate) {
-      this.props.dispatch(getFee())
-    }
+    // if (!totalL1FeeRate || !userL1RewardFeeRate) {
+    //   this.props.dispatch(getL1Fee())
+    // }
 
+    // if (!totalL2FeeRate || !userL2RewardFeeRate) {
+    //   this.props.dispatch(getL2Fee())
+    // }
+
+    //this.props.dispatch(getL1Fee())
+    //this.props.dispatch(getL2Fee())
     this.props.dispatch(getFarmInfo())
 
   }
@@ -93,8 +106,8 @@ class Farm extends React.Component {
   componentDidUpdate(prevState) {
 
     const {
-      totalFeeRate,
-      userRewardFeeRate,
+      // totalL1FeeRate, userL1RewardFeeRate,
+      // totalL2FeeRate, userL2RewardFeeRate 
       poolInfo,
       userInfo,
     } = this.props.farm
@@ -104,13 +117,21 @@ class Farm extends React.Component {
       layer2
     } = this.props.balance
 
-    if (prevState.farm.totalFeeRate !== totalFeeRate) {
-      this.setState({ totalFeeRate })
-    }
+    // if (prevState.farm.totalL1FeeRate !== totalL1FeeRate) {
+    //   this.setState({ totalL1FeeRate })
+    // }
 
-    if (prevState.farm.userRewardFeeRate !== userRewardFeeRate) {
-      this.setState({ userRewardFeeRate })
-    }
+    // if (prevState.farm.userL1RewardFeeRate !== userL1RewardFeeRate) {
+    //   this.setState({ userL1RewardFeeRate })
+    // }
+
+    // if (prevState.farm.totalL2FeeRate !== totalL2FeeRate) {
+    //   this.setState({ totalL2FeeRate })
+    // }
+
+    // if (prevState.farm.userL2RewardFeeRate !== userL2RewardFeeRate) {
+    //   this.setState({ userL2RewardFeeRate })
+    // }
 
     if (!isEqual(prevState.farm.poolInfo, poolInfo)) {
       this.setState({ poolInfo })
@@ -186,9 +207,7 @@ class Farm extends React.Component {
   render() {
 
     const {
-      // Pool
       poolInfo,
-      // user
       userInfo,
       lpChoice,
       poolTab,
@@ -249,7 +268,7 @@ class Farm extends React.Component {
                     to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for later harvesting by liquidity providers.
                     <br /><br />
                     <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
-                    bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. In the current (v1) system, the pool operator is responsible
+                    bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. In the current system, the pool operator is responsible
                     for pool rebalancing, when and if needed, using 'classic' deposit and exit operations to move funds from one pool to another.
                     <br /><br />
                     <span style={{ fontWeight: '700' }}>Future work</span>. A more elegant approach to pool balancing is an 'automatic'
