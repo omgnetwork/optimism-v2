@@ -127,8 +127,10 @@ class NetworkService {
     this.networkName = null
 
     // gas
-    this.L1GasLimit = 9999999
-    this.L2GasLimit = 10000000
+    this.L1GasLimit = 9999999 //setting of this value not important since it's not connected to anything in the contracts 
+    // "param _l1Gas Unused, but included for potential forward compatibility considerations"
+
+    this.L2GasLimit = 1300000 //use the same as the hardcoded receive
 
     // Dao
     this.BobaContract = null
