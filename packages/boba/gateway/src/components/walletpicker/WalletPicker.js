@@ -121,7 +121,6 @@ function WalletPicker ({ onEnable, enabled }) {
   }, [ onEnable, accountsEnabled ]);
 
   useEffect(() => {
-    console.log([walletEnabled , wrongNetwork])
     if (walletEnabled && wrongNetwork) {
       dispatch(openModal('wrongNetworkModal'));
       localStorage.setItem('changeChain', false);
