@@ -278,7 +278,7 @@ func GetReqID(ctx context.Context) string {
 	return reqId
 }
 
-// GetLastIPAddresses returns comma separated list of remote IP addresses
+// GetLastIPAddresses returns last remote IP addresses
 func GetLastIPAddresses(r *http.Request) string {
 	ips := []string{r.RemoteAddr}
 
