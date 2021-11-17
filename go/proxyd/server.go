@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/log"
@@ -106,7 +107,11 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info("received RPC request", "req_id", GetReqID(ctx), "auth", GetAuthCtx(ctx))
+	start := time.Now()
+	log.Info("received RPC request", "req_id", GetReqID(ctx), "auth", GetAuthCtx(ctx), "client", GetLastIPAddresses(r))
+	defer func() {
+		log.Info("complete RPC request", "req_id", GetReqID(ctx), "elapsed_time", time.Since(start).Milliseconds(), "ms")
+	}()
 
 	req, err := ParseRPCReq(io.LimitReader(r.Body, s.maxBodySize))
 	if err != nil {
@@ -162,7 +167,11 @@ func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info("received WS connection", "req_id", GetReqID(ctx))
+	log.Info("received WS connection", "req_id", GetReqID(ctx), "client", GetLastIPAddresses(r))
+	start := time.Now()
+	defer func() {
+		log.Info("complete RPC request", "req_id", GetReqID(ctx), "elapsed_time", time.Since(start).Milliseconds(), "ms")
+	}()
 
 	clientConn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -267,4 +276,16 @@ func GetReqID(ctx context.Context) string {
 		return ""
 	}
 	return reqId
+}
+
+// GetLastIPAddresses returns comma separated list of remote IP addresses
+func GetLastIPAddresses(r *http.Request) string {
+	ips := []string{r.RemoteAddr}
+
+	addresses := r.Header.Get("X-Forwarded-For")
+	if len(addresses) > 0 {
+		ips = append(ips, strings.Split(addresses, ",")...)
+	}
+
+	return ips[len(ips)-1]
 }
