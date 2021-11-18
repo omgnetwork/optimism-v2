@@ -42,26 +42,26 @@ function Exits({ searchHistory, transactions, chainLink }) {
   const allAddresses = networkService.getAllAddresses()
   
   const _exits = transactions.filter(i => {
-    return i.hash.includes(searchHistory) && (
-      i.to !== null && (
-        i.to.toLowerCase() === allAddresses.L2LPAddress.toLowerCase() ||
-        i.to.toLowerCase() === allAddresses.L2StandardBridgeAddress.toLowerCase()
-      )
-    )
+    return i.hash.includes(searchHistory) && i.to !== null && i.exitL2
   })
+
+  //console.log("_exits:",_exits)
+  //console.log("transactions:",transactions)
 
   const renderExits = _exits.map((i, index) => {
     
-    //these are other types of transactions like approvals
-    if(i.exitL2 === false) {
-      return null
-    }
-
     const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
+    
+    let metaData = ''
 
-    const typeTX = typeof(i.typeTX) === 'undefined' ? '' : i.typeTX
-    const activity = typeof(i.activity) === 'undefined' ? '' : ' (' + i.activity + ')'
-    let metaData = typeTX + ' ' + activity
+    //i.crossDomainMessage.fast can be either 1 or null,
+    //where null denotes the classic 7 day exit 
+
+    if(i.crossDomainMessage.fast === 1) {
+      metaData = 'Fast Bridge'
+    } else if (i.crossDomainMessage.fast === null) {
+      metaData = 'Classic 7-day Bridge'
+    }
 
     let isExitable = false
     let details = null
@@ -82,7 +82,7 @@ function Exits({ searchHistory, transactions, chainLink }) {
     }
 
     //are we dealing with a traditional exit?
-    if (to === networkService.L2StandardBridgeAddress.toLowerCase()) {
+    if (to === allAddresses.L2StandardBridgeAddress.toLowerCase()) {
 
       isExitable = moment().isAfter(moment.unix(i.crossDomainMessage.crossDomainMessageEstimateFinalizedTime))
 

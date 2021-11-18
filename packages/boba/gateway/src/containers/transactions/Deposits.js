@@ -26,8 +26,6 @@ import { logAmount } from 'util/amountConvert'
 import Pager from 'components/pager/Pager'
 import Transaction from 'components/transaction/Transaction'
 
-import networkService from 'services/networkService'
-
 import * as styles from './Transactions.module.scss'
 import * as S from './History.styles';
 
@@ -40,20 +38,12 @@ function Deposits({ searchHistory, transactions }) {
   const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))
   const tokenList = useSelector(selectTokens)
 
-  const allAddresses = networkService.getAllAddresses()
-
   useEffect(() => {
-    setPage(1);
-  }, [searchHistory]);
+    setPage(1)
+  }, [searchHistory])
 
   const _deposits = transactions.filter(i => {
-    return i.hash.includes(searchHistory) && (
-      i.to !== null && (
-        i.to.toLowerCase() === allAddresses.L1LPAddress.toLowerCase() ||
-        i.to.toLowerCase() === allAddresses.L1_ETH_Address.toLowerCase() ||
-        i.to.toLowerCase() === allAddresses.L1StandardBridgeAddress.toLowerCase()
-      )
-    )
+    return i.hash.includes(searchHistory) && i.to !== null && i.depositL2 
   })
 
   const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE);
@@ -87,19 +77,23 @@ function Deposits({ searchHistory, transactions }) {
               )}
               {paginatedDeposits.map((i, index) => {
                 
-                if(i.depositL2 === false) {
-                  return null
-                }
-
-                const typeTX = typeof(i.typeTX) === 'undefined' ? '' : i.typeTX
-                const activity = typeof(i.activity) === 'undefined' ? '' : ' (' + i.activity + ')'
-                let metaData = typeTX + ' ' + activity
+                //const typeTX = typeof(i.typeTX) === 'undefined' ? '' : i.typeTX
+                //const activity = typeof(i.activity) === 'undefined' ? '' : ' (' + i.activity + ')'
+                //let metaData = typeTX + ' ' + activity
                 
                 const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
 
                 let details = null
+                let amountTx = null
 
-                let amountTx = null;
+                let metaData = ''
+
+                if(i.crossDomainMessage.fast === 1) {
+                  metaData = 'Fast Bridge'
+                } else if (i.crossDomainMessage.fast === 0) {
+                  metaData = 'Classic Bridge'
+                }
+
                 if (i.action && i.action.token) {
                   const token = tokenList[i.action.token.toLowerCase()];
                   if (!!token) {
