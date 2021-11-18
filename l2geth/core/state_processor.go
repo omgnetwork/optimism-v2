@@ -143,3 +143,59 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 
 	return receipt, err
 }
+
+
+func ApplyTransactionForPreExec(config *params.ChainConfig, bc ChainContext, author *common.Address, gp *GasPool, statedb *state.StateDB, header *types.Header, tx *types.Transaction, msg types.Message, usedGas *uint64, cfg vm.Config) (*types.Receipt, error) {
+  var err error
+  // Create a new context to be used in the EVM environment
+  context := NewEVMContext(msg, header, bc, author)
+  // Create a new environment which holds all relevant information
+  // about the transaction and calling mechanisms.
+  vmenv := vm.NewEVM(context, statedb, config, cfg)
+
+  // UsingOVM
+  // Compute the fee related information that is to be included
+  // on the receipt. This must happen before the state transition
+  // to ensure that the correct information is used.
+  l1Fee, l1GasPrice, l1GasUsed, scalar, err := fees.DeriveL1GasInfo(msg, statedb)
+  if err != nil {
+    return nil, err
+  }
+
+  // Apply the transaction to the current state (included in the env)
+  _, gas, failed, err := ApplyMessage(vmenv, msg, gp)
+  if err != nil {
+    return nil, err
+  }
+
+  // Update the state with pending changes
+  var root []byte
+  if config.IsByzantium(header.Number) {
+    statedb.Finalise(true)
+  } else {
+    root = statedb.IntermediateRoot(config.IsEIP158(header.Number)).Bytes()
+  }
+  *usedGas += gas
+
+  // Create a new receipt for the transaction, storing the intermediate root and gas used by the tx
+  // based on the eip phase, we're passing whether the root touch-delete accounts.
+  receipt := types.NewReceipt(root, failed, *usedGas)
+  receipt.L1GasPrice = l1GasPrice
+  receipt.L1GasUsed = l1GasUsed
+  receipt.L1Fee = l1Fee
+  receipt.FeeScalar = scalar
+  receipt.TxHash = tx.Hash()
+  receipt.GasUsed = gas
+  // if the transaction created a contract, store the creation address in the receipt.
+  if msg.To() == nil {
+    receipt.ContractAddress = crypto.CreateAddress(vmenv.Context.Origin, tx.Nonce())
+  }
+  // Set the receipt logs and create a bloom for filtering
+  receipt.Logs = statedb.GetLogs(tx.Hash())
+  receipt.Bloom = types.CreateBloom(types.Receipts{receipt})
+  receipt.BlockHash = statedb.BlockHash()
+  receipt.BlockNumber = header.Number
+  receipt.TransactionIndex = uint(statedb.TxIndex())
+
+  return receipt, err
+}
