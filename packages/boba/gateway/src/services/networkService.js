@@ -171,7 +171,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
-    if (this.masterSystemConfig === 'mainnet') return
+    //if (this.masterSystemConfig === 'mainnet') return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
@@ -220,7 +220,7 @@ class NetworkService {
 
     // NOT SUPPORTED on LOCAL
     if (this.masterSystemConfig === 'local') return
-    if (this.masterSystemConfig === 'mainnet') return
+    //if (this.masterSystemConfig === 'mainnet') return
 
     const response = await omgxWatcherAxiosInstance(
       this.masterSystemConfig
@@ -900,6 +900,30 @@ class NetworkService {
         (i) => i.exitL2 && i.crossDomainMessage
       )
       return { exited: filteredTransactions }
+    }
+
+  }
+
+  async getSevens() {
+
+    console.log("getSevens()")
+
+    // NOT SUPPORTED on LOCAL
+    if (this.masterSystemConfig === 'local') return
+
+    const response = await omgxWatcherAxiosInstance(
+      this.masterSystemConfig
+    ).get('get.l2.pendingexits')
+
+    //console.log("response:",response)
+
+    if (response.status === 201) {
+      const sevens = response.data
+      const filteredSevens = sevens.filter(
+        (i) => (i.fastRelay === 0) && (i.status === 'pending')
+      )
+      //console.log("response:",filteredSevens)
+      return filteredSevens
     }
 
   }
