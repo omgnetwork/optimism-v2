@@ -21,6 +21,10 @@ export function selectlayer2Balance (state) {
   return state.balance.layer2
 }
 
+export function selectGas (state) {
+  return state.balance.gas
+}
+
 export function selectL1LPBalanceString (state) {
   return state.balance.l1LpBalanceWeiString
 }
@@ -54,6 +58,10 @@ export function selectL2FeeRate (state) {
 
 export function selectFastExitCost (state) {
   return state.balance.fastExitCost
+}
+
+export function selectClassicExitCost (state) {
+  return state.balance.classicExitCost
 }
 
 export function selectFastDepositCost (state) {
