@@ -465,19 +465,26 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // Clear the event cache to avoid keeping every single event in memory and eventually
             // getting OOM killed. Messages are already sorted in ascending order so the last message
             // will have the highest batch index.
-            const lastMessage = messages[messages.length - 1]
+            // const lastMessage = messages[messages.length - 1]
 
-            // Find the batch corresponding to the last processed message.
-            const lastProcessedBatch = await this._getStateBatchHeader(
-              lastMessage.parentTransactionIndex
-            )
+            // // Find the batch corresponding to the last processed message.
+            // const lastProcessedBatch = await this._getStateBatchHeader(
+            //   lastMessage.parentTransactionIndex
+            // )
 
-            // Remove any events from the cache for batches that should've been processed by now.
-            this.state.eventCache = this.state.eventCache.filter((event) => {
-              return (
-                event.args._batchIndex > lastProcessedBatch.batch.batchIndex
+            // // Remove any events from the cache for batches that should've been processed by now.
+            // this.state.eventCache = this.state.eventCache.filter((event) => {
+            //   return (
+            //     event.args._batchIndex > lastProcessedBatch.batch.batchIndex
+            //   )
+            // })
+
+            if (this.state.eventCache.length > 5000) {
+              this.state.eventCache = this.state.eventCache.slice(
+                this.state.eventCache.length - 5000,
+                this.state.eventCache.length
               )
-            })
+            }
           }
 
           this.logger.info(
@@ -890,7 +897,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     )
   }
 
-  /* The filter makes sure that the message-relayer-fast only handles message traffic 
+  /* The filter makes sure that the message-relayer-fast only handles message traffic
      intended for it
   */
 
