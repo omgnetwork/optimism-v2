@@ -99,6 +99,22 @@ x-integration_3_pk: &integration_3_pk
 version: "3"
 
 services:
+  # redis:
+  #   image: redis:alpine
+  #   ports:
+  #     - "6379:6379"
+  #   command:
+  #     - --save ""
+  #     - --appendonly no
+  #make sure you setup proxyd.toml
+  # proxyd:
+  #   ports:
+  #     - 8081:8080
+  #   depends_on:
+  #     - redis
+  #   image: proxyd:latest
+  #   volumes:
+  #     - ../go/proxyd:/etc/proxyd/
   # base service builder
   builder:
     image: bobanetwork/builder:latest
@@ -168,8 +184,6 @@ services:
         DTL_REGISTRY_URL: http://dtl:8081/addresses.json
         DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
         RETRIES: 150
-    ports:
-      - ${DEPLOYER_PORT:-8099}:8081 # Can eventually remove this now that DTL is serving stuff
 
   # deploys boba contracts and serves contract addresses
   boba_deployer:
@@ -192,9 +206,6 @@ services:
       << : *fast-relayer_pk
       RETRIES: 150
       DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
-    ports:
-        # expose the service to the host for getting the contract addrs
-      - ${BOBA_DEPLOYER_PORT:-8078}:8079
 
   dtl:
     depends_on:
@@ -237,7 +248,7 @@ services:
         # connecting to the DTL
         ROLLUP_CLIENT_HTTP: http://dtl:7878
         ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-        RETRIES: 60
+        RETRIES: 100
         # no need to keep this secret, only used internally to sign blocks
         BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
         BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
@@ -356,7 +367,7 @@ services:
         ROLLUP_BACKEND: 'l1'
         ROLLUP_VERIFIER_ENABLE: 'true'
         ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-        RETRIES: 60
+        RETRIES: 100
     ports:
       - ${VERIFIER_HTTP_PORT:-8547}:8545
       - ${VERIFIER_WS_PORT:-8548}:8546
@@ -381,7 +392,7 @@ services:
         ROLLUP_BACKEND: 'l2'
         ROLLUP_VERIFIER_ENABLE: 'true'
         ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-        RETRIES: 60
+        RETRIES: 100
         # no need to keep this secret, only used internally to sign blocks
         BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
         BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
