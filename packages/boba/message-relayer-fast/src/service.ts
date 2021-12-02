@@ -429,12 +429,12 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // Clear the event cache to avoid keeping every single event in memory and eventually
             // getting OOM killed. Messages are already sorted in ascending order so the last message
             // will have the highest batch index.
-            const lastMessage = messages[messages.length - 1]
+            // const lastMessage = messages[messages.length - 1]
 
             // Find the batch corresponding to the last processed message.
-            const lastProcessedBatch = await this._getStateBatchHeader(
-              lastMessage.parentTransactionIndex
-            )
+            // const lastProcessedBatch = await this._getStateBatchHeader(
+            //   lastMessage.parentTransactionIndex
+            // )
 
             // Remove any events from the cache for batches that should've been processed by now.
             const oldSize = this.state.eventCache.length
