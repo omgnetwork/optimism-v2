@@ -270,7 +270,7 @@ func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
 	}
 	root := statedb.IntermediateRoot(false)
 	head := &types.Header{
-		Number:     new(big.Int).SetUint64(g.Number),
+		Number:     new(big.Int).SetUint64(42/*g.Number*/),
 		Nonce:      types.EncodeNonce(g.Nonce),
 		Time:       g.Timestamp,
 		ParentHash: g.ParentHash,
@@ -298,9 +298,9 @@ func (g *Genesis) ToBlock(db ethdb.Database) *types.Block {
 // The block is committed as the canonical head block.
 func (g *Genesis) Commit(db ethdb.Database) (*types.Block, error) {
 	block := g.ToBlock(db)
-	if block.Number().Sign() != 0 {
-		return nil, fmt.Errorf("can't commit genesis block with number > 0")
-	}
+	// if block.Number().Sign() != 0 {
+	// 	return nil, fmt.Errorf("can't commit genesis block with number > 0")
+	// }
 	config := g.Config
 	if config == nil {
 		config = params.AllEthashProtocolChanges
