@@ -96,7 +96,15 @@ export class L2IngestionService extends BaseService<L2IngestionServiceOptions> {
     while (this.running) {
       try {
         const highestSyncedL2BlockNumber =
-          (await this.state.db.getHighestSyncedUnconfirmedBlock()) || 43 //1 + 42 = 43
+          (await this.state.db.getHighestSyncedUnconfirmedBlock()) || 42 //1 + 42 = 43
+          //43 gives this: 
+          /*
+          {"level":30,"time":1638659712553,"fromBlock":43,"toBlock":42,"msg":"Synchronizing unconfirmed transactions from Layer 2 (Optimistic Ethereum)"}
+
+{"level":40,"time":1638659712553,"startBlockNumber":43,"endBlockNumber":42,"msg":"Cannot query with start block number larger than end block number"}
+*/
+//so this needs to be set to 42 rather than 1
+
 
         const currentL2Block = await this.state.l2RpcProvider.getBlockNumber()
 
