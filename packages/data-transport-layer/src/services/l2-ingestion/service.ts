@@ -96,7 +96,7 @@ export class L2IngestionService extends BaseService<L2IngestionServiceOptions> {
     while (this.running) {
       try {
         const highestSyncedL2BlockNumber =
-          (await this.state.db.getHighestSyncedUnconfirmedBlock()) || 1
+          (await this.state.db.getHighestSyncedUnconfirmedBlock()) || 43 //1 + 42 = 43
 
         const currentL2Block = await this.state.l2RpcProvider.getBlockNumber()
 
