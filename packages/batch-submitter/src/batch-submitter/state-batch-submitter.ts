@@ -123,7 +123,7 @@ export class StateBatchSubmitter extends BatchSubmitter {
 
     // We will submit state roots for txs which have been in the tx chain for a while.
     const totalElements: number =
-      (await this.ctcContract.getTotalElements()).toNumber() + this.blockOffset
+      (await this.ctcContract.getTotalElements()).toNumber() //+ this.blockOffset
     this.logger.info('Retrieved total elements from CTC', {
       totalElements,
     })

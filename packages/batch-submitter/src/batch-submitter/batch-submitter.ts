@@ -86,23 +86,23 @@ export abstract class BatchSubmitter {
     })
 
     if (this.syncing === true) {
-      this.logger.info(
-        'Syncing mode enabled! Skipping batch submission and clearing queue...'
-      )
+      // this.logger.info(
+      //   'Syncing mode enabled! Skipping batch submission and clearing queue...'
+      // )
       //return this._onSync()
     }
     const range = await this._getBatchStartAndEnd()
     
-    this.logger.info(
-        'getBatchStartAndEnd', {
-          rangeStart: range.start,
-          rangeEnd: range.end,
-        }
-      )
-
     if (!range) {
       return
     }
+
+    this.logger.info(
+      'getBatchStartAndEnd', {
+        rangeStart: range.start,
+        rangeEnd: range.end,
+      }
+    )
 
     return this._submitBatch(range.start, range.end)
   }
