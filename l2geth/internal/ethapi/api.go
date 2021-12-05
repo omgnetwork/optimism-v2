@@ -871,7 +871,7 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.Blo
 		}
 		if block != nil {
 			txs := block.Transactions()
-			if header.Number.Uint64() != 0 {
+			if header.Number.Uint64() != 42 {
 				if len(txs) != 1 {
 					return nil, 0, false, fmt.Errorf("block %d has more than 1 transaction", header.Number.Uint64())
 				}
