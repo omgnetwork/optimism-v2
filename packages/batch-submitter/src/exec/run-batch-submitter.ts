@@ -103,7 +103,7 @@ export const run = async () => {
   // Default is 1 because Geth normally has 1 more block than L1
   const BLOCK_OFFSET = config.uint(
     'block-offset',
-    parseInt(env.BLOCK_OFFSET, 10) || 1
+    43//parseInt(env.BLOCK_OFFSET, 10) || 1
   )
 
   /* Logger */

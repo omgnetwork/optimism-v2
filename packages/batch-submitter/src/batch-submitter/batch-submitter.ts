@@ -69,6 +69,7 @@ export abstract class BatchSubmitter {
   public abstract _updateChainInfo(): Promise<void>
 
   public async submitNextBatch(): Promise<TransactionReceipt> {
+
     if (typeof this.l2ChainId === 'undefined') {
       this.l2ChainId = await this._getL2ChainId()
     }
@@ -88,9 +89,17 @@ export abstract class BatchSubmitter {
       this.logger.info(
         'Syncing mode enabled! Skipping batch submission and clearing queue...'
       )
-      return this._onSync()
+      //return this._onSync()
     }
     const range = await this._getBatchStartAndEnd()
+    
+    this.logger.info(
+        'getBatchStartAndEnd', {
+          rangeStart: range.start,
+          rangeEnd: range.end,
+        }
+      )
+
     if (!range) {
       return
     }
