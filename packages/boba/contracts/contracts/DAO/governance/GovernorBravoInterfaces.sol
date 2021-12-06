@@ -29,6 +29,9 @@ contract GovernorBravoEvents {
     /// @notice An event emitted when the voting period is set
     event VotingPeriodSet(uint oldVotingPeriod, uint newVotingPeriod);
 
+    /// @notice An event emitted when the quorum votes is set
+    event QuorumVotesSet(uint oldQuorumVotes, uint newQuorumVotes);
+
     /// @notice Emitted when implementation is changed
     event NewImplementation(address oldImplementation, address newImplementation);
 
@@ -132,6 +135,9 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
 
         /// @notice Current number of votes for abstaining for this proposal
         uint abstainVotes;
+
+        /// @notice The quorumVotes for this proposal
+        uint quorumVotes;
 
         /// @notice Flag marking whether the proposal has been canceled
         bool canceled;

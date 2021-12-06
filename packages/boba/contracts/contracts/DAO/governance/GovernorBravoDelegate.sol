@@ -26,8 +26,14 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoE
     /// @notice The max setable voting delay (seconds before proposal goes votable)
     uint public constant MAX_VOTING_DELAY = 7 days; // 1 week
 
+    /// @notice The minimum setable quorum votes
+    uint public constant MIN_QUORUM_VOTES = 1000000e18; // 1,000,000 BOBA
+
+    /// @notice The maximum setable quorum votes
+    uint public constant MAX_QUORUM_VOTES = 10000000e18; // 10,000,000 BOBA
+
     /// @notice The number of votes in support of a proposal required for a quorum to be reached and for a vote to succeed
-    uint public constant quorumVotes = 1000000e18; // 1,000,000 BOBA
+    uint public quorumVotes = 1000000e18; // 1,000,000 BOBA
 
     /// @notice The maximum number of actions that can be included in a proposal
     uint public constant proposalMaxOperations = 10; // 10 actions
@@ -106,6 +112,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoE
             forVotes: 0,
             againstVotes: 0,
             abstainVotes: 0,
+            quorumVotes: quorumVotes,
             canceled: false,
             executed: false
         });
@@ -203,7 +210,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoE
             return ProposalState.Pending;
         } else if (block.timestamp <= proposal.endTimestamp) {
             return ProposalState.Active;
-        } else if (proposal.forVotes <= proposal.againstVotes || proposal.forVotes < quorumVotes) {
+        } else if (proposal.forVotes <= proposal.againstVotes || proposal.forVotes < proposal.quorumVotes) {
             return ProposalState.Defeated;
         } else if (proposal.eta == 0) {
             return ProposalState.Succeeded;
@@ -324,6 +331,20 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoE
         proposalThreshold = newProposalThreshold;
 
         emit ProposalThresholdSet(oldProposalThreshold, proposalThreshold);
+    }
+
+    /**
+      * @notice Admin function for setting the quorumVotes
+      * @dev newQuorumVotes must be greater than the hardcoded min
+      * @param newQuorumVotes new quorumVotes
+      */
+    function _setQuorumVotes(uint newQuorumVotes) external {
+        require(msg.sender == admin, "GovernorBravo::_setQuorumVotes: admin only");
+        require(newQuorumVotes >= MIN_QUORUM_VOTES && newQuorumVotes <= MAX_QUORUM_VOTES, "GovernorBravo::_setQuorumVotes: invalid quorum Votes");
+        uint oldQuorumVotes = quorumVotes;
+        quorumVotes = newQuorumVotes;
+
+        emit QuorumVotesSet(oldQuorumVotes, quorumVotes);
     }
 
     /**
