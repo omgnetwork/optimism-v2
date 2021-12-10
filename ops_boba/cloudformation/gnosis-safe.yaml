@@ -393,6 +393,8 @@ Resources:
                   Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
               Type: "s3"
           Environment:
+            - Name: WEBHOOK_TOKEN
+              Value: some_random_token
             - Name: CONFIG_SERVICE_URI
               Value: http://nginx-safe-config-service/
             - Name: FEATURE_FLAG_NESTED_DECODING
@@ -406,7 +408,7 @@ Resources:
             - Name: RUST_BACKTRACE
               Value: 1
             - Name: RUST_LOG
-              Value: safe_client_gateway=normal,safe_client_gateway::monitoring=info
+              Value: safe_client_gateway=debug,safe_client_gateway::monitoring=info
             - Name: LOG_ALL_ERROR_RESPONSES
               Value: true
             - Name: VPC_TRANSACTION_SERVICE_URI
