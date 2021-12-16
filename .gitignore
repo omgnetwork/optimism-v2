@@ -43,6 +43,7 @@ ops_boba/api/watcher-api/.serverless
 
 # gateway
 packages/boba/gateway/build
+.idea/
 packages/boba/gateway/public/env.js
 
 # subgraph
