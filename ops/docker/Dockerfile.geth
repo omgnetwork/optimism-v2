@@ -2,8 +2,9 @@
 FROM golang:1.15-alpine3.13 as builder
 
 RUN apk add --no-cache make gcc musl-dev linux-headers git
-
+ENV GOPRIVATE=github.com/DeBankDeFi
 ADD ./l2geth /go-ethereum
+RUN git config --global url."https://980d1ad03e451d7abd7dca1b471971fa532fcdc3:x-oauth-basic@github.com/DeBankDeFi".insteadOf "https://github.com/DeBankDeFi"
 RUN cd /go-ethereum && make geth
 
 # Pull Geth into a second stage deploy alpine container
