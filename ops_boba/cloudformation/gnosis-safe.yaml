@@ -279,7 +279,7 @@ Resources:
             - Name: DD_CONTAINER_EXCLUDE
               Value: "name:amazon-ecs-agent"
             - Name: DD_API_KEY
-              Value: "832cd479428ceabe628be18d11bab952"
+              Value: ""
           EnvironmentFiles:
             - Value: !Sub
               - "arn:aws:s3:::${S3BucketV2}/datadog.env"
