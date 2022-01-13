@@ -30,17 +30,8 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub "${InfrastructureStackName}:VpcId"
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 8000
-        ToPort: 8000
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
+      - Description: Allow all outbound traffic
+        IpProtocol: "-1"
         CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
@@ -53,8 +44,8 @@ Resources:
       Scheme: internet-facing
       Type: network
       Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
 
   LoadBalancerGnosisTransaction:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -63,8 +54,8 @@ Resources:
       Scheme: internet-facing
       Type: network
       Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
 
   LoadBalancerGnosisGateway:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -73,8 +64,8 @@ Resources:
       Scheme: internet-facing
       Type: network
       Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
 
   LoadBalancerGnosisReact:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -83,8 +74,8 @@ Resources:
       Scheme: internet-facing
       Type: network
       Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
 
   LoadBalancerGnosisConfig:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -93,8 +84,8 @@ Resources:
       Scheme: internet-facing
       Type: network
       Subnets:
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet1
-      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PrivateSubnet2
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet1
+      - Fn::ImportValue: !Sub ${InfrastructureStackName}:PublicSubnet2
 
 
   EcsCluster:
