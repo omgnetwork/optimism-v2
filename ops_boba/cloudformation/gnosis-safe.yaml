@@ -571,77 +571,77 @@ Resources:
             com.datadoghq.ad.logs: '[{"source": "worker", "service": "worker"}]'
           Essential: false
           Memory: "1024"
-        # - Image: !Sub "${DockerPrefix}/safe-client-gateway:${ImageTag}"
-        #   Name: safe-client-gateway
-        #   Ulimits:
-        #     - Name: nofile
-        #       SoftLimit: 65536
-        #       HardLimit: 65536
-        #     - Name: nproc
-        #       SoftLimit: 65536
-        #       HardLimit: 65536
-        #     - Name: core
-        #       SoftLimit: 0
-        #       HardLimit: 0
-        #   PortMappings:
-        #     - ContainerPort: 3666
-        #       HostPort: 3666
-        #   MountPoints:
-        #     - ContainerPath: "/nginx"
-        #       SourceVolume: nginx
-        #   EnvironmentFiles:
-        #     - Value: !Sub
-        #       - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
-        #       - S3BucketV2:
-        #           Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
-        #       Type: "s3"
-        #   Environment:
-        #     - Name: CONFIG_SERVICE_URI
-        #       Value: !Sub
-        #         - "https://safe-config.${EndpointAddress}/"
-        #         - EndpointAddress:
-        #             Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
-        #     - Name: FEATURE_FLAG_NESTED_DECODING
-        #       Value: true
-        #     - Name: FEATURE_FLAG_BALANCES_RATE_IMPLEMENTATION
-        #       Value: false
-        #     - Name: SCHEME
-        #       Value: http
-        #     - Name: ROCKET_LOG_LEVEL
-        #       Value: debug
-        #     - Name: RUST_BACKTRACE
-        #       Value: 1
-        #     - Name: RUST_LOG
-        #       Value: safe_client_gateway=debug,safe_client_gateway::monitoring=info
-        #     - Name: LOG_ALL_ERROR_RESPONSES
-        #       Value: true
-        #     - Name: VPC_TRANSACTION_SERVICE_URI
-        #       Value: true
-        #     - Name: CONCURRENT_BALANCE_TOKEN_REQUESTS
-        #       Value: 5
-        #     - Name: INTERNAL_CLIENT_CONNECT_TIMEOUT
-        #       Value: 10000
-        #     - Name: SAFE_APP_INFO_REQUEST_TIMEOUT
-        #       Value: 10000
-        #     - Name: CHAIN_INFO_REQUEST_TIMEOUT
-        #       Value: 15000
-        #     - Name: EXCHANGE_API_BASE_URI
-        #       Value: http://api.exchangeratesapi.io/latest
-        #     - Name: REDIS_URI
-        #       Value: !Sub
-        #         - "redis://${EndpointAddress}:6379"
-        #         - EndpointAddress:
-        #             Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
-        #     - Name: ROCKET_PORT
-        #       Value: 3666
-        #     - Name: ROCKET_ADDRESS
-        #       Value: 0.0.0.0
-        #   DockerLabels:
-        #     com.datadoghq.ad.check_names: '["safe-client-gateway"]'
-        #     com.datadoghq.ad.init_configs: '[{}]'
-        #     com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
-        #   Essential: true
-        #   Memory: "4000"
+        - Image: !Sub "${DockerPrefix}/safe-client-gateway:${ImageTag}"
+          Name: safe-client-gateway
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: nproc
+              SoftLimit: 65536
+              HardLimit: 65536
+            - Name: core
+              SoftLimit: 0
+              HardLimit: 0
+          PortMappings:
+            - ContainerPort: 3666
+              HostPort: 3666
+          MountPoints:
+            - ContainerPath: "/nginx"
+              SourceVolume: nginx
+          EnvironmentFiles:
+            - Value: !Sub
+              - "arn:aws:s3:::${S3BucketV2}/gnosis-safe.env"
+              - S3BucketV2:
+                  Fn::ImportValue: !Sub "${InfrastructureStackName}:S3BucketV2"
+              Type: "s3"
+          Environment:
+            - Name: CONFIG_SERVICE_URI
+              Value: !Sub
+                - "https://safe-config.${EndpointAddress}/"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:DomainName"
+            - Name: FEATURE_FLAG_NESTED_DECODING
+              Value: true
+            - Name: FEATURE_FLAG_BALANCES_RATE_IMPLEMENTATION
+              Value: false
+            - Name: SCHEME
+              Value: http
+            - Name: ROCKET_LOG_LEVEL
+              Value: debug
+            - Name: RUST_BACKTRACE
+              Value: 1
+            - Name: RUST_LOG
+              Value: safe_client_gateway=debug,safe_client_gateway::monitoring=info
+            - Name: LOG_ALL_ERROR_RESPONSES
+              Value: true
+            - Name: VPC_TRANSACTION_SERVICE_URI
+              Value: true
+            - Name: CONCURRENT_BALANCE_TOKEN_REQUESTS
+              Value: 5
+            - Name: INTERNAL_CLIENT_CONNECT_TIMEOUT
+              Value: 10000
+            - Name: SAFE_APP_INFO_REQUEST_TIMEOUT
+              Value: 10000
+            - Name: CHAIN_INFO_REQUEST_TIMEOUT
+              Value: 15000
+            - Name: EXCHANGE_API_BASE_URI
+              Value: http://api.exchangeratesapi.io/latest
+            - Name: REDIS_URI
+              Value: !Sub
+                - "redis://${EndpointAddress}:6379"
+                - EndpointAddress:
+                    Fn::ImportValue: !Sub "${InfrastructureStackName}:RedisClusterGnosis:DNS"
+            - Name: ROCKET_PORT
+              Value: 3666
+            - Name: ROCKET_ADDRESS
+              Value: 0.0.0.0
+          DockerLabels:
+            com.datadoghq.ad.check_names: '["safe-client-gateway"]'
+            com.datadoghq.ad.init_configs: '[{}]'
+            com.datadoghq.ad.logs: '[{"source": "safe-client-gateway", "service": "safe-client-gateway"}]'
+          Essential: true
+          Memory: "4000"
         - Image: !Sub "${DockerPrefix}/safe-config-service:${ImageTag}"
           Name: safe-config-service
           Ulimits:
@@ -761,12 +761,12 @@ Resources:
         - ContainerName: nginx-safe-transaction-service
           ContainerPort: 8000
           TargetGroupArn: !Ref GnosisLBTargetGroup2
-        # - ContainerName: safe-client-gateway
-        #   ContainerPort: 3666
-        #   TargetGroupArn: !Ref GnosisLBTargetGroup3
-        # - ContainerName: safe-react
-        #   ContainerPort: 3000
-        #   TargetGroupArn: !Ref GnosisLBTargetGroup4
+        - ContainerName: safe-client-gateway
+          ContainerPort: 3666
+          TargetGroupArn: !Ref GnosisLBTargetGroup3
+        - ContainerName: safe-react
+          ContainerPort: 3000
+          TargetGroupArn: !Ref GnosisLBTargetGroup4
         - ContainerName: safe-config-service
           ContainerPort: 8080
           TargetGroupArn: !Ref GnosisLBTargetGroup5
