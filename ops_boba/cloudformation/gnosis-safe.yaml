@@ -776,8 +776,8 @@ Resources:
           SecurityGroups:
             - Fn::ImportValue: !Sub "${InfrastructureStackName}:LoadBalancerGnosis:SecurityGroup"
           Subnets:
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet1"
-            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PrivateSubnet2"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PublicSubnet1"
+            - Fn::ImportValue: !Sub "${InfrastructureStackName}:PublicSubnet2"
       HealthCheckGracePeriodSeconds: 300
       DesiredCount: !Ref ServiceCount
       LaunchType: EC2
