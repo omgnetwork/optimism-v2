@@ -25,14 +25,14 @@ import (
 	"time"
 
 	"github.com/ethereum-optimism/optimism/l2geth/common"
-  "github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
+	"github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
 	"github.com/ethereum-optimism/optimism/l2geth/crypto"
-  "github.com/ethereum-optimism/optimism/l2geth/log"
+	"github.com/ethereum-optimism/optimism/l2geth/log"
 	"github.com/ethereum-optimism/optimism/l2geth/params"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/dump"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/util"
-  "github.com/ethereum-optimism/optimism/l2geth/rpc"
+	"github.com/ethereum-optimism/optimism/l2geth/rpc"
 	"golang.org/x/crypto/sha3"
 )
 
