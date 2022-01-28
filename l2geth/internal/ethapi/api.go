@@ -45,6 +45,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/p2p"
 	"github.com/ethereum-optimism/optimism/l2geth/params"
 	"github.com/ethereum-optimism/optimism/l2geth/rlp"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/fees"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 	"github.com/ethereum-optimism/optimism/l2geth/rpc"
 	"github.com/tyler-smith/go-bip39"
@@ -65,6 +66,10 @@ const (
 // It offers only methods that operate on public data that is freely available to anyone.
 type PublicEthereumAPI struct {
 	b Backend
+}
+
+type callmsg struct {
+	types.Message
 }
 
 // NewPublicEthereumAPI creates a new Ethereum protocol API.
@@ -910,7 +915,7 @@ func DoCall(ctx context.Context, b Backend, args CallArgs, blockNrOrHash rpc.Blo
 	defer cancel()
 
 	// Get a new instance of the EVM.
-	evm, vmError, err := b.GetEVM(ctx, msg, state, header)
+	evm, vmError, err := b.GetEVM(ctx, msg, state, header, vmCfg)
 	if err != nil {
 		return nil, 0, false, err
 	}
@@ -989,11 +994,13 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 	}
 	cap = hi
 
-	// Set sender address or use a default if none specified
-	if args.From == nil {
-		if wallets := b.AccountManager().Wallets(); len(wallets) > 0 {
-			if accounts := wallets[0].Accounts(); len(accounts) > 0 {
-				args.From = &accounts[0].Address
+	if !rcfg.UsingOVM {
+		// Set sender address or use a default if none specified
+		if args.From == nil {
+			if wallets := b.AccountManager().Wallets(); len(wallets) > 0 {
+				if accounts := wallets[0].Accounts(); len(accounts) > 0 {
+					args.From = &accounts[0].Address
+				}
 			}
 		}
 	}
@@ -1037,7 +1044,35 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 			return 0, fmt.Errorf("gas required exceeds allowance (%d)", cap)
 		}
 	}
-	return hexutil.Uint64(hi), nil
+
+	nonce, _ := b.GetPoolNonce(ctx, *args.From)
+
+	value := new(big.Int)
+	if args.Value != nil {
+		value = args.Value.ToInt()
+	}
+
+	gasPrice := new(big.Int)
+	if args.GasPrice != nil {
+		gasPrice = args.GasPrice.ToInt()
+	}
+
+	var data []byte
+	if args.Data != nil {
+		data = []byte(*args.Data)
+	}
+
+	msg := callmsg{types.NewMessage(*args.From, args.To, nonce, value, hi, gasPrice, data, false, new(big.Int), 0, []byte{0}, types.QueueOriginSequencer)}
+
+	state, _, _ := b.StateAndHeaderByNumberOrHash(ctx, blockNrOrHash)
+	l2ExtraGas := new(big.Int)
+	if rcfg.UsingOVM {
+		if msg.GasPrice().Cmp(common.Big0) != 0 {
+			l2ExtraGas, _ = fees.CalculateL2GasForL1Msg(msg, state, nil)
+		}
+	}
+
+	return hexutil.Uint64(hi + l2ExtraGas.Uint64()), nil
 }
 
 // EstimateGas returns an estimate of the amount of gas needed to execute the
