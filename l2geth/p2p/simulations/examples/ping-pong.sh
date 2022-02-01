@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Boot a ping-pong network simulation using the HTTP API started by ping-pong.go
 

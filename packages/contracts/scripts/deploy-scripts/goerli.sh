@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ### DEPLOYMENT SCRIPT ###
 # To be called from root of contracts dir #

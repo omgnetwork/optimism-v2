@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+SHELL := /usr/bin/env bash
 
 VERSION := `git describe --abbrev=0`
 GITCOMMIT := `git rev-parse HEAD`

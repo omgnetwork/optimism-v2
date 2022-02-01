@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 export L2_BLOCK_GAS_LIMIT=15000000
 export L2_CHAIN_ID=420

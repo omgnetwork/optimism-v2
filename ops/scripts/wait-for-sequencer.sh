@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 CONTAINER=l2geth
 
 RETRIES=30

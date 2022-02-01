@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+SHELL := /usr/bin/env bash
 
 GITCOMMIT := $(shell git rev-parse HEAD)
 GITDATE := $(shell git show -s --format='%ct')

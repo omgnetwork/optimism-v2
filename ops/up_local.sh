@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #if ! [ -x "$(command -v yq)" ]; then
 #  echo 'Error: yq is not installed. brew install yq' >&2

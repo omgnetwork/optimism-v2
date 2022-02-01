@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Deterministically recreate the gas price oracle bindings
 # for testing. This script depends on geth being in the monorepo

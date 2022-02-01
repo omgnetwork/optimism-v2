@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ### All available deploy options at the time of deployment: ###
 #  --ctc-force-inclusion-period-seconds  Number of seconds that the sequencer has to include transactions before the L1 queue. (default: 2592000)

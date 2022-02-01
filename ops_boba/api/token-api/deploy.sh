@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # if [[$STAGE == "all"]]; then
 #   echo 'You set STAGE to rinkeby. Deploying to Rinkeby...'
