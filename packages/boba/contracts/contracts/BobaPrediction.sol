@@ -28,6 +28,8 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     bool public genesisLockOnce = false;
     bool public genesisStartOnce = false;
 
+    address public bobaTokenAddress;
+
     address public adminAddress; // address of the admin
     address public operatorAddress; // address of the operator
 
@@ -107,6 +109,8 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
 
     event GetCurrentQuote(string turingUrl, string turingPair, uint256 marketPrice, uint256 timestamp);
 
+    event NewBobaTokenAddress(address bobaTokenAddress);
+
     modifier onlyAdmin() {
         require(msg.sender == adminAddress, "Not admin");
         _;
@@ -140,6 +144,7 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
      * @param _minBetAmount: minimum bet amounts (in wei)
      * @param _turingUpdateAllowance: turing update allowance
      * @param _treasuryFee: treasury fee (1000 = 10%)
+     * @param _bobaTokenAddress: bobaTokenAddress
      */
     constructor(
         address _turingAddress,
@@ -151,7 +156,8 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         uint256 _bufferSeconds,
         uint256 _minBetAmount,
         uint256 _turingUpdateAllowance,
-        uint256 _treasuryFee
+        uint256 _treasuryFee,
+        address _bobaTokenAddress
     ) {
         require(_treasuryFee <= MAX_TREASURY_FEE, "Treasury fee too high");
 
@@ -165,20 +171,25 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         minBetAmount = _minBetAmount;
         turingUpdateAllowance = _turingUpdateAllowance;
         treasuryFee = _treasuryFee;
+        bobaTokenAddress = _bobaTokenAddress;
     }
 
     /**
      * @notice Bet bear position
      * @param epoch: epoch
+     * @param value: boba token amount
      */
-    function betBear(uint256 epoch) external payable whenNotPaused nonReentrant notContract {
+    function betBear(uint256 epoch, uint256 value) external payable whenNotPaused nonReentrant notContract {
         require(epoch == currentEpoch, "Bet is too early/late");
         require(_bettable(epoch), "Round not bettable");
-        require(msg.value >= minBetAmount, "Bet amount must be greater than minBetAmount");
         require(ledger[epoch][msg.sender].amount == 0, "Can only bet once per round");
+        require(value >= minBetAmount, "Bet amount must be greater than minBetAmount");
+
+        // Transfer Boba token this contract
+        IERC20(bobaTokenAddress).safeTransferFrom(msg.sender, address(this), value);
 
         // Update round data
-        uint256 amount = msg.value;
+        uint256 amount = value;
         Round storage round = rounds[epoch];
         round.totalAmount = round.totalAmount + amount;
         round.bearAmount = round.bearAmount + amount;
@@ -195,15 +206,19 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     /**
      * @notice Bet bull position
      * @param epoch: epoch
+     * @param value: boba token amount
      */
-    function betBull(uint256 epoch) external payable whenNotPaused nonReentrant notContract {
+    function betBull(uint256 epoch, uint256 value) external payable whenNotPaused nonReentrant notContract {
         require(epoch == currentEpoch, "Bet is too early/late");
         require(_bettable(epoch), "Round not bettable");
-        require(msg.value >= minBetAmount, "Bet amount must be greater than minBetAmount");
         require(ledger[epoch][msg.sender].amount == 0, "Can only bet once per round");
+        require(value >= minBetAmount, "Bet amount must be greater than minBetAmount");
+
+        // Transfer Boba token this contract
+        IERC20(bobaTokenAddress).safeTransferFrom(msg.sender, address(this), value);
 
         // Update round data
-        uint256 amount = msg.value;
+        uint256 amount = value;
         Round storage round = rounds[epoch];
         round.totalAmount = round.totalAmount + amount;
         round.bullAmount = round.bullAmount + amount;
@@ -249,7 +264,7 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         }
 
         if (reward > 0) {
-            _safeTransferBNB(address(msg.sender), reward);
+            IERC20(bobaTokenAddress).safeTransfer(address(msg.sender), reward);
         }
     }
 
@@ -325,7 +340,7 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     function claimTreasury() external nonReentrant onlyAdmin {
         uint256 currentTreasuryAmount = treasuryAmount;
         treasuryAmount = 0;
-        _safeTransferBNB(adminAddress, currentTreasuryAmount);
+        IERC20(bobaTokenAddress).safeTransfer(adminAddress, currentTreasuryAmount);
 
         emit TreasuryClaim(currentTreasuryAmount);
     }
@@ -378,6 +393,17 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         operatorAddress = _operatorAddress;
 
         emit NewOperatorAddress(_operatorAddress);
+    }
+
+    /**
+     * @notice Set operator address
+     * @dev Callable by admin
+     */
+    function setBobaTokenAddress(address _bobaTokenAddress) external whenPaused onlyAdmin {
+        require(_bobaTokenAddress != address(0), "Cannot be zero address");
+        bobaTokenAddress = _bobaTokenAddress;
+
+        emit NewBobaTokenAddress(_bobaTokenAddress);
     }
 
     /**
@@ -637,16 +663,6 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
             "Can only start new round after round n-2 closeTimestamp"
         );
         _startRound(epoch);
-    }
-
-    /**
-     * @notice Transfer BNB in a safe way
-     * @param to: address to transfer BNB to
-     * @param value: BNB amount to transfer (in wei)
-     */
-    function _safeTransferBNB(address to, uint256 value) internal {
-        (bool success, ) = to.call{value: value}("");
-        require(success, "TransferHelper: BNB_TRANSFER_FAILED");
     }
 
     /**
