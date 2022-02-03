@@ -409,15 +409,16 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     /**
      * @notice Set Turing address
      * @dev Callable by admin
+     * @param _turingAddress turing address
      */
-    function setTuring(address _turing) external whenPaused onlyAdmin {
-        require(_turing != address(0), "Cannot be zero address");
-        turing = TuringHelper(_turing);
+    function setTuring(address _turingAddress) external whenPaused onlyAdmin {
+        require(_turingAddress != address(0), "Cannot be zero address");
+        turing = TuringHelper(_turingAddress);
 
         // Dummy check to make sure the interface implements this function properly
         _getCurrentQuote();
 
-        emit NewTuring(_turing);
+        emit NewTuring(_turingAddress);
     }
 
     /**
