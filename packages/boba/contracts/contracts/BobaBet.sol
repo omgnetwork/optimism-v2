@@ -15,9 +15,9 @@ import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@boba/turing-hybrid-compute/contracts/TuringHelper.sol';
 
 /**
- * @title BobaPrediction
+ * @title BobaBet
  */
-contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
+contract BobaBet is Ownable, Pausable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     TuringHelper private turing;
@@ -42,9 +42,6 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
 
     uint256 public currentEpoch; // current epoch for prediction round
 
-    uint256 public turingLatestTimestamp;
-    uint256 public turingUpdateAllowance; // seconds
-
     uint256 public constant MAX_TREASURY_FEE = 1000; // 10%
 
     mapping(uint256 => mapping(address => BetInfo)) public ledger;
@@ -52,8 +49,8 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     mapping(address => uint256[]) public userRounds;
 
     enum Position {
-        Bull,
-        Bear
+        Up,
+        Down
     }
 
     struct Round {
@@ -61,13 +58,12 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         uint256 startTimestamp;
         uint256 lockTimestamp;
         uint256 closeTimestamp;
-        uint256 lockPrice;
-        uint256 closePrice;
-        uint256 lockTuringTimestamp;
+        uint8 lockNumber; //
+        uint8 closeNumber;
         uint256 closeTuringTimestamp;
         uint256 totalAmount;
-        uint256 bullAmount;
-        uint256 bearAmount;
+        uint256 upAmount;
+        uint256 downAmount;
         uint256 rewardBaseCalAmount;
         uint256 rewardAmount;
         bool turingCalled;
@@ -79,11 +75,11 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         bool claimed; // default false
     }
 
-    event BetBear(address indexed sender, uint256 indexed epoch, uint256 amount);
-    event BetBull(address indexed sender, uint256 indexed epoch, uint256 amount);
+    event BetDown(address indexed sender, uint256 indexed epoch, uint256 amount);
+    event BetUp(address indexed sender, uint256 indexed epoch, uint256 amount);
     event Claim(address indexed sender, uint256 indexed epoch, uint256 amount);
-    event EndRound(uint256 indexed epoch, uint256 indexed timestamp, uint256 price);
-    event LockRound(uint256 indexed epoch, uint256 indexed timestamp, uint256 price);
+    event EndRound(uint256 indexed epoch, uint256 indexed timestamp, uint8 closeNumber);
+    event LockRound(uint256 indexed epoch, uint8 lockNumber);
 
     event NewAdminAddress(address admin);
     event NewBufferAndIntervalSeconds(uint256 bufferSeconds, uint256 intervalSeconds);
@@ -91,8 +87,6 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     event NewTreasuryFee(uint256 indexed epoch, uint256 treasuryFee);
     event NewOperatorAddress(address operator);
     event NewTuring(address turingAddress);
-    event NewTuringParams(string turingUrl, string turingPair);
-    event NewTuringUpdateAllowance(uint256 turingUpdateAllowance);
 
     event Pause(uint256 indexed epoch);
     event RewardsCalculated(
@@ -107,7 +101,7 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     event TreasuryClaim(uint256 amount);
     event Unpause(uint256 indexed epoch);
 
-    event GetCurrentQuote(string turingUrl, string turingPair, uint256 marketPrice, uint256 timestamp);
+    event GetRandomNumber(uint8 randomNumber);
 
     event NewBobaTokenAddress(address bobaTokenAddress);
 
@@ -135,51 +129,43 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     /**
      * @notice Constructor
      * @param _turingAddress: turing address
-     * @param _turingUrl: turing url
-     * @param _turingPair: turing pair
      * @param _adminAddress: admin address
      * @param _operatorAddress: operator address
      * @param _intervalSeconds: number of time within an interval
-     * @param _bufferSeconds: buffer of time for resolution of price
+     * @param _bufferSeconds: buffer of time for resolution of random number
      * @param _minBetAmount: minimum bet amounts (in wei)
-     * @param _turingUpdateAllowance: turing update allowance
      * @param _treasuryFee: treasury fee (1000 = 10%)
      * @param _bobaTokenAddress: bobaTokenAddress
      */
     constructor(
         address _turingAddress,
-        string memory _turingUrl,
-        string memory _turingPair,
         address _adminAddress,
         address _operatorAddress,
         uint256 _intervalSeconds,
         uint256 _bufferSeconds,
         uint256 _minBetAmount,
-        uint256 _turingUpdateAllowance,
         uint256 _treasuryFee,
         address _bobaTokenAddress
     ) {
         require(_treasuryFee <= MAX_TREASURY_FEE, "Treasury fee too high");
+        require(_bufferSeconds < _intervalSeconds, "bufferSeconds must be inferior to intervalSeconds");
 
         turing = TuringHelper(_turingAddress);
-        turingUrl = _turingUrl;
-        turingPair = _turingPair;
         adminAddress = _adminAddress;
         operatorAddress = _operatorAddress;
         intervalSeconds = _intervalSeconds;
         bufferSeconds = _bufferSeconds;
         minBetAmount = _minBetAmount;
-        turingUpdateAllowance = _turingUpdateAllowance;
         treasuryFee = _treasuryFee;
         bobaTokenAddress = _bobaTokenAddress;
     }
 
     /**
-     * @notice Bet bear position
+     * @notice Bet down position
      * @param epoch: epoch
      * @param value: boba token amount
      */
-    function betBear(uint256 epoch, uint256 value) external payable whenNotPaused nonReentrant notContract {
+    function betDown(uint256 epoch, uint256 value) external payable whenNotPaused nonReentrant notContract {
         require(epoch == currentEpoch, "Bet is too early/late");
         require(_bettable(epoch), "Round not bettable");
         require(ledger[epoch][msg.sender].amount == 0, "Can only bet once per round");
@@ -192,23 +178,23 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         uint256 amount = value;
         Round storage round = rounds[epoch];
         round.totalAmount = round.totalAmount + amount;
-        round.bearAmount = round.bearAmount + amount;
+        round.downAmount = round.downAmount + amount;
 
         // Update user data
         BetInfo storage betInfo = ledger[epoch][msg.sender];
-        betInfo.position = Position.Bear;
+        betInfo.position = Position.Down;
         betInfo.amount = amount;
         userRounds[msg.sender].push(epoch);
 
-        emit BetBear(msg.sender, epoch, amount);
+        emit BetDown(msg.sender, epoch, amount);
     }
 
     /**
-     * @notice Bet bull position
+     * @notice Bet up position
      * @param epoch: epoch
      * @param value: boba token amount
      */
-    function betBull(uint256 epoch, uint256 value) external payable whenNotPaused nonReentrant notContract {
+    function betUp(uint256 epoch, uint256 value) external payable whenNotPaused nonReentrant notContract {
         require(epoch == currentEpoch, "Bet is too early/late");
         require(_bettable(epoch), "Round not bettable");
         require(ledger[epoch][msg.sender].amount == 0, "Can only bet once per round");
@@ -221,15 +207,15 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         uint256 amount = value;
         Round storage round = rounds[epoch];
         round.totalAmount = round.totalAmount + amount;
-        round.bullAmount = round.bullAmount + amount;
+        round.upAmount = round.upAmount + amount;
 
         // Update user data
         BetInfo storage betInfo = ledger[epoch][msg.sender];
-        betInfo.position = Position.Bull;
+        betInfo.position = Position.Up;
         betInfo.amount = amount;
         userRounds[msg.sender].push(epoch);
 
-        emit BetBull(msg.sender, epoch, amount);
+        emit BetUp(msg.sender, epoch, amount);
     }
 
     /**
@@ -269,7 +255,7 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
-     * @notice Start the next round n, lock price for round n-1, end round n-2
+     * @notice Start the next round n, lock random number for round n-1, end round n-2
      * @dev Callable by operator
      */
     function executeRound() external whenNotPaused onlyOperator {
@@ -278,13 +264,12 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
             "Can only run after genesisStartRound and genesisLockRound is triggered"
         );
 
-        (uint256 currentPrice, uint256 timestamp) = _getPriceFromTuring();
-
-        turingLatestTimestamp = uint256(timestamp);
+        // Make sure that turing is working
+        uint8 randomNumber = _getRandomNumber();
 
         // CurrentEpoch refers to previous round (n-1)
-        _safeLockRound(currentEpoch, timestamp, currentPrice);
-        _safeEndRound(currentEpoch - 1, timestamp, currentPrice);
+        _safeLockRound(currentEpoch);
+        _safeEndRound(currentEpoch - 1, randomNumber);
         _calculateRewards(currentEpoch - 1);
 
         // Increment currentEpoch to current round (n)
@@ -300,11 +285,9 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         require(genesisStartOnce, "Can only run after genesisStartRound is triggered");
         require(!genesisLockOnce, "Can only run genesisLockRound once");
 
-        (uint256 currentPrice, uint256 timestamp) = _getPriceFromTuring();
+        uint8 randomNumber = _getRandomNumber();
 
-        turingLatestTimestamp = uint256(timestamp);
-
-        _safeLockRound(currentEpoch, timestamp, currentPrice);
+        _safeLockRound(currentEpoch);
 
         currentEpoch = currentEpoch + 1;
         _startRound(currentEpoch);
@@ -317,6 +300,8 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
      */
     function genesisStartRound() external whenNotPaused onlyOperator {
         require(!genesisStartOnce, "Can only run genesisStartRound once");
+
+        uint8 randomNumber = _getRandomNumber();
 
         currentEpoch = currentEpoch + 1;
         _startRound(currentEpoch);
@@ -416,39 +401,9 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         turing = TuringHelper(_turingAddress);
 
         // Dummy check to make sure the interface implements this function properly
-        _getCurrentQuote();
+        _getRandomNumber();
 
         emit NewTuring(_turingAddress);
-    }
-
-    /**
-     * @notice Set Turing params
-     * @dev Callable by admin
-     */
-    function setTuringParams(string memory _turingUrl, string memory _turingPair) external whenPaused onlyAdmin {
-        require(
-            keccak256(abi.encodePacked((_turingUrl))) == keccak256(abi.encodePacked((""))) &&
-            keccak256(abi.encodePacked((turingPair))) == keccak256(abi.encodePacked((""))),
-            "Cannot be blank string"
-        );
-
-        turingUrl = _turingUrl;
-        turingPair = _turingPair;
-
-        // Dummy check to make sure the interface implements this function properly
-        _getCurrentQuote();
-
-        emit NewTuringParams(turingUrl, turingPair);
-    }
-
-    /**
-     * @notice Set turing update allowance
-     * @dev Callable by admin
-     */
-    function setTuringUpdateAllowance(uint256 _turingUpdateAllowance) external whenPaused onlyAdmin {
-        turingUpdateAllowance = _turingUpdateAllowance;
-
-        emit NewTuringUpdateAllowance(_turingUpdateAllowance);
     }
 
     /**
@@ -537,15 +492,12 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     function claimable(uint256 epoch, address user) public view returns (bool) {
         BetInfo memory betInfo = ledger[epoch][user];
         Round memory round = rounds[epoch];
-        if (round.lockPrice == round.closePrice) {
-            return false;
-        }
         return
             round.turingCalled &&
             betInfo.amount != 0 &&
             !betInfo.claimed &&
-            ((round.closePrice > round.lockPrice && betInfo.position == Position.Bull) ||
-                (round.closePrice < round.lockPrice && betInfo.position == Position.Bear));
+            ((round.closeNumber >= round.lockNumber && betInfo.position == Position.Up) ||
+                (round.closeNumber < round.lockNumber && betInfo.position == Position.Down));
     }
 
     /**
@@ -574,23 +526,17 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         uint256 treasuryAmt;
         uint256 rewardAmount;
 
-        // Bull wins
-        if (round.closePrice > round.lockPrice) {
-            rewardBaseCalAmount = round.bullAmount;
+        // Up wins
+        if (round.closeNumber >= round.lockNumber) {
+            rewardBaseCalAmount = round.upAmount;
             treasuryAmt = (round.totalAmount * treasuryFee) / 10000;
             rewardAmount = round.totalAmount - treasuryAmt;
         }
-        // Bear wins
-        else if (round.closePrice < round.lockPrice) {
-            rewardBaseCalAmount = round.bearAmount;
+        // Down wins
+        else if (round.closeNumber < round.lockNumber) {
+            rewardBaseCalAmount = round.downAmount;
             treasuryAmt = (round.totalAmount * treasuryFee) / 10000;
             rewardAmount = round.totalAmount - treasuryAmt;
-        }
-        // House wins
-        else {
-            rewardBaseCalAmount = 0;
-            rewardAmount = 0;
-            treasuryAmt = round.totalAmount;
         }
         round.rewardBaseCalAmount = rewardBaseCalAmount;
         round.rewardAmount = rewardAmount;
@@ -604,13 +550,11 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     /**
      * @notice End round
      * @param epoch: epoch
-     * @param timestamp: timestamp
-     * @param price: price of the round
+     * @param randomNumber: random number
      */
     function _safeEndRound(
         uint256 epoch,
-        uint256 timestamp,
-        uint256 price
+        uint8 randomNumber
     ) internal {
         require(rounds[epoch].lockTimestamp != 0, "Can only end round after round has locked");
         require(block.timestamp >= rounds[epoch].closeTimestamp, "Can only end round after closeTimestamp");
@@ -619,23 +563,19 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
             "Can only end round within bufferSeconds"
         );
         Round storage round = rounds[epoch];
-        round.closePrice = price;
-        round.closeTuringTimestamp = timestamp;
+        round.closeNumber = randomNumber;
+        round.closeTuringTimestamp = block.timestamp;
         round.turingCalled = true;
 
-        emit EndRound(epoch, timestamp, round.closePrice);
+        emit EndRound(epoch, round.closeTuringTimestamp, round.closeNumber);
     }
 
     /**
      * @notice Lock round
      * @param epoch: epoch
-     * @param timestamp: timestamp
-     * @param price: price of the round
      */
     function _safeLockRound(
-        uint256 epoch,
-        uint256 timestamp,
-        uint256 price
+        uint256 epoch
     ) internal {
         require(rounds[epoch].startTimestamp != 0, "Can only lock round after round has started");
         require(block.timestamp >= rounds[epoch].lockTimestamp, "Can only lock round after lockTimestamp");
@@ -645,10 +585,9 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         );
         Round storage round = rounds[epoch];
         round.closeTimestamp = block.timestamp + intervalSeconds;
-        round.lockPrice = price;
-        round.lockTuringTimestamp = timestamp;
+        round.lockNumber = 128; // 2^8 /2 = 256 /2 = 128
 
-        emit LockRound(epoch, timestamp, round.lockPrice);
+        emit LockRound(epoch, round.lockNumber);
     }
 
     /**
@@ -696,21 +635,6 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
     }
 
     /**
-     * @notice Get latest recorded price from turing
-     * If it falls below allowed buffer or has not updated, it would be invalid.
-     */
-    function _getPriceFromTuring() internal returns (uint256, uint256) {
-        uint256 leastAllowedTimestamp = block.timestamp + turingUpdateAllowance;
-        (uint256 price, uint256 timestamp ) = _getCurrentQuote();
-        require(timestamp <= leastAllowedTimestamp, "Turing update exceeded max timestamp allowance");
-        require(
-            uint256(timestamp) > turingLatestTimestamp,
-            "Turing update timestamp must be larger than turingLatestTimestamp"
-        );
-        return (timestamp, price);
-    }
-
-    /**
      * @notice Returns true if `account` is a contract.
      * @param account: account address
      */
@@ -722,15 +646,20 @@ contract BobaPrediction is Ownable, Pausable, ReentrancyGuard {
         return size > 0;
     }
 
-    function _getCurrentQuote() internal returns (uint256 marketPrice, uint256 timestamp) {
+    function _getRandomNumber() public returns (uint8) {
 
-        bytes memory encRequest = abi.encode(turingPair);
-        bytes memory encResponse = turing.TuringTx(turingUrl, encRequest);
+        uint256 result = turing.TuringRandom();
 
-        (uint256 marketPrice, uint256 timestamp) = abi.decode(encResponse,(uint256,uint256));
+        bytes memory i_bytes = abi.encodePacked(result);
 
-        emit GetCurrentQuote(turingUrl, turingPair, marketPrice, timestamp);
+        uint8 randomNumber  = uint8(i_bytes[ 0]);
 
+        emit GetRandomNumber(randomNumber);
+
+        return randomNumber;
     }
 
+    function getBlockTimstamp() public view returns (uint256) {
+        return block.timestamp;
+    }
 }
