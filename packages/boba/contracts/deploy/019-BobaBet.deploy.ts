@@ -48,7 +48,7 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l2.address,
     (hre as any).deployConfig.deployer_l2.address,
     900, // _intervalSeconds: 15 * 60
-    30, // _bufferSeconds: 30
+    600, // _bufferSeconds: 10 * 60
     utils.parseEther('1'), // _minBetAmount
     300, // _treasuryFee: 300
     L2BOBAAdress,
