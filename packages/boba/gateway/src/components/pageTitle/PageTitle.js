@@ -1,6 +1,7 @@
-import { Typography } from '@material-ui/core';
+
+import { Typography } from '@mui/material'
 import React from 'react';
-import * as S from './PageTitle.styles';
+import * as S from './PageTitle.styles'
 
 const PageTitle = ({ title }) => {
 

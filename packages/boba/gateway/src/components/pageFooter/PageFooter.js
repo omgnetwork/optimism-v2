@@ -1,5 +1,5 @@
-import { IconButton } from '@material-ui/core'
-import { Telegram, Twitter } from '@material-ui/icons'
+import { IconButton } from '@mui/material'
+import { Telegram, Twitter } from '@mui/icons-material'
 import { setPage } from 'actions/uiAction'
 import DiscordIcon from 'components/icons/DiscordIcon'
 import React from 'react'
