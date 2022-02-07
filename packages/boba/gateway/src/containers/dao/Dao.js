@@ -28,7 +28,7 @@ import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
 import AlertIcon from 'components/icons/AlertIcon'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
-import PageHeader from 'components/pageHeader/PageHeader'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 import * as S from './Dao.styles'
 import * as styles from './Dao.module.scss'
@@ -48,7 +48,7 @@ function DAO() {
 
     return (
         <>
-            <PageHeader title="DAO" />
+            {/* <PageTitle title="DAO" /> */}
 
             <div className={styles.container}>
 

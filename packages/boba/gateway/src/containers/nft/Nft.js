@@ -8,7 +8,7 @@ import * as S from './Nft.styles'
 import * as styles from './Nft.module.scss'
 
 import { Grid, Typography } from '@material-ui/core'
-import PageHeader from 'components/pageHeader/PageHeader'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 import Input from 'components/input/Input'
 import Button from 'components/button/Button'
@@ -83,7 +83,7 @@ class Nft extends React.Component {
 
     if(layer === 'L1') {
         return <div className={styles.container}>
-            <PageHeader title="NFT" />
+            {/* <PageTitle title="NFT" /> */}
             <S.LayerAlert>
               <S.AlertInfo>
                 <AlertIcon />
@@ -101,7 +101,7 @@ class Nft extends React.Component {
 
     return (
       <>
-        <PageHeader title="NFT" />
+        {/* <PageTitle title="NFT" /> */}
 
         <Grid item xs={12} >
 

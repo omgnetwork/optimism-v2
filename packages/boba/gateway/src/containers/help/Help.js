@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Grid, Link, Typography } from '@material-ui/core'
-import PageHeader from 'components/pageHeader/PageHeader'
+import PageTitle from 'components/pageTitle/PageTitle'
 
 class Help extends React.Component {
 
@@ -9,7 +9,7 @@ class Help extends React.Component {
 
     return (
       <>
-        <PageHeader title="HELP/FAQ" />
+        {/* <PageTitle title="HELP/FAQ" /> */}
 
         <Grid item xs={12}>
         

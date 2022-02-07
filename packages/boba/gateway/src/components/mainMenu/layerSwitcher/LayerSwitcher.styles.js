@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Typography } from '@material-ui/core';
+import { Typography, Box } from '@material-ui/core';
 
 export const WalletPickerContainer = styled.div`
   display: flex;
@@ -12,6 +12,22 @@ export const WalletPickerContainer = styled.div`
     padding: 10px;
   }
 `;
+
+export const LayerSwitcherWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0px 10px;
+`;
+
+export const LayerContent = styled(Box)(({}) => ({
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'flex-start',
+  flexDirection: 'column'
+}))
 
 export const Label = styled(Typography)(({ theme }) => ({
   marginLeft: theme.spacing(1),

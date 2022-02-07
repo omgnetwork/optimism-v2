@@ -29,7 +29,7 @@ import networkService from 'services/networkService'
 
 import * as S from './Farm.styles'
 import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@material-ui/core'
-import PageHeader from 'components/pageHeader/PageHeader'
+import PageTitle from 'components/pageTitle/PageTitle'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
@@ -210,7 +210,7 @@ class Farm extends React.Component {
 
     return (
       <>
-        <PageHeader title="Earn" />
+        {/* <PageTitle title="Earn" /> */}
 
         <S.Wrapper dropDownBox={dropDownBox}>
 

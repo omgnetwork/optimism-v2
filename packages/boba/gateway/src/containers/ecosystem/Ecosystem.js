@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography'
 import { Link, Telegram, Twitter } from '@material-ui/icons'
 import Carousel from 'components/carousel/Carousel'
 import DiscordIcon from 'components/icons/DiscordIcon'
-import PageHeader from 'components/pageHeader/PageHeader'
+import PageTitle from 'components/pageTitle/PageTitle'
 import React, { useEffect, useState } from 'react'
 import * as styles from './Ecosystem.module.scss'
 import * as S from './Ecosystem.styles'
@@ -23,7 +23,7 @@ function ECOSYSTEM() {
 
   return (
     <>
-      <PageHeader title="Ecosystem" />
+      {/* <PageTitle title="Ecosystem" /> */}
       <div className={styles.container}>
         {
           Object.keys(projectByCategory).map((d) => {

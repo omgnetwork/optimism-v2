@@ -29,7 +29,7 @@ import ListAccountBatch from 'components/listAccount/listAccountBatch'
 
 import * as S from './Account.styles'
 
-import PageHeader from 'components/pageHeader/PageHeader'
+import PageTitle from 'components/pageTitle/PageTitle'
 import { Box, Grid, Tab, Tabs, Typography, useMediaQuery } from '@material-ui/core'
 import { fetchLookUpPrice, fetchTransactions, fetchBalances } from 'actions/networkAction'
 import { selectNetwork } from 'selectors/setupSelector'
@@ -232,7 +232,7 @@ function Account ({ enabled }) {
 
   return (
     <>
-      <PageHeader title="Bridge"/>
+      {/* <PageTitle title="Bridge"/> */}
 
       {disabled &&
         <S.LayerAlert style={{border: 'solid 1px yellow'}}>

@@ -34,7 +34,7 @@ import * as styles from './Save.module.scss'
 
 import { Box, Typography, Grid } from '@material-ui/core'
 
-import PageHeader from 'components/pageHeader/PageHeader'
+import PageTitle from 'components/pageTitle/PageTitle'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 
@@ -110,7 +110,7 @@ class Save extends React.Component {
 
     if(netLayer === 'L1') {
         return <div className={styles.container}>
-            <PageHeader title="Staking" />
+            {/* <PageTitle title="Staking" /> */}
             <S.LayerAlert>
               <S.AlertInfo>
                 <AlertIcon />
@@ -129,7 +129,7 @@ class Save extends React.Component {
 
     if(!netLayer) {
       return <div className={styles.container}>
-          <PageHeader title="Staking" />
+          {/* <PageTitle title="Staking" /> */}
           <S.LayerAlert>
             <S.AlertInfo>
               <AlertIcon />
@@ -147,7 +147,7 @@ class Save extends React.Component {
 
     return (
       <>
-        <PageHeader title="Staking" />
+        {/* <PageTitle title="Staking" /> */}
 
         <S.Wrapper>
           <Grid 

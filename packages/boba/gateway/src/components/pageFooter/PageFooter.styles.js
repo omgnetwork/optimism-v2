@@ -33,6 +33,7 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
 export const FooterLink = styled(Link)(({ theme }) => ({
   marginLeft: theme.spacing(1),
   color: theme.palette.text.disabled,
+  textDecoration: 'none',
 }));
 
 export const FooterLogoWrapper = styled(Box)(({ theme }) => ({
@@ -44,7 +45,6 @@ export const FooterLogoWrapper = styled(Box)(({ theme }) => ({
 
 export const FooterDivier = styled(Divider)(({ theme }) => ({
   background: 'rgba(255, 255, 255, 0.04)',
-  border: '1px solid #000000',
   boxSizing: 'border-box',
   boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
   width: '100%'
@@ -56,7 +56,7 @@ export const FooterLinkWrapper = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   alignItems: 'center',
   width: '100%',
-  margin: '30px 0',
+  margin: '20px 0',
 }))
 
 export const LinkWrapper = styled(Box)(({ theme }) => ({

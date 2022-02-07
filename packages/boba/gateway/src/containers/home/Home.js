@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { selectModalState } from 'selectors/uiSelector'
-
+import PageHeader from 'components/pageHeader/PageHeader'
 import useInterval from 'util/useInterval'
 
 import {
@@ -235,7 +235,8 @@ function Home() {
       </Alert>
 
       <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
-        <MainMenu />
+        {/* <MainMenu /> */}
+        <PageHeader />
         <Container maxWidth={false} sx={{
           height: 'calc(100% - 150px)',
           minHeight: '500px',

@@ -90,6 +90,9 @@ function App () {
       body3: {
         fontSize: '0.8em'
       },
+      body4: {
+        fontSize: 12
+      },
     },
     components: {
       MuiPaper: {

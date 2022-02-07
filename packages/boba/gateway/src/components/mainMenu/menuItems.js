@@ -12,18 +12,6 @@ export const menuItems = [
     url: "/Ecosystem"
   },
   {
-    key: 'History',
-    icon: "HistoryIcon",
-    title: "History",
-    url: "/history"
-  },
-  {
-    key: 'BobaScope',
-    icon: "SearchIcon",
-    title: "Analytics",
-    url: "/bobascope"
-  },
-  {
     key: 'Farm',
     icon: "EarnIcon",
     title: "Earn",
@@ -32,14 +20,8 @@ export const menuItems = [
   {
     key: 'Save',
     icon: "SaveIcon",
-    title: "Stake@5%",
+    title: "Stake",
     url: "/save",
-  },
-  {
-    key: 'NFT',
-    icon: "NFTIcon",
-    title: "NFT",
-    url: "/nft"
   },
   {
     key: 'DAO',
@@ -47,22 +29,50 @@ export const menuItems = [
     title: "DAO",
     url: "/dao"
   },
-  {
-    key: 'Airdrop',
-    icon: "SwapIcon",
-    title: "Airdrop",
-    url: "/airdrop"
-  },
-  {
-    key: 'GnosisSafe',
-    icon: "SafeIcon",
-    title: "Multisig",
-    url: "https://multisig.boba.network/"
-  },
   // {
-  //   key: 'Help',
-  //   icon: "HelpIcon",
-  //   title: "Help/FAQ",
-  //   url: "/help"
+  //   key: 'MORE',
+  //   title: "More",
+  //   url: "/more",
+  //   child: [
+  //     {
+  //       key: 'History',
+  //       icon: "HistoryIcon",
+  //       title: "History",
+  //       url: "/history"
+  //     },
+  //     {
+  //       key: 'BobaScope',
+  //       icon: "SearchIcon",
+  //       title: "Analytics",
+  //       url: "/bobascope"
+  //     },
+      
+  //     {
+  //       key: 'NFT',
+  //       icon: "NFTIcon",
+  //       title: "NFT",
+  //       url: "/nft"
+  //     },
+      
+  //     {
+  //       key: 'Airdrop',
+  //       icon: "SwapIcon",
+  //       title: "Airdrop",
+  //       url: "/airdrop"
+  //     },
+  //     {
+  //       key: 'GnosisSafe',
+  //       icon: "SafeIcon",
+  //       title: "Multisig",
+  //       url: "https://multisig.boba.network/"
+  //     },
+  //     {
+  //       key: 'Help',
+  //       icon: "HelpIcon",
+  //       title: "Help/FAQ",
+  //       url: "/help"
+  //     },
+  //   ]
   // },
+  
 ]

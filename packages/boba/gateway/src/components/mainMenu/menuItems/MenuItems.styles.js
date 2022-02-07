@@ -9,7 +9,7 @@ export const Nav = styled('nav')(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'center', 
   alignItems: 'center', 
-  gap: '20px',
+  gap: '10px',
   flexWrap: 'wrap',
   [theme.breakpoints.down('md')]: {
     width: '100%',
@@ -29,6 +29,9 @@ export const MenuItem = styled(Box)(({ selected, theme }) => ({
   fontWeight: 'normal',
   cursor: 'pointer',
   height: '22px',
+  '&:hover': {
+    color: `${theme.palette.secondary.main}`,
+  },
   '&:before': {
     'content': '"  "',
     display: 'inline-block', 
