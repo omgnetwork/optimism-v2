@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Typography, Box } from '@material-ui/core';
+import { Box, Typography } from '@mui/material';
 
 export const WalletPickerContainer = styled.div`
   display: flex;

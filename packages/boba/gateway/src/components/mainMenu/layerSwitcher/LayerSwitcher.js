@@ -14,19 +14,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { IconButton, Typography } from '@material-ui/core'
-import { Box } from '@material-ui/system'
+import { Box, Typography, IconButton } from '@mui/material'
 import { switchChain } from 'actions/setupAction.js'
+
 import Button from 'components/button/Button'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import LayerIcon from 'components/icons/LayerIcon'
+
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectAccountEnabled, selectJustSwitchedChain, selectLayer } from 'selectors/setupSelector'
+
 import * as S from './LayerSwitcher.styles.js'
-
-
 
 function LayerSwitcher({ isButton = false, size }) {
 

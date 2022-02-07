@@ -1,6 +1,6 @@
-import { Box } from '@material-ui/core'
-import { styled } from '@material-ui/core/styles'
 import bobaIcon from 'images/boba2/boba2Icon.svg'
+import { Box } from '@mui/material'
+import { styled } from '@mui/material/styles'
 
 export const Nav = styled('nav')(({ theme }) => ({
   width: '100%',

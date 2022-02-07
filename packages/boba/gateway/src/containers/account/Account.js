@@ -30,7 +30,8 @@ import ListAccountBatch from 'components/listAccount/listAccountBatch'
 import * as S from './Account.styles'
 
 import PageTitle from 'components/pageTitle/PageTitle'
-import { Box, Grid, Tab, Tabs, Typography, useMediaQuery } from '@material-ui/core'
+import { Box, Grid, Tab, Tabs, Typography, useMediaQuery } from '@mui/material'
+
 import { fetchLookUpPrice, fetchTransactions, fetchBalances } from 'actions/networkAction'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useTheme } from '@emotion/react'

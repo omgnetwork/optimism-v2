@@ -7,15 +7,13 @@ import ListNFT from 'components/listNFT/listNFT'
 import * as S from './Nft.styles'
 import * as styles from './Nft.module.scss'
 
-import { Grid, Typography } from '@material-ui/core'
 import PageTitle from 'components/pageTitle/PageTitle'
+import { Grid, Typography } from '@mui/material'
 
 import Input from 'components/input/Input'
 import Button from 'components/button/Button'
 
 import networkService from 'services/networkService'
-
-//import { addNFT } from 'actions/nftAction'
 
 import ListContract from 'components/listContract/listContract'
 

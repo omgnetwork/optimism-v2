@@ -1,6 +1,5 @@
-import { Box, Divider, Link } from "@material-ui/core";
-import { styled } from '@material-ui/core/styles';
-
+import { styled } from '@mui/material/styles'
+import { Box, Divider, Link } from "@mui/material"
 
 export const HeaderWrapper = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -10,4 +9,4 @@ export const HeaderWrapper = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   alignItems: 'center',
   padding: '20px',
-}));
+}))

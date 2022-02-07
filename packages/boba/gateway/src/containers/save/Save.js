@@ -32,7 +32,7 @@ import Button from 'components/button/Button'
 import * as S from './Save.styles'
 import * as styles from './Save.module.scss'
 
-import { Box, Typography, Grid } from '@material-ui/core'
+import { Box, Typography, Grid } from '@mui/material'
 
 import PageTitle from 'components/pageTitle/PageTitle'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'

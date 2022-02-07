@@ -28,11 +28,12 @@ import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
 
 import * as S from './Farm.styles'
-import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@material-ui/core'
+
 import PageTitle from 'components/pageTitle/PageTitle'
+import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@mui/material'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 class Farm extends React.Component {
 
