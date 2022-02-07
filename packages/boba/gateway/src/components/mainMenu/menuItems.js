@@ -59,10 +59,10 @@ export const menuItems = [
     title: "Multisig",
     url: "https://multisig.boba.network/"
   },
-  {
-    key: 'Help',
-    icon: "HelpIcon",
-    title: "Help/FAQ",
-    url: "/help"
-  },
+  // {
+  //   key: 'Help',
+  //   icon: "HelpIcon",
+  //   title: "Help/FAQ",
+  //   url: "/help"
+  // },
 ]

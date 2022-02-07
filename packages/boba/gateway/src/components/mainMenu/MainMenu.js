@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { ReactComponent as Logo } from './../../images/logo-boba.svg'
+import { ReactComponent as BobaLogo } from '../../images/boba2/logo-boba2.svg'
 import * as S from "./MainMenu.styles"
 
 import { Link } from 'react-router-dom'
@@ -61,8 +62,8 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
         </Container>
       ) : (
         <S.Menu>
-          <Logo style={{maxWidth: '160px'}}/>
-          <div style={{
+          <BobaLogo style={{maxWidth: '160px'}}/>
+          {/* <div style={{
             display: 'flex', 
             justifyContent: 'center', 
             alignItems: 'flex-start', 
@@ -74,7 +75,7 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
           >
             <NetworkSwitcher />
             <LayerSwitcher />
-          </div>
+          </div> */}
           <MenuItems setOpen={setOpen} />
           <WalletPicker />
         </S.Menu>
