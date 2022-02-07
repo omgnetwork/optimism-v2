@@ -6,24 +6,26 @@ import { setTheme } from 'actions/uiAction.js';
 import { useSelector } from 'react-redux';
 import { selectModalState } from 'selectors/uiSelector.js';
 import { useDispatch } from 'react-redux';
+import { IconButton } from '@material-ui/core';
 
-function ThemeSwitcher () {
+function ThemeSwitcher() {
   const theme = useSelector(selectModalState('theme'));
   const dispatch = useDispatch();
   return (
     <S.ThemeSwitcherTag>
-      <S.Button onClick={() => {
-        localStorage.setItem('theme', 'dark');
-        dispatch(setTheme('dark'));
-      }} selected={theme === 'dark'}>
-        <DarkIcon />
-      </S.Button>
-      <S.Button onClick={() => {
-        localStorage.setItem('theme', 'light');
-        dispatch(setTheme('light'));
-      }} selected={theme === 'light'}>
-        <LightIcon />
-      </S.Button>
+      {theme === 'light' ?
+        <IconButton onClick={() => {
+          localStorage.setItem('theme', 'dark');
+          dispatch(setTheme('dark'));
+        }} selected={true}>
+          <DarkIcon />
+        </IconButton>
+        : <IconButton onClick={() => {
+          localStorage.setItem('theme', 'light');
+          dispatch(setTheme('light'));
+        }} selected={true}>
+          <LightIcon />
+        </IconButton>}
     </S.ThemeSwitcherTag>
   );
 }

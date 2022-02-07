@@ -87,6 +87,7 @@ import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 
 function Home() {
 
@@ -235,7 +236,6 @@ function Home() {
       </Alert>
 
       <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
-        {/* <MainMenu /> */}
         <PageHeader />
         <Container maxWidth={false} sx={{
           height: 'calc(100% - 150px)',
@@ -244,6 +244,8 @@ function Home() {
           width: '100vw',
           marginRight: 'unset'
         }}>
+          {/* TODO: Remove OR Fix me */}
+          <WalletPicker /> 
           {pageDisplay === "AccountNow" &&
             <Account />
           }
