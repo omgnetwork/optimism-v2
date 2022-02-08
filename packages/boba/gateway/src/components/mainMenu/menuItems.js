@@ -2,7 +2,7 @@ export const menuItems = [
   {
     key: 'AccountNow',
     icon: "WalletIcon",
-    title: "Wallet",
+    title: "Bridge",
     url: "/"
   },
   {
@@ -10,6 +10,12 @@ export const menuItems = [
     icon: "SafeIcon",
     title: "Ecosystem",
     url: "/Ecosystem"
+  },
+  {
+    key: 'Wallet',
+    icon: "WalletIcon",
+    title: "Wallet",
+    url: "/"
   },
   {
     key: 'Farm',

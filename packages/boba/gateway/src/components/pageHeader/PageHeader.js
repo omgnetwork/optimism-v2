@@ -5,12 +5,22 @@ import MenuItems from 'components/mainMenu/menuItems/MenuItems'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
 import { useState } from 'react'
-import { Box, Container, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Container, Drawer, IconButton, Link, Typography, useMediaQuery, useTheme } from '@mui/material'
 import NavIcon from 'components/icons/NavIcon'
 import WalletIcon from 'components/icons/WalletIcon'
+import CloseIcon from 'components/icons/CloseIcon'
+import { makeStyles } from '@mui/styles'
+
+const useStyles = makeStyles({
+  root: {
+    width: "100%",
+    color: "f00",
+  },
+})
 
 const PageHeader = () => {
     
+  const classes = useStyles()
    // eslint-disable-next-line no-unused-vars
   const [ open, setOpen ] = useState();
   const theme = useTheme()
@@ -24,13 +34,26 @@ const PageHeader = () => {
             <S.HeaderWrapper>
               <BobaLogo style={{ maxWidth: '160px' }} />
               <S.HeaderActionButton>
-                <Box onClick={() => setOpen(!open)} sx={{ cursor: 'pointer' }}>
+                {/* <Box onClick={() => setOpen(!open)} sx={{ cursor: 'pointer' }}>
                   <WalletIcon />
-                </Box>
+                </Box> */}
                 <Box onClick={() => setOpen(!open)} sx={{ cursor: 'pointer' }}>
                   <NavIcon />
                 </Box>
               </S.HeaderActionButton>
+              <Drawer open={open} onClose={() => setOpen(false)} classes={{ paper: classes.root }}>
+                <S.StyleDrawer theme={theme}>
+                  <S.DrawerHeader>
+                    <S.WrapperCloseIcon>
+                      <Typography component='p' variant="h2" fontWeight={500}>Menu</Typography>
+                      <IconButton size="small" onClick={() => setOpen(false)}>
+                        <CloseIcon />
+                      </IconButton>
+                    </S.WrapperCloseIcon>
+                  </S.DrawerHeader>
+                  <MenuItems setOpen={setOpen} />
+                </S.StyleDrawer>
+              </Drawer>
             </S.HeaderWrapper>
           </Container>
         ) : (<S.HeaderWrapper>

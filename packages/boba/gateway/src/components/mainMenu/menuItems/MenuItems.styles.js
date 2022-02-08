@@ -13,14 +13,13 @@ export const Nav = styled('nav')(({ theme }) => ({
   flexWrap: 'wrap',
   [theme.breakpoints.down('md')]: {
     width: '100%',
-    paddingLeft: '30px',
+    gap: '20px',
+    marginTop: '130px',
+    flexWrap: 'nowrap',
+    alignItems: 'flex-start',
     backgroundColor: theme.palette.background.default,
-  },
-  [theme.breakpoints.up('md')]: {
-    //paddingTop: '30px',
-    //display: 'flex',
-    //flexDirection: 'row',
-  },
+    flexDirection: 'column',
+  }
 }))
 
 export const MenuItem = styled(Box)(({ selected, theme }) => ({
@@ -29,17 +28,25 @@ export const MenuItem = styled(Box)(({ selected, theme }) => ({
   fontWeight: 'normal',
   cursor: 'pointer',
   height: '22px',
+  [ theme.breakpoints.up('md') ]: {
+    '&:before': {
+      'content': '"  "',
+      display: 'inline-block', 
+      visibility: `${selected ? 'visible': 'hidden'}`, 
+      height: '20px',
+      width: '20px',
+      backgroundImage: `url(${bobaIcon})`,
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+    }
+  },
+  [ theme.breakpoints.down('md') ]: {
+    fontSize: '20px',
+    fontWeight: '400',
+    marginLeft: '20px'
+  },
   '&:hover': {
     color: `${theme.palette.secondary.main}`,
   },
-  '&:before': {
-    'content': '"  "',
-    display: 'inline-block', 
-    visibility: `${selected ? 'visible': 'hidden'}`, 
-    height: '20px',
-    width: '20px',
-    backgroundImage: `url(${bobaIcon})`,
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center',
-  }
+  
 }))

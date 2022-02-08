@@ -21,3 +21,21 @@ export const HeaderActionButton = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   alignItems: 'center',
 }))
+
+export const DrawerHeader = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px 24px;
+`;
+
+export const WrapperCloseIcon = styled(Box)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const StyleDrawer = styled(Box)`
+  background-color: ${(props) => props.theme.palette.mode === 'light' ? 'white' : '#111315'};
+  height: 100%;
+`;
