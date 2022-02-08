@@ -213,6 +213,21 @@ class Farm extends React.Component {
       <>
         {/* <PageTitle title="Earn" /> */}
 
+        {!accountEnabled &&
+          <S.LayerAlert>
+            <S.AlertInfo>
+              <AlertIcon />
+              <S.AlertText
+                variant="body2"
+                component="p"
+              >
+                You have not connected your wallet. To see your balances and contribute to the liquidity pool, connect to MetaMask
+              </S.AlertText>
+            </S.AlertInfo>
+            <WalletPicker />
+          </S.LayerAlert>
+        }
+        
         <S.Wrapper dropDownBox={dropDownBox}>
 
           <S.GridItemTagContainer container spacing={2} direction="row" justifyContent="left" alignItems="center" >
@@ -280,21 +295,6 @@ class Farm extends React.Component {
           ) : null}
 
         </S.Wrapper>
-
-        {!accountEnabled &&
-          <S.LayerAlert>
-            <S.AlertInfo>
-              <AlertIcon />
-              <S.AlertText
-                variant="body2"
-                component="p"
-              >
-                You have not connected your wallet. To see your balances and contribute to the liquidity pool, connect to MetaMask
-              </S.AlertText>
-            </S.AlertInfo>
-            <WalletPicker />
-          </S.LayerAlert>
-        }
 
         <Box sx={{ my: 3, width: '100%' }}>
           <S.GridItemTagContainer sx={{ mb: 2, display: 'flex' }}>

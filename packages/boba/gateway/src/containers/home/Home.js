@@ -244,8 +244,6 @@ function Home() {
           width: '100vw',
           marginRight: 'unset'
         }}>
-          {/* TODO: Remove OR Fix me */}
-          <WalletPicker /> 
           {pageDisplay === "AccountNow" &&
             <Account />
           }

@@ -46,6 +46,9 @@ import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
 
+import AlertIcon from 'components/icons/AlertIcon'
+import WalletPicker from 'components/walletpicker/WalletPicker'
+
 function Account ({ enabled }) {
 
   const dispatch = useDispatch()
@@ -234,6 +237,21 @@ function Account ({ enabled }) {
   return (
     <>
       {/* <PageTitle title="Bridge"/> */}
+
+      {!accountEnabled &&
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon />
+            <S.AlertText
+              variant="body2"
+              component="p"
+            >
+              You have not connected your wallet. To see your balances, bridge, and transfer, connect to MetaMask
+            </S.AlertText>
+          </S.AlertInfo>
+          <WalletPicker />
+        </S.LayerAlert>
+      }
 
       {disabled &&
         <S.LayerAlert style={{border: 'solid 1px yellow'}}>

@@ -67,21 +67,7 @@ function MainMenu({ pageDisplay, handleSetPage, onEnable, enabled }) {
       ) : (
         <S.Menu>
           <BobaLogo style={{maxWidth: '160px'}}/>
-          {/* <div style={{
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'flex-start', 
-            flexDirection: 'column',
-            borderRight: 'solid white',
-            borderWidth: '1px',
-            paddingRight: '10px',
-          }}
-          >
-            <NetworkSwitcher />
-            <LayerSwitcher />
-          </div> */}
           <MenuItems setOpen={setOpen} />
-          <WalletPicker />
         </S.Menu>
       )}
     </>

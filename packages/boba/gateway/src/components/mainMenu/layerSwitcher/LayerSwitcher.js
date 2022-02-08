@@ -41,21 +41,34 @@ function LayerSwitcher({ isButton = false, size }) {
 
   const dispatchSwitchLayer = useCallback(() => {
     console.log("LS: switchLayer accountEnabled:", accountEnabled)
-    if (!accountEnabled) return
+    //if (!accountEnabled) return
     //dispatch(setLayer(layer))
-    if (layer === 'L1')
+    if (!layer) {
       dispatch(switchChain('L2'))
-    else if (layer === 'L2')
+    }
+    else if (layer === 'L1') {
+      dispatch(switchChain('L2'))
+    }
+    else if (layer === 'L2') {
       dispatch(switchChain('L1'))
+    }
   }, [ dispatch, accountEnabled, layer ])
 
   return (
     <S.LayerSwitcherWrapper>
+      {!layer ? <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
+        <Typography variant="body4" sx={{
+          color: 'rgba(255, 255, 255, 0.3)',
+          whiteSpace: 'nowrap'
+        }} >Click Chain to Connect</Typography>
+      </S.LayerContent> : null}
       <IconButton
         sx={{ gap: '5px' }}
-        onClick={() => { if (layer === 'L2') { dispatchSwitchLayer() } }}
-        aria-label="eth">
-        <EthereumIcon active={layer === 'L1'} />
+        onClick={() => { dispatchSwitchLayer() }}
+        aria-label="eth"
+      >
+        <EthereumIcon active={true} />
       </IconButton>
       {layer === 'L1' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
@@ -65,9 +78,10 @@ function LayerSwitcher({ isButton = false, size }) {
       </S.LayerContent> : null}
       <IconButton
         sx={{ gap: '5px' }}
-        onClick={() => { if (layer === 'L1') { dispatchSwitchLayer() } }}
-        aria-label="boba">
-        <BobaIcon active={layer === 'L2'} />
+        onClick={() => { dispatchSwitchLayer() }}
+        aria-label="boba"
+      >
+        <BobaIcon active={true} />
       </IconButton>
       {layer === 'L2' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
