@@ -6,6 +6,8 @@ import { isEqual } from 'lodash'
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
 
+import { settle_v0 } from 'actions/networkAction'
+
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import { Box, Typography, Link, Fade } from '@mui/material'
@@ -75,6 +77,25 @@ class ListAccount extends React.Component {
     this.props.dispatch(openModal(modalName, token, fast))
   }
 
+  settle_v0() {
+    this.props.dispatch(settle_v0())
+    // if ( token.address && recipient )
+    // {
+    //   try {
+    //     console.log("Amount to transfer:", value_Wei_String)
+    //     const transferResponseGood = await dispatch(
+    //       transfer(recipient, value_Wei_String, token.address)
+    //     )
+    //     if (transferResponseGood) {
+    //       dispatch(openAlert('Transaction submitted'))
+    //     }
+    //     handleClose()
+    //   } catch (err) {
+    //     //guess not really?
+    //   }
+    // }
+  }
+
   render() {
 
     const {
@@ -135,7 +156,12 @@ class ListAccount extends React.Component {
                     Bridge/Transfer
                   </S.TextTableCell>
                 }
-                {token.symbol !== 'xBOBA' && token.symbol !== 'WAGMIv0' &&
+                {chain === 'L2' && token.symbol === 'WAGMIv0' &&
+                  <S.TextTableCell enabled={`${enabled}`} variant="body2" component="div">
+                    Settle
+                  </S.TextTableCell>
+                }
+                {token.symbol !== 'xBOBA' &&
                   <Box sx={{display: "flex", opacity: !enabled ? "0.4" : "1.0", transform: dropDownBox ? "rotate(-180deg)" : ""}}>
                     <ExpandMoreIcon sx={{width: "12px"}}/>
                   </Box>
@@ -159,7 +185,7 @@ class ListAccount extends React.Component {
                        }}
                      >
                        <Typography variant="body2" component="p" >
-                         You are on L2. To use L1, click SWITCH LAYER
+                         You are on Boba. To use Ethereum, switch to Ethereum
                        </Typography>
                      </Box>
                      <Box sx={{ textAlign: 'center'}}>
@@ -176,7 +202,7 @@ class ListAccount extends React.Component {
                        }}
                      >
                        <Typography variant="body2" component="p" >
-                         You are on L1. To use L2, click SWITCH LAYER
+                         You are on Ethereum. To use Boba, switch to Boba
                        </Typography>
                      </Box>
                      <Box sx={{ textAlign: 'center'}}>
@@ -211,7 +237,7 @@ class ListAccount extends React.Component {
               </>
               }
 
-              {enabled && chain === 'L2' && token.symbol !== 'OLO' &&
+              {enabled && chain === 'L2' && token.symbol !== 'OLO' &&  token.symbol !== 'WAGMIv0' &&
                 <>
                   <Button
                     onClick={()=>{this.handleModalClick('exitModal', token, false)}}
@@ -266,6 +292,18 @@ class ListAccount extends React.Component {
                     Transfer
                   </Button>
                 </>
+              }
+
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
+                  <Button
+                    onClick={()=>{this.settle_v0()}}
+                    variant="contained"
+                    disabled={true}
+                    tooltip="Settle your WAGMv0 long options."
+                    fullWidth
+                  >
+                    Settle
+                  </Button>
               }
             </S.DropdownWrapper>
           </Fade>
