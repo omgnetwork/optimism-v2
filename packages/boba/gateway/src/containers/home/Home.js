@@ -81,13 +81,12 @@ import Ecosystem from 'containers/ecosystem/Ecosystem'
 
 import { Box, Container } from '@mui/material'
 
-import MainMenu from 'components/mainMenu/MainMenu'
 import PageFooter from 'components/pageFooter/PageFooter'
 
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
-import WalletPicker from 'components/walletpicker/WalletPicker'
+
 
 function Home() {
 

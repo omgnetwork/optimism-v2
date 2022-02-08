@@ -5,10 +5,10 @@ import MenuItems from 'components/mainMenu/menuItems/MenuItems'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
 import { useState } from 'react'
-import { Typography } from '@mui/material';
 
 const PageHeader = () => {
     
+   // eslint-disable-next-line no-unused-vars
    const [open, setOpen]= useState();
   
   return (

@@ -7,7 +7,6 @@ import ListNFT from 'components/listNFT/listNFT'
 import * as S from './Nft.styles'
 import * as styles from './Nft.module.scss'
 
-import PageTitle from 'components/pageTitle/PageTitle'
 import { Grid, Typography } from '@mui/material'
 
 import Input from 'components/input/Input'

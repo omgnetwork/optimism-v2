@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import PageTitle from 'components/pageTitle/PageTitle'
 import { Grid, Link, Typography } from '@mui/material'
 
 class Help extends React.Component {

@@ -29,7 +29,6 @@ import networkService from 'services/networkService'
 
 import * as S from './Farm.styles'
 
-import PageTitle from 'components/pageTitle/PageTitle'
 import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@mui/material'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'

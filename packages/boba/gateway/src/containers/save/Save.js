@@ -34,7 +34,6 @@ import * as styles from './Save.module.scss'
 
 import { Box, Typography, Grid } from '@mui/material'
 
-import PageTitle from 'components/pageTitle/PageTitle'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 

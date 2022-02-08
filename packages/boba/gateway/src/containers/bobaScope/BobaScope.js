@@ -36,7 +36,6 @@ import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
 import useInterval from 'util/useInterval'
-import PageTitle from 'components/pageTitle/PageTitle'
 
 import { POLL_INTERVAL } from 'util/constant'
 

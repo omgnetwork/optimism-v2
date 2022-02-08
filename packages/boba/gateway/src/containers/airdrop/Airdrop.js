@@ -7,7 +7,6 @@ import * as styles from './Airdrop.module.scss'
 
 import { Box, Grid, Typography } from '@mui/material'
 import Button from 'components/button/Button'
-import PageTitle from 'components/pageTitle/PageTitle'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import AlertIcon from 'components/icons/AlertIcon'

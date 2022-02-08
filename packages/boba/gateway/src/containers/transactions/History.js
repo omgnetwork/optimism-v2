@@ -42,7 +42,7 @@ import * as S from './History.styles'
 import * as styles from './Transactions.module.scss'
 
 import useInterval from 'util/useInterval'
-import PageTitle from 'components/pageTitle/PageTitle'
+
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import AlertIcon from 'components/icons/AlertIcon'
 
