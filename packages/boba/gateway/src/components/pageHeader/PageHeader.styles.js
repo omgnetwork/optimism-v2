@@ -9,4 +9,15 @@ export const HeaderWrapper = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   alignItems: 'center',
   padding: '20px',
+  [ theme.breakpoints.down('md') ]: {
+    justifyContent: 'space-between',
+    padding: '20px 0',
+  }
+}))
+
+export const HeaderActionButton = styled(Box)(({ theme }) => ({
+  gap: '10px',
+  display: 'flex',
+  justifyContent: 'space-around',
+  alignItems: 'center',
 }))

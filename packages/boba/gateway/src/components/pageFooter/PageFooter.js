@@ -27,27 +27,25 @@ const PageFooter = () => {
       <S.FooterLinkWrapper>
         <S.LinkWrapper>
           <S.FooterLink
-            component="button"
             variant="body2"
             onClick={() => {
               dispatch(setPage('Help'))
             }}
           >FAQs</S.FooterLink>
           <S.FooterLink
-            component="button"
             variant="body2"
             onClick={() => {
               dispatch(setPage('Airdrop'))
             }}
           >AirDrop</S.FooterLink>
           <S.FooterLink
-            component="button"
             variant="body2"
             onClick={() => {
               dispatch(setPage('BobaScope'))
             }}
           >System Analytics</S.FooterLink>
         </S.LinkWrapper>
+        <S.FooterDivierMobile />
         <S.SocialWrapper>
           <IconButton href="https://boba.eco/twitter" target='_blank' aria-label="twitter">
             <Twitter sx={{opacity: 0.65}} />
