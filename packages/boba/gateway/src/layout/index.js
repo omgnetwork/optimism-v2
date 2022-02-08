@@ -107,6 +107,7 @@ function App () {
             textTransform: "none",
             boxShadow: "box-shadow: 0px 0px 7px rgba(73, 107, 239, 0.35)",
             minWidth: "0",
+            color: '#031313',
             "&.Mui-disabled": {
               background: light ? 'transparent' : 'rgba(255, 255, 255, 0.04)',
               color: light ? 'rgba(0, 0, 0, 0.5)' :'rgba(255, 255, 255, 0.5)',
@@ -118,7 +119,8 @@ function App () {
           {
             props: { variant: 'contained', color: 'primary' },
             style: {
-              background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
+              // background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
+              background: '#BAE21A',
               "&:hover": {
                 boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
@@ -132,7 +134,7 @@ function App () {
               borderWidth: '1.4px',
               filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
               "&:hover": {
-                backgroundColor: "#506DFA",
+                backgroundColor: "#BAE21A",
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
               }
@@ -168,7 +170,7 @@ function App () {
               fontSize: '14px',
               background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
               textTransform: 'uppercase',
-              borderRadius: '4px',
+              borderRadius: '12px',
               minWidth: '0',
               "&:hover": {
                 boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',

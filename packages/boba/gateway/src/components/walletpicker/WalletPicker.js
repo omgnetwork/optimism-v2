@@ -13,11 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Box, useMediaQuery } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
 import { setEnableAccount, setLayer } from 'actions/setupAction'
 import Button from 'components/button/Button'
-import WalletAddress from 'components/walletAddress/WalletAddress'
+
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectAccountEnabled, selectJustSwitchedChain, selectNetwork } from 'selectors/setupSelector'
@@ -30,9 +28,6 @@ function WalletPicker() {
   const network = useSelector(selectNetwork())
   const accountEnabled = useSelector(selectAccountEnabled())
   const justSwitchedChain = useSelector(selectJustSwitchedChain())
-
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const dispatchBootAccount = useCallback(() => {
 
@@ -75,13 +70,8 @@ function WalletPicker() {
         disabled={accountEnabled}
         onClick={() => dispatchBootAccount()}
       >
-        Connect To Metamask
+        Connect
       </Button>
-    }
-    {accountEnabled &&
-      <Box sx={{display: isMobile ? "none" : "flex"}}>
-        <WalletAddress/>
-      </Box>
     }
     </>
   )

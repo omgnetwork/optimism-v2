@@ -14,7 +14,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { IconButton, Typography } from '@mui/material'
+import { IconButton, Typography, useMediaQuery } from '@mui/material'
+import { useTheme } from '@mui/styles'
 import { switchChain } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
@@ -23,6 +24,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectAccountEnabled, selectJustSwitchedChain, selectLayer } from 'selectors/setupSelector'
 import * as S from './LayerSwitcher.styles.js'
 
+import networkService from 'services/networkService';
+import truncate from 'truncate-middle';
+import WalletPicker from 'components/walletpicker/WalletPicker.js'
+import Button from 'components/button/Button.js'
 
 
 
@@ -32,6 +37,11 @@ function LayerSwitcher({ isButton = false, size }) {
   const accountEnabled = useSelector(selectAccountEnabled())
   const justSwitchedChain = useSelector(selectJustSwitchedChain())
   let layer = useSelector(selectLayer())
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  const wAddress = networkService.account ? truncate(networkService.account, 6, 4, '...') : '';
 
   console.log("LS: Layer:", layer)
   console.log("LS: accountEnabled:", accountEnabled)
@@ -52,6 +62,74 @@ function LayerSwitcher({ isButton = false, size }) {
     }
   }, [ dispatch, accountEnabled, layer ])
 
+
+  if (isMobile) {
+    return (
+      <S.LayerSwitcherWrapperMobile>
+        <S.LayerWrapper>
+          <IconButton
+            sx={{ gap: '5px' }}
+            aria-label="eth"
+          >
+            <EthereumIcon />
+          </IconButton>
+          <S.LayerContent>
+            <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
+            {layer === 'L1' ?
+              <Typography component='p' variant="body4" sx={{
+                color: 'rgba(255, 255, 255, 0.3)'
+              }} >{wAddress}</Typography> :
+              <Typography variant="body4" sx={{
+                opacity: '0.3',
+                whiteSpace: 'nowrap'
+              }} >Not Connected</Typography>
+            }
+          </S.LayerContent>
+          {!layer ? <WalletPicker /> : layer === 'L1' ? null :
+            <Button
+              type="primary"
+              variant="contained"
+              size='small'
+              onClick={() => dispatchSwitchLayer()}
+            >
+              Switch
+            </Button>}
+        </S.LayerWrapper>
+        <S.LayerDivider></S.LayerDivider>
+        <S.LayerWrapper>
+          <IconButton
+            sx={{ gap: '5px' }}
+            aria-label="boba"
+          >
+            <BobaIcon />
+          </IconButton>
+          <S.LayerContent>
+            <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
+            {layer === 'L2' ?
+              <Typography component='p' variant="body4" sx={{
+                color: 'rgba(255, 255, 255, 0.3)'
+              }} >{wAddress}</Typography> :
+              <Typography variant="body4" sx={{
+                opacity: '0.3',
+                whiteSpace: 'nowrap'
+              }} >Not Connected</Typography>
+            }
+          </S.LayerContent>
+          {!layer ? <WalletPicker /> : layer === 'L2' ? null :
+            <Button
+              type="primary"
+              variant="contained"
+              size='small'
+              onClick={() => dispatchSwitchLayer()}
+            >
+              Switch
+            </Button>
+          }
+        </S.LayerWrapper>
+      </S.LayerSwitcherWrapperMobile>
+    )
+  }
+
   return (
     <S.LayerSwitcherWrapper>
       <IconButton
@@ -59,20 +137,20 @@ function LayerSwitcher({ isButton = false, size }) {
         onClick={() => { dispatchSwitchLayer() }}
         aria-label="eth"
       >
-        <EthereumIcon/>
+        <EthereumIcon />
       </IconButton>
       <IconButton
         sx={{ gap: '5px' }}
         onClick={() => { dispatchSwitchLayer() }}
         aria-label="boba"
       >
-        <BobaIcon/>
+        <BobaIcon />
       </IconButton>
       {layer === 'L1' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
         <Typography component='p' variant="body4" sx={{
           color: 'rgba(255, 255, 255, 0.3)'
-        }} >ox810Ff...4F95BB</Typography>
+        }} >{wAddress}</Typography>
       </S.LayerContent> : null}
       {!layer ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
@@ -85,60 +163,9 @@ function LayerSwitcher({ isButton = false, size }) {
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
         <Typography variant="body4" sx={{
           color: 'rgba(255, 255, 255, 0.3)'
-        }} >ox810Ff...4F95BB</Typography>
+        }} >{wAddress}</Typography>
       </S.LayerContent> : null}
     </S.LayerSwitcherWrapper>)
-  // we are not connected to MM so Layer is not defined
-
-  // if (accountEnabled !== true) {
-  //   return (
-  //   <S.WalletPickerContainer>
-  //     <S.WalletPickerWrapper>
-  //       <Box sx={{display: 'flex', width: '100%', alignItems: 'center'}}>
-  //         <LayerIcon />
-  //         <S.Label variant="body2">Layer</S.Label>
-  //         <Typography
-  //           className={'active'}
-  //           variant="body2"
-  //           component="span"
-  //           color="white"
-  //           style={{paddingLeft: '30px', fontSize: '0.7em', lineHeight: '0.9em'}}
-  //         >
-  //           Wallet not<br/>connected
-  //         </Typography>
-  //       </Box>
-  //     </S.WalletPickerWrapper>
-  //   </S.WalletPickerContainer>)
-  // }
-
-  // return (
-  //   <S.WalletPickerContainer>
-  //     <S.WalletPickerWrapper>
-  //       <Box sx={{ display: 'flex', width: '100%', alignItems: 'center' }}>
-  //         <LayerIcon />
-  //         <S.Label variant="body2">Layer</S.Label>
-  //         <S.LayerSwitch>
-  //           <Typography
-  //             className={layer === 'L1' ? 'active' : ''}
-  //             onClick={() => { if (layer === 'L2') { dispatchSwitchLayer() } }}
-  //             variant="body2"
-  //             component="span"
-  //             color="white">
-  //             1
-  //           </Typography>
-  //           <Typography
-  //             className={layer === 'L2' ? 'active' : ''}
-  //             onClick={() => { if (layer === 'L1') { dispatchSwitchLayer() } }}
-  //             variant="body2"
-  //             component="span"
-  //             color="white">
-  //             2
-  //           </Typography>
-  //         </S.LayerSwitch>
-  //       </Box>
-  //     </S.WalletPickerWrapper>
-  //   </S.WalletPickerContainer>
-  // )
 }
 
 export default LayerSwitcher

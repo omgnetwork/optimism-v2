@@ -5,7 +5,7 @@ import MenuItems from 'components/mainMenu/menuItems/MenuItems'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
 import { useState } from 'react'
-import { Box, Container, Drawer, IconButton, Link, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Container, Drawer, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
 import NavIcon from 'components/icons/NavIcon'
 import WalletIcon from 'components/icons/WalletIcon'
 import CloseIcon from 'components/icons/CloseIcon'
@@ -23,6 +23,7 @@ const PageHeader = () => {
   const classes = useStyles()
    // eslint-disable-next-line no-unused-vars
   const [ open, setOpen ] = useState();
+  const [ walletOpen, setWalletOpen ] = useState();
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   
@@ -34,9 +35,9 @@ const PageHeader = () => {
             <S.HeaderWrapper>
               <BobaLogo style={{ maxWidth: '160px' }} />
               <S.HeaderActionButton>
-                {/* <Box onClick={() => setOpen(!open)} sx={{ cursor: 'pointer' }}>
+                <Box onClick={() => setWalletOpen(!walletOpen)} sx={{ cursor: 'pointer' }}>
                   <WalletIcon />
-                </Box> */}
+                </Box>
                 <Box onClick={() => setOpen(!open)} sx={{ cursor: 'pointer' }}>
                   <NavIcon />
                 </Box>
@@ -52,6 +53,20 @@ const PageHeader = () => {
                     </S.WrapperCloseIcon>
                   </S.DrawerHeader>
                   <MenuItems setOpen={setOpen} />
+                </S.StyleDrawer>
+              </Drawer>
+              <Drawer open={true} onClose={() => setWalletOpen(false)} classes={{ paper: classes.root }}>
+                <S.StyleDrawer theme={theme}>
+                  <S.DrawerHeader>
+                    <S.WrapperCloseIcon>
+                      <Typography component='p' variant="h2" fontWeight={500}>Connect wallet</Typography>
+                      <IconButton size="small" onClick={() => setWalletOpen(false)}>
+                        <CloseIcon />
+                      </IconButton>
+                    </S.WrapperCloseIcon>
+                  </S.DrawerHeader>
+                  <S.HeaderDivider />
+                  <LayerSwitcher />
                 </S.StyleDrawer>
               </Drawer>
             </S.HeaderWrapper>
