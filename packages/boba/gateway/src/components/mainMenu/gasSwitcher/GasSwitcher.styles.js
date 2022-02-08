@@ -14,8 +14,12 @@ export const WalletPickerContainer = styled.div`
 `;
 
 export const Label = styled(Typography)(({ theme }) => ({
-  marginLeft: theme.spacing(1),
-  color: theme.palette.text.disabled,
+  marginLeft: theme.spacing(2),
+  opacity: '0.65'
+}));
+
+export const Value = styled(Typography)(({ theme }) => ({
+  opacity: '0.85'
 }));
 
 export const WalletPickerWrapper = styled.div`
@@ -51,7 +55,7 @@ export const MenuItem = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  gap: 1rem;
+  gap: 5px;
   p {
     white-space: nowrap;
   }

@@ -14,19 +14,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Box, Typography, IconButton } from '@mui/material'
+import { IconButton, Typography } from '@mui/material'
 import { switchChain } from 'actions/setupAction.js'
-
-import Button from 'components/button/Button'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
-import LayerIcon from 'components/icons/LayerIcon'
-
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectAccountEnabled, selectJustSwitchedChain, selectLayer } from 'selectors/setupSelector'
-
 import * as S from './LayerSwitcher.styles.js'
+
+
+
 
 function LayerSwitcher({ isButton = false, size }) {
 
@@ -56,33 +54,33 @@ function LayerSwitcher({ isButton = false, size }) {
 
   return (
     <S.LayerSwitcherWrapper>
-      {!layer ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
-        <Typography variant="body4" sx={{
-          color: 'rgba(255, 255, 255, 0.3)',
-          whiteSpace: 'nowrap'
-        }} >Click Chain to Connect</Typography>
-      </S.LayerContent> : null}
       <IconButton
         sx={{ gap: '5px' }}
         onClick={() => { dispatchSwitchLayer() }}
         aria-label="eth"
       >
-        <EthereumIcon active={true} />
+        <EthereumIcon/>
       </IconButton>
-      {layer === 'L1' ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
-        <Typography variant="body4" sx={{
-          color: 'rgba(255, 255, 255, 0.3)'
-        }} >ox810Ff...4F95BB</Typography>
-      </S.LayerContent> : null}
       <IconButton
         sx={{ gap: '5px' }}
         onClick={() => { dispatchSwitchLayer() }}
         aria-label="boba"
       >
-        <BobaIcon active={true} />
+        <BobaIcon/>
       </IconButton>
+      {layer === 'L1' ? <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
+        <Typography component='p' variant="body4" sx={{
+          color: 'rgba(255, 255, 255, 0.3)'
+        }} >ox810Ff...4F95BB</Typography>
+      </S.LayerContent> : null}
+      {!layer ? <S.LayerContent>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
+        <Typography variant="body4" sx={{
+          opacity: '0.3',
+          whiteSpace: 'nowrap'
+        }} >Click Chain to Connect</Typography>
+      </S.LayerContent> : null}
       {layer === 'L2' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba Network</Typography>
         <Typography variant="body4" sx={{

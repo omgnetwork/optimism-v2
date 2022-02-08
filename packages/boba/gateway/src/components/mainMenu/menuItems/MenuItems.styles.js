@@ -43,16 +43,3 @@ export const MenuItem = styled(Box)(({ selected, theme }) => ({
     backgroundPosition: 'center',
   }
 }))
-
-// export const MenuItem = styled(Box)`
-//   color: ${props => props.selected ? props.theme.palette.secondary.main : "inherit"};
-//   font-size: 0.8em;
-//   font-weight: ${props => props.selected ? 700 : 'normal'};
-//   cursor: pointer;
-//   &:before :  {
-//     content: 'B';
-//     height: '20px';
-//     width: '20px';
-//   };
-  
-// `

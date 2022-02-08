@@ -49,14 +49,14 @@ const PageFooter = () => {
           >System Analytics</S.FooterLink>
         </S.LinkWrapper>
         <S.SocialWrapper>
-          <IconButton target='_blank' aria-label="telegram">
-            <Telegram />
+          <IconButton href="https://boba.eco/twitter" target='_blank' aria-label="twitter">
+            <Twitter sx={{opacity: 0.65}} />
           </IconButton>
-          <IconButton target='_blank' aria-label="telegram">
-            <Twitter />
-          </IconButton>
-          <IconButton target='_blank' aria-label="telegram">
+          <IconButton href="https://boba.eco/discord" target='_blank' aria-label="discord">
             <DiscordIcon />
+          </IconButton>
+          <IconButton href="https://boba.eco/telegram" target='_blank' aria-label="telegram">
+            <Telegram sx={{opacity: 0.65}} />
           </IconButton>
         </S.SocialWrapper>
       </S.FooterLinkWrapper>

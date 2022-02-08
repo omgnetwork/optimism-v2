@@ -13,20 +13,21 @@ export const WalletPickerContainer = styled.div`
   }
 `;
 
-export const LayerSwitcherWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 0px 10px;
-`;
+export const LayerSwitcherWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  background: `${theme.palette.mode === 'light' ? '#FFFFFF' : "rgba(255, 255, 255, 0.06)"}`,
+  borderRadius: '12px',
+  padding: '0px 10px'
+}));
 
-export const LayerContent = styled(Box)(({}) => ({
+export const LayerContent = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'flex-start',
   alignItems: 'flex-start',
-  flexDirection: 'column'
+  flexDirection: 'column',
+  marginLeft: '5px'
 }))
 
 export const Label = styled(Typography)(({ theme }) => ({

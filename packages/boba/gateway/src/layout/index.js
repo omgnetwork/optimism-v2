@@ -43,10 +43,10 @@ function App () {
         contrastText: '#fff',
       },
       secondary: {
-        main: '#CCFF00',
+        main: light ? '#1CD6D1' : '#CCFF00',
       },
       background: {
-        default: light ? "#fff" : "#111315",
+        default: light ? "#F5F6F6" : "#111315",
         secondary: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.04)',
         secondaryLight: light ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',

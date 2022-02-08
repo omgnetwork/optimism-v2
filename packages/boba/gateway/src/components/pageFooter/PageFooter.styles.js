@@ -11,7 +11,7 @@ export const Wrapper = styled(Box)(({ theme }) => ({
   bottom: 0,
   width: '100%',
   height: '184px',
-  background: '#1A1D1F',
+  background: `${theme.palette.mode === 'dark' ? '#1A1D1F' : '#FFFFFF'}`,
   [ theme.breakpoints.down('md') ]: {
     marginTop: 0,
   },
@@ -44,9 +44,9 @@ export const FooterLogoWrapper = styled(Box)(({ theme }) => ({
 }))
 
 export const FooterDivier = styled(Divider)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.04)',
+  background: `${ theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
   boxSizing: 'border-box',
-  boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+  boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
 }))
 
