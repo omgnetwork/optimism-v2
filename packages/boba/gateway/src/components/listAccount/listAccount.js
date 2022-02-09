@@ -10,7 +10,7 @@ import { settle_v0 } from 'actions/networkAction'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-import { Box, Typography, Link, Fade } from '@mui/material'
+import { Box, Typography, Link, Fade, Slider } from '@mui/material'
 import * as S from './ListAccount.styles'
 
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
@@ -36,7 +36,8 @@ class ListAccount extends React.Component {
       dropDownBox: false,
       networkLayer,
       disabled,
-      loading
+      loading,
+      sliderValue: 650,
     }
 
   }
@@ -77,6 +78,10 @@ class ListAccount extends React.Component {
     this.props.dispatch(openModal(modalName, token, fast))
   }
 
+  handleSliderChange(slider) {
+    this.setState({ sliderValue: slider })
+  }
+
   settle_v0() {
     this.props.dispatch(settle_v0())
     // if ( token.address && recipient )
@@ -103,7 +108,8 @@ class ListAccount extends React.Component {
       chain,
       dropDownBox,
       networkLayer,
-      disabled
+      disabled,
+      sliderValue
     } = this.state
 
     const enabled = (networkLayer === chain) ? true : false
@@ -180,17 +186,17 @@ class ListAccount extends React.Component {
               {!enabled && chain === 'L1' &&
                 <S.AccountAlertBox>
                   <Box
-                       sx={{
-                         flex: 1,
-                       }}
-                     >
-                       <Typography variant="body2" component="p" >
-                         You are on Boba. To use Ethereum, switch to Ethereum
-                       </Typography>
-                     </Box>
-                     <Box sx={{ textAlign: 'center'}}>
-                       <LayerSwitcher isButton={true} />
-                     </Box>
+                      sx={{
+                        flex: 1,
+                      }}
+                    >
+                      <Typography variant="body2" component="p" >
+                        Wrong Network. Please connect to Boba.
+                      </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'center'}}>
+                      <LayerSwitcher isButton={true} />
+                    </Box>
                 </S.AccountAlertBox>
               }
 
@@ -202,7 +208,7 @@ class ListAccount extends React.Component {
                        }}
                      >
                        <Typography variant="body2" component="p" >
-                         You are on Ethereum. To use Boba, switch to Boba
+                         Wrong network. Please connect to Ethereum.
                        </Typography>
                      </Box>
                      <Box sx={{ textAlign: 'center'}}>
@@ -295,6 +301,12 @@ class ListAccount extends React.Component {
               }
 
               {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
+              <>
+                  <Typography variant="body3" component="p" >
+                    WAGMI value will be {sliderValue}
+                  </Typography>
+                  <Slider value={sliderValue} onChange={this.handleSliderChange} aria-label="WAGMI_value" valueLabelDisplay="auto" />
+
                   <Button
                     onClick={()=>{this.settle_v0()}}
                     variant="contained"
@@ -304,6 +316,7 @@ class ListAccount extends React.Component {
                   >
                     Settle
                   </Button>
+              </>
               }
             </S.DropdownWrapper>
           </Fade>

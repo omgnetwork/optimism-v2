@@ -29,8 +29,6 @@ import truncate from 'truncate-middle';
 import WalletPicker from 'components/walletpicker/WalletPicker.js'
 import Button from 'components/button/Button.js'
 
-
-
 function LayerSwitcher({ isButton = false, size }) {
 
   const dispatch = useDispatch()
@@ -47,21 +45,51 @@ function LayerSwitcher({ isButton = false, size }) {
   console.log("LS: accountEnabled:", accountEnabled)
   console.log("LS: justSwitchedChain:", justSwitchedChain)
 
-  const dispatchSwitchLayer = useCallback(() => {
+  const dispatchSwitchLayer = useCallback((targetLayer) => {
     console.log("LS: switchLayer accountEnabled:", accountEnabled)
+    console.log("LS: targetLayer:", targetLayer)
     //if (!accountEnabled) return
     //dispatch(setLayer(layer))
     if (!layer) {
       dispatch(switchChain('L2'))
     }
-    else if (layer === 'L1') {
+    else if (layer === 'L1' && targetLayer === 'L2') {
       dispatch(switchChain('L2'))
     }
-    else if (layer === 'L2') {
+    else if (layer === 'L2' && targetLayer === 'L1') {
       dispatch(switchChain('L1'))
+    }
+    else {
+      // do nothing - we are on the correct chain
     }
   }, [ dispatch, accountEnabled, layer ])
 
+  if (isButton) {
+    return (
+      <S.LayerSwitcherWrapperMobile>
+        <S.LayerWrapper>
+          {!layer ? <WalletPicker /> : layer === 'L1' ? 
+            <Button
+              type="primary"
+              variant="contained"
+              size='small'
+              onClick={() => dispatchSwitchLayer('L2')}
+            >
+              Switch
+            </Button> :
+            <Button
+              type="primary"
+              variant="contained"
+              size='small'
+              onClick={() => dispatchSwitchLayer('L1')}
+            >
+              Switch
+            </Button>
+          }
+        </S.LayerWrapper>
+      </S.LayerSwitcherWrapperMobile>
+    )
+  }
 
   if (isMobile) {
     return (
@@ -90,12 +118,13 @@ function LayerSwitcher({ isButton = false, size }) {
               type="primary"
               variant="contained"
               size='small'
-              onClick={() => dispatchSwitchLayer()}
+              onClick={() => dispatchSwitchLayer('L1')}
             >
               Switch
             </Button>}
         </S.LayerWrapper>
-        <S.LayerDivider></S.LayerDivider>
+        <S.LayerDivider>
+        </S.LayerDivider>
         <S.LayerWrapper>
           <IconButton
             sx={{ gap: '5px' }}
@@ -120,7 +149,7 @@ function LayerSwitcher({ isButton = false, size }) {
               type="primary"
               variant="contained"
               size='small'
-              onClick={() => dispatchSwitchLayer()}
+              onClick={() => dispatchSwitchLayer('L2')}
             >
               Switch
             </Button>
@@ -134,14 +163,14 @@ function LayerSwitcher({ isButton = false, size }) {
     <S.LayerSwitcherWrapper>
       <IconButton
         sx={{ gap: '5px' }}
-        onClick={() => { dispatchSwitchLayer() }}
+        onClick={() => { dispatchSwitchLayer('L1') }}
         aria-label="eth"
       >
         <EthereumIcon />
       </IconButton>
       <IconButton
         sx={{ gap: '5px' }}
-        onClick={() => { dispatchSwitchLayer() }}
+        onClick={() => { dispatchSwitchLayer('L2') }}
         aria-label="boba"
       >
         <BobaIcon />

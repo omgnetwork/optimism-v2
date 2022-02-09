@@ -24,6 +24,8 @@ import { selectTransactions } from 'selectors/transactionSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
+import Slider from '@mui/material/Slider';
+
 import ListAccount from 'components/listAccount/listAccount'
 import ListAccountBatch from 'components/listAccount/listAccountBatch'
 
