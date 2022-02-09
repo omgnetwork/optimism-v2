@@ -124,16 +124,16 @@ class ListAccount extends React.Component {
 
     const marks = [
       {
-        value: 0,
-        label: '300M',
+        value: 30,
+        label: '500M',
       },
       {
         value: 50,
         label: '650M',
       },
       {
-        value: 100,
-        label: '1B',
+        value: 70,
+        label: '800M',
       },
     ];
 
@@ -201,6 +201,7 @@ class ListAccount extends React.Component {
           {dropDownBox ? (
           <Fade in={dropDownBox}>
             <S.DropdownWrapper>
+
               {!enabled && chain === 'L1' &&
                 <S.AccountAlertBox>
                   <Box
@@ -319,9 +320,15 @@ class ListAccount extends React.Component {
               }
 
               {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
-              <>
+                <div style={{  
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
                   <Typography variant="body3" component="p" >
-                    Each WAGMI will settle for {WAGMI_v0} BOBA at a TVL of {TVL}M
+                    At a TVL of {TVL}M each WAGMI will settle for {WAGMI_v0} BOBA 
                   </Typography>
                   <Slider 
                     min={0}
@@ -332,7 +339,6 @@ class ListAccount extends React.Component {
                     step={10}
                     marks={marks} 
                   />
-
                   <Button
                     onClick={()=>{this.settle_v0()}}
                     variant="contained"
@@ -342,7 +348,7 @@ class ListAccount extends React.Component {
                   >
                     Settle
                   </Button>
-              </>
+                </div>
               }
             </S.DropdownWrapper>
           </Fade>
