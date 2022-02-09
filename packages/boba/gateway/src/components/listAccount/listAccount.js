@@ -37,7 +37,7 @@ class ListAccount extends React.Component {
       networkLayer,
       disabled,
       loading,
-      sliderValue: 650,
+      sliderValue: 55,
     }
 
   }
@@ -78,8 +78,8 @@ class ListAccount extends React.Component {
     this.props.dispatch(openModal(modalName, token, fast))
   }
 
-  handleSliderChange(slider) {
-    this.setState({ sliderValue: slider })
+  handleSliderChange = (e) => {
+    this.setState({sliderValue: e.target.value})
   }
 
   settle_v0() {
@@ -118,6 +118,24 @@ class ListAccount extends React.Component {
     const amount = token.symbol === 'ETH' ? 
       Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, {minimumFractionDigits: 3,maximumFractionDigits:3}) :
       Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, {minimumFractionDigits: 2,maximumFractionDigits:2})
+
+    const WAGMI_v0 = 1 + (sliderValue / 100)
+    const TVL = Number(300 + (sliderValue / 100) * 700)
+
+    const marks = [
+      {
+        value: 0,
+        label: '300M',
+      },
+      {
+        value: 50,
+        label: '650M',
+      },
+      {
+        value: 100,
+        label: '1B',
+      },
+    ];
 
     return (
       <>
@@ -303,9 +321,17 @@ class ListAccount extends React.Component {
               {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
               <>
                   <Typography variant="body3" component="p" >
-                    WAGMI value will be {sliderValue}
+                    Each WAGMI will settle for {WAGMI_v0} BOBA at a TVL of {TVL}M
                   </Typography>
-                  <Slider value={sliderValue} onChange={this.handleSliderChange} aria-label="WAGMI_value" valueLabelDisplay="auto" />
+                  <Slider 
+                    min={0}
+                    max={100}
+                    value={sliderValue} 
+                    onChange={this.handleSliderChange} 
+                    aria-label="WAGMIv0" 
+                    step={10}
+                    marks={marks} 
+                  />
 
                   <Button
                     onClick={()=>{this.settle_v0()}}
