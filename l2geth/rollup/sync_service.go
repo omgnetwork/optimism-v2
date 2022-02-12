@@ -833,7 +833,9 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 		// This should never happen, but sometimes does
 		log.Error("Timestamp monotonicity violation", "hash", tx.Hash().Hex())
 		// Fix for turing
-		s.SetLatestL1Timestamp(tx.L1Timestamp())
+		if s.verifier {
+			s.SetLatestL1Timestamp(tx.L1Timestamp())
+		}
 	}
 
 	l1BlockNumber := tx.L1BlockNumber()
