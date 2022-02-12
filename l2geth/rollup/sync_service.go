@@ -832,6 +832,8 @@ func (s *SyncService) applyTransactionToTip(tx *types.Transaction) error {
 	} else if tx.L1Timestamp() < s.GetLatestL1Timestamp() {
 		// This should never happen, but sometimes does
 		log.Error("Timestamp monotonicity violation", "hash", tx.Hash().Hex())
+		// Fix for turing
+		s.SetLatestL1Timestamp(tx.L1Timestamp())
 	}
 
 	l1BlockNumber := tx.L1BlockNumber()
