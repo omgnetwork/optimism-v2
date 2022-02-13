@@ -13,6 +13,7 @@ import { L2Transaction, L2Block, RollupInfo } from '@eth-optimism/core-utils'
  */
 interface UnformattedL2Transaction extends TransactionResponse {
   l1BlockNumber: string
+  l1Timestamp: string
   l1MessageSender: string
   signatureHashType: string
   queueOrigin: string
@@ -121,10 +122,8 @@ export class MockchainProvider extends providers.JsonRpcProvider {
   }
 
   private _toL2Block(block: UnformattedL2Block): L2Block {
-    const l1BlockNumber: number = parseInt(
-      block.transactions[0].l1BlockNumber,
-      10
-    )
+    const l1BlockNumber: number = parseInt(block.transactions[0].l1BlockNumber, 10)
+    const l1Timestamp: number = parseInt(block.transactions[0].l1Timestamp, 10)
     const queueOrigin: string = block.transactions[0].queueOrigin
     const l1TxOrigin: string = block.transactions[0].l1MessageSender
     const l1Turing: string = block.transactions[0].l1Turing
@@ -135,6 +134,7 @@ export class MockchainProvider extends providers.JsonRpcProvider {
       l1Turing,
       queueOrigin,
       l1BlockNumber,
+      l1Timestamp,
     }
     // Add an interface here to fix the type casing into L2Block during Object.assign
     interface PartialL2Block {
@@ -215,6 +215,7 @@ const BLOCKS = JSON.parse(`
              "v":62710,
              "creates":"0xA193E42526F1FEA8C99AF609dcEabf30C1c29fAA",
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404102,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -269,6 +270,7 @@ const BLOCKS = JSON.parse(`
              "v":62709,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404103,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -323,6 +325,7 @@ const BLOCKS = JSON.parse(`
              "v":62710,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404104,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -377,6 +380,7 @@ const BLOCKS = JSON.parse(`
              "v":62709,
              "creates":"0x94BA4d5Ebb0e05A50e977FFbF6e1a1Ee3D89299c",
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404105,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -485,6 +489,7 @@ const BLOCKS = JSON.parse(`
              "v":62709,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404107,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -539,6 +544,7 @@ const BLOCKS = JSON.parse(`
              "v":62709,
              "creates":"0x956dA338C1518a7FB213042b70c60c021aeBd554",
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404108,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -593,6 +599,7 @@ const BLOCKS = JSON.parse(`
              "v":62710,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404109,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -647,6 +654,7 @@ const BLOCKS = JSON.parse(`
              "v":62709,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404110,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -701,6 +709,7 @@ const BLOCKS = JSON.parse(`
              "v":62710,
              "creates":"0x6454C9d69a4721feBA60e26A367bD4D56196Ee7c",
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404111,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -755,6 +764,7 @@ const BLOCKS = JSON.parse(`
              "v":62710,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404112,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -809,6 +819,7 @@ const BLOCKS = JSON.parse(`
              "v":62709,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404113,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -863,6 +874,7 @@ const BLOCKS = JSON.parse(`
              "v":62709,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404114,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -917,6 +929,7 @@ const BLOCKS = JSON.parse(`
              "v":62709,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404115,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
@@ -971,6 +984,7 @@ const BLOCKS = JSON.parse(`
              "v":62709,
              "creates":null,
              "l1BlockNumber":"1",
+             "l1Timestamp":1603404116,
              "l1TxOrigin":"0x3333333333333333333333333333333333333333",
              "l1Turing":"0x00",
              "rawTransaction":"0x420420",
