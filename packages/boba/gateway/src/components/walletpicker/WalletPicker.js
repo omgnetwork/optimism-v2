@@ -21,7 +21,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectAccountEnabled, selectJustSwitchedChain, selectNetwork } from 'selectors/setupSelector'
 import networkService from 'services/networkService'
 
-function WalletPicker() {
+function WalletPicker({
+  label= 'Connect'
+}) {
 
   const dispatch = useDispatch()
 
@@ -70,7 +72,7 @@ function WalletPicker() {
         disabled={accountEnabled}
         onClick={() => dispatchBootAccount()}
       >
-        Connect
+        {label}
       </Button>
     }
     </>

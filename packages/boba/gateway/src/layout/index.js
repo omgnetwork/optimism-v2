@@ -47,7 +47,7 @@ function App () {
       },
       background: {
         default: light ? "#F5F6F6" : "#111315",
-        secondary: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.04)',
+        secondary: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.02)',
         secondaryLight: light ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? "#fff" : 'rgba(32, 29, 49, 0.8)',
@@ -124,16 +124,20 @@ function App () {
               "&:hover": {
                 boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
+                backgroundColor: "#BAE21A",
               }
             },
           },
           {
             props: { variant: 'outlined', color: 'primary' },
             style: {
-              color: light ? '#000' : '#fff',
+              color: '#BAE21A' , //light ? '#000' : '#fff',
               borderWidth: '1.4px',
+              borderColor: '#BAE21A',
               filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
               "&:hover": {
+                color: '#000',
+                borderColor: '#BAE21A',
                 backgroundColor: "#BAE21A",
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
@@ -152,9 +156,9 @@ function App () {
           {
             props: { variant: 'outlined', color: 'neutral' },
             style: {
-              color: light ? "#000" : "#fff",
+              color: light ? "#000" : "rgba(255, 255, 255, 0.65)",
               borderWidth: '1.4px',
-              borderColor: light ? "#000" : "#fff",
+              borderColor: light ? "#000" : "rgba(255, 255, 255, 0.25)",
               "&:hover": {
                 opacity: 0.9,
                 borderWidth: '1.4px',
