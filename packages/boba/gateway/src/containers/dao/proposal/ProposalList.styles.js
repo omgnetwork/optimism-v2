@@ -15,7 +15,10 @@ export const DaoProposalHead = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   padding: '24px 0px',
   width: '100%',
-  margin: '5px'
+  margin: '5px',
+  [theme.breakpoints.down('sm')]: {
+    padding: '0px',
+  },
 }));
 
 export const DaoProposalListContainer = styled(Box)(({ theme }) => ({
@@ -24,7 +27,11 @@ export const DaoProposalListContainer = styled(Box)(({ theme }) => ({
   borderRadius: '8px',
   padding: '20px 10px',
   width: '100%',
+  height: '600px',
   '.loadingContainer' : {
     padding: '10px auto',
-  }
+  },
+  [theme.breakpoints.down('sm')]: {
+    padding: '0px',
+  },
 }));

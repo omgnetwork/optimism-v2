@@ -17,7 +17,6 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { openError, openModal } from 'actions/uiAction'
 import { Box, Typography } from '@mui/material'
-import { useTheme } from '@emotion/react'
 
 import Button from 'components/button/Button'
 import ProposalList from './proposal/ProposalList'
@@ -25,8 +24,6 @@ import ProposalList from './proposal/ProposalList'
 import { selectDaoBalance, selectDaoVotes, selectDaoBalanceX, selectDaoVotesX, selectProposalThreshold } from 'selectors/daoSelector'
 import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
 
-import AlertIcon from 'components/icons/AlertIcon'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 
 import * as S from './Dao.styles'
@@ -37,8 +34,6 @@ import { Circle } from '@mui/icons-material'
 function DAO() {
 
   const dispatch = useDispatch()
-
-  const theme = useTheme()
 
   const balance = useSelector(selectDaoBalance)
   const balanceX = useSelector(selectDaoBalanceX)
@@ -60,7 +55,10 @@ function DAO() {
               <Box sx={{ padding: '24px 0px' }}>
                 <S.DaoWalletHead>
                   <Typography variant="h3">Boba Wallet</Typography>
-                  <Typography variant="body2"><Circle sx={{ height: "10px", width: "10px", color: '#FF6A55' }} /> Disconnect</Typography>
+                  {
+                    !accountEnabled ?
+                      <Typography variant="body2" sx={{color: '#FF6A55'}}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnect</Typography>
+                      : <Typography variant="body2" sx={{color: '#BAE21A'}}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
                 </S.DaoWalletHead>
                 <Typography variant="body3" sx={{ opacity: "0.6" }}>Only used on Boba, please switch to boba.</Typography>
               </Box>
@@ -68,19 +66,19 @@ function DAO() {
               <Box sx={{ padding: '24px 0px' }}>
                 <Typography variant="h4">Balances</Typography>
                 <Typography variant="body1" style={{ opacity: '0.7' }}>BOBA:</Typography>
-                <Typography variant="body1" >{!!layer ? Number(balance) : '--'}</Typography>
+                <Typography variant="h3" >{!!layer ? Number(balance) : '--'}</Typography>
                 <Typography variant="body1" style={{ opacity: '0.7' }}>xBOBA:</Typography>
-                <Typography variant="body1" >{!!layer ? Number(balanceX) : '--'}</Typography>
+                <Typography variant="h3" >{!!layer ? Number(balanceX) : '--'}</Typography>
               </Box>
               <S.DividerLine />
               <Box sx={{ padding: '24px 0px' }}>
                 <Typography variant="h4">Available Votes</Typography>
                 <Typography variant="body1" style={{ opacity: '0.7' }}>Boba:</Typography>
-                <Typography variant="body1" >{!!layer ? Number(votes) : '--'}</Typography>
+                <Typography variant="h3" >{!!layer ? Number(votes) : '--'}</Typography>
                 <Typography variant="body1" style={{ opacity: '0.7' }}>xBoba:</Typography>
-                <Typography variant="body1" >{!!layer ? Number(votesX) : '--'}</Typography>
+                <Typography variant="h3" >{!!layer ? Number(votesX) : '--'}</Typography>
                 <Typography variant="body1" style={{ opacity: '0.7' }}>Total:</Typography>
-                <Typography variant="body1" >{!!layer ? Number(votes) + Number(votesX) : '--'}</Typography>
+                <Typography variant="h3" >{!!layer ? Number(votes) + Number(votesX) : '--'}</Typography>
                 {
                   !layer ?
                     <S.DaoWalletPickerContainer>
@@ -166,62 +164,6 @@ function DAO() {
             </S.LayerAlert>
           } */}
 
-          {/* <div className={styles.content} style={{ background: theme.palette.background.secondary }}>
-            <div className={styles.topRow}>
-              <div className={styles.transferContainer}>
-                <div className={styles.info} style={{ textAlign: 'left', padding: '20px' }}>
-                  <Typography variant="h4">Wallet Balances</Typography>
-                  <Typography variant="h4" style={{ opacity: '0.7', paddingLeft: '60px', fontSize: '0.8em' }}>{Number(balanceX)} xBOBA</Typography>
-                  <Typography variant="h4" style={{ opacity: '0.7', paddingLeft: '60px', fontSize: '0.8em' }}>{Number(balance)} BOBA</Typography>
-                </div>
-              </div>
-              <div className={styles.transferContainer}>
-                <div className={styles.info} style={{ textAlign: 'left', padding: '20px', paddingBottom: '0px' }}>
-                  <Typography variant="h4">Votes</Typography>
-                  <Typography variant="h4" style={{ opacity: '0.7', paddingLeft: '60px', fontSize: '0.8em' }}>{Number(votesX)} xBOBA</Typography>
-                  <Typography variant="h4" style={{ opacity: '0.7', paddingLeft: '60px', fontSize: '0.8em' }}>{Number(votes)} BOBA</Typography>
-                  <Typography variant="h4" style={{ opacity: '0.7', paddingLeft: '60px', fontSize: '0.8em' }}>{Number(votes) + Number(votesX)} Total</Typography>
-                </div>
-              </div>
-              <div className={styles.transferContainer} style={{ paddingTop: '10px' }}>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  onClick={() => { dispatch(openModal('delegateDaoXModal')) }}
-                  disabled={!accountEnabled}
-                >
-                  Delegate xBOBA
-                </Button>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  onClick={() => { dispatch(openModal('delegateDaoModal')) }}
-                  disabled={!accountEnabled}
-                >
-                  Delegate BOBA
-                </Button>
-              </div>
-            </div>
-            <Typography
-              variant="body2"
-              style={{
-                fontSize: '0.7em',
-                margin: '10px',
-                opacity: '0.6',
-                textAlign: 'left',
-                lineHeight: '1.0em',
-                //padding: '20px',
-                //paddingTop: 0,
-              }}
-            >
-              To delegate voting authority, select "Delegate Votes". You can delegate to one address at a time. To vote from this account, please delegate your votes to yourself.
-              The number of votes delegated is equal to your balance of BOBA.
-              Votes are delegated until you delegate again (to someone else) or transfer your BOBA.
-            </Typography>
-          </div> */}
-          {/* <div className={styles.proposal}>
-            <ProposalList />
-          </div> */}
         </S.DaoPageContainer>
       </div>
     </>)

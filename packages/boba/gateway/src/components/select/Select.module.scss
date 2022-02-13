@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
+  min-width: 110px;
 
   .label {
     margin-bottom: 10px;
@@ -17,7 +18,7 @@
     flex-direction: row;
     align-items: center;
     border-radius: 12px;
-    min-width: 110px;
+    
   }
 
   .select {
@@ -34,6 +35,7 @@
     top: 0;
     bottom: 0;
     opacity: 0;
+    min-width: 110px;
   }
 
   .selected {

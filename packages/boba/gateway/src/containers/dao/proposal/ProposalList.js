@@ -14,27 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { Typography } from '@mui/material'
-import { useTheme } from '@emotion/react'
-
-import { openError, openModal } from 'actions/uiAction'
-
-import Button from 'components/button/Button'
 
 import * as S from './ProposalList.styles'
-import Proposal from 'components/listProposal/listProposal'
-import Pager from 'components/pager/Pager'
+import Proposal from 'components/Proposal/Proposal'
 
 import * as styles from './proposalList.module.scss'
 
-import { selectProposals, selectProposalThreshold, selectDaoVotes, selectDaoVotesX } from 'selectors/daoSelector'
+import { selectProposals } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled } from 'selectors/setupSelector'
 
 import { orderBy } from 'lodash'
 import Select from 'components/select/Select'
+
 
 const PER_PAGE = 8
 
@@ -42,36 +36,36 @@ const PER_PAGE = 8
 
 function ProposalList() {
 
-    const theme = useTheme()
-
-    const [ page, setPage ] = useState(1)
-    const dispatch = useDispatch()
+    // const [ page, setPage ] = useState(1)
 
     const [selectedState, setSelectedState] = useState('All')
     
     const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
     const proposals = useSelector(selectProposals)
-
+    // TODO: make use of this to filter the proposals
     const options = [
         { value: 'All', title: 'All' },
-        { value: 'Pending', title: 'Pending' },
-        { value: 'Active', title: 'Active' },
-        { value: 'Success', title: 'Success' },
-        { value: 'Defeated', title: 'Defeated' },
-        { value: 'Canceled', title: 'Canceled' },
+        {value: 'Pending', title: 'Pending'},
+        {value: 'Active', title: 'Active'},
+        {value: 'Canceled', title: 'Canceled'},
+        {value: 'Defeated', title: 'Defeated'},
+        {value: 'Succeeded', title: 'Succeeded'},
+        {value: 'Queued', title: 'Queued'},
+        {value: 'Expired', title: 'Expired'},
+        {value: 'Executed', title: 'Executed'} 
       ]
 
       
     const onActionChange = (e) => {
-        console.log(e.value);
-        setSelectedState(e.value);
+        setSelectedState(e.target.value);
    }
     
     const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
-    const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
-    const endingIndex = page * PER_PAGE
-    const paginatedProposals = orderedProposals.slice(startingIndex, endingIndex)
+    // const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
+    // const endingIndex = page * PER_PAGE
+    // const paginatedProposals = orderedProposals.slice(startingIndex, endingIndex)
+    const paginatedProposals = orderedProposals;
 
     let totalNumberOfPages = Math.ceil(orderedProposals.length / PER_PAGE)
     if (totalNumberOfPages === 0) totalNumberOfPages = 1
@@ -79,13 +73,6 @@ function ProposalList() {
     return <>
         <S.DaoProposalHead>
             <Typography variant="h3">Proposal</Typography>
-            {/* <Pager
-                currentPage={page}
-                isLastPage={paginatedProposals.length < PER_PAGE}
-                totalPages={totalNumberOfPages}
-                onClickNext={() => setPage(page + 1)}
-                onClickBack={() => setPage(page - 1)}
-            /> */}
             <Select
                 options={options}
                 onSelect={onActionChange}

@@ -2,14 +2,19 @@ import { styled } from '@mui/material/styles'
 import { Box, Typography, Grid, Divider } from "@mui/material"
 
 export const DaoPageContainer = styled(Box)(({ theme }) => ({
-  width: '70%',
   margin: '0px auto',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',
   padding: '10px',
   paddingTop: '0px',
-  gap: '20px'
+  gap: '20px',
+  width: '70%',
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: '0px',
+  },
+  
 }));
 
 export const DaoPageContent = styled(Box)(({ theme }) => ({
@@ -17,18 +22,24 @@ export const DaoPageContent = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   alignItems: 'flex-start',
   paddingTop: '0px',
-  gap: '10px'
+  gap: '10px',
+  [theme.breakpoints.down('sm')]: {
+    flexDirection: 'column'
+  },
 }));
 
 export const DaoWalletContainer = styled(Box)(({ theme }) => ({
   background: theme.palette.background.secondary,
-  width: '30%',
   margin: 'auto',
   display: 'flex',
   flexDirection: 'column',
   padding: '0px 20px',
   minHeight: '700px',
   borderRadius: '20px',
+  width: '30%',
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+  },
 }));
 
 export const DaoWalletHead = styled(Box)(({ theme }) => ({
@@ -63,6 +74,10 @@ export const DaoProposalContainer = styled(Box)(({ theme }) => ({
   minHeight: '500px',
   borderRadius: '20px',
   background: theme.palette.background.secondary,
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: '0 20px',
+  },
 }));
 
 export const TableHeading = styled(Box)(({ theme }) => ({
