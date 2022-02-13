@@ -28,6 +28,7 @@ export enum QueueOrigin {
  */
 export interface L2Transaction extends TransactionResponse {
   l1BlockNumber: number
+  l1Timestamp: number
   l1TxOrigin: string
   l1Turing: string
   queueOrigin: string

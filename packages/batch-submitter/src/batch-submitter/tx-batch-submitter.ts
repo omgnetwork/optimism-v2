@@ -755,14 +755,18 @@ export class TransactionBatchSubmitter extends BatchSubmitter {
   }
 
   private async _getL2BatchElement(blockNumber: number): Promise<BatchElement> {
+    
     const block = await this._getBlock(blockNumber)
+    
     this.logger.debug('Fetched L2 block', {
       block,
     })
 
+    console.log('Fetched L2 block:', block)
+
     const batchElement = {
       stateRoot: block.stateRoot,
-      timestamp: block.timestamp,
+      timestamp: block.transactions[0].l1Timestamp, //block.timestamp,
       blockNumber: block.transactions[0].l1BlockNumber,
       isSequencerTx: false,
       rawTransaction: undefined,
