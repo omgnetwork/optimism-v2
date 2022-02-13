@@ -929,28 +929,6 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	parent := w.chain.CurrentBlock()
 	num := parent.Number()
 
-	// Preserve liveliness as best as possible. Must panic on L1 to L2
-	// transactions as the timestamp cannot be malleated
-	// this is problematic for the verifier - this logic would only seem to apply to the sequencer?
-	// but then why are some verifier transactions going through?
-	// if parent.Time() > tx.L1Timestamp() {
-	// 	// this means that the verifier block is in the future and this is a tx from the past 
-	// 	log.Error("Monotonicity violation - trying to recover", "index", num)
-	// 	if tx.QueueOrigin() == types.QueueOriginSequencer {
-	// 		log.Error("Monotonicity violation - forcing tx.L1Timestamp to parent.Time()", "actual timestamp", tx.L1Timestamp(), "parent time", parent.Time())
-	// 		tx.SetL1Timestamp(parent.Time())
-	// 		prev := parent.Transactions()
-	// 		if len(prev) == 1 {
-	// 			log.Error("Monotonicity violation - also messing with L1 blocknumber", "actual block number", tx.L1BlockNumber(), "updated value", prev[0].L1BlockNumber().Uint64())
-	// 			tx.SetL1BlockNumber(prev[0].L1BlockNumber().Uint64())
-	// 		} else {
-	// 			log.Error("Cannot recover L1 Blocknumber")
-	// 		}
-	// 	} else {
-	// 		log.Error("Cannot recover from monotonicity violation")
-	// 	}
-	// }
-
 	// Fill in the index field in the tx meta if it is `nil`.
 	// This should only ever happen in the case of the sequencer
 	// receiving a queue origin sequencer transaction. The verifier
@@ -1147,14 +1125,14 @@ func (w *worker) commit(uncles []*types.Header, interval func(), start time.Time
 			if bn == nil {
 				bn = new(big.Int)
 			}
-			log.Info("New block", 
-				"index", block.Number().Uint64()-uint64(1), 
-				"l1-timestamp", tx.L1Timestamp(), 
-				"l1-blocknumber", bn.Uint64(), 
+			log.Info("New block",
+				"index", block.Number().Uint64()-uint64(1),
+				"l1-timestamp", tx.L1Timestamp(),
+				"l1-blocknumber", bn.Uint64(),
 				"tx-hash", tx.Hash().Hex(),
-				"queue-origin", tx.QueueOrigin(), 
-				"gas", block.GasUsed(), 
-				"fees", feesEth, 
+				"queue-origin", tx.QueueOrigin(),
+				"gas", block.GasUsed(),
+				"fees", feesEth,
 				"elapsed", common.PrettyDuration(time.Since(start)))
 
 		case <-w.exitCh:
