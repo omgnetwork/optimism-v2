@@ -139,11 +139,12 @@ function DAO() {
                   variant="outlined"
                   disabled={!accountEnabled}
                   onClick={() => {
-                    if (Number(votes + votesX) < Number(proposalThreshold)) {
-                      dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
-                    } else {
-                      dispatch(openModal('newProposalModal'))
-                    }
+                    dispatch(openModal('newProposalModal'))
+                    // if (Number(votes + votesX) < Number(proposalThreshold)) {
+                    //   dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
+                    // } else {
+                    //   dispatch(openModal('newProposalModal'))
+                    // }
                   }}
                 >
                   Create new proposal
