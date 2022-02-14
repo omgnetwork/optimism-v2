@@ -32,6 +32,9 @@ import PageTitle from 'components/pageTitle/PageTitle'
 import { Circle } from '@mui/icons-material'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
+import networkService from 'services/networkService'
+import truncateMiddle from 'truncate-middle'
+import WalletIcon from 'components/icons/WalletIcon'
 
 function DAO() {
 
@@ -42,6 +45,7 @@ function DAO() {
   const votes = useSelector(selectDaoVotes)
   const votesX = useSelector(selectDaoVotesX)
   const proposalThreshold = useSelector(selectProposalThreshold)
+  const wAddress = networkService.account ? truncateMiddle(networkService.account, 6, 6, '...') : '';
 
   let layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -62,7 +66,10 @@ function DAO() {
                       <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
                       : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
                 </S.DaoWalletHead>
-                <Typography variant="body3" sx={{ opacity: "0.6" }}>Please connect to Boba to vote and propose.</Typography>
+                {!accountEnabled ?
+                  <Typography variant="body3" sx={{ opacity: "0.6" }}>Please connect to Boba to vote and propose.</Typography>
+                  : <Box sx={{ display: 'flex', alignItems: 'center'}}> <WalletIcon /> &nbsp; <Typography variant="body3">{wAddress}</Typography></Box>
+                }
               </Box>
               <S.DividerLine />
               <Box sx={{ padding: '24px 0px' }}>
