@@ -40,8 +40,12 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
 export const FooterLink = styled(Box)(({ theme }) => ({
   marginLeft: theme.spacing(1),
   marginTop: theme.spacing(1),
-  opacity: 0.65,
+  fontSize: '14px',
   textDecoration: 'none',
+  cursor: 'pointer',
+  '&:hover': {
+    color: theme.palette.secondary.main,
+  },
 }));
 
 export const FooterLogoWrapper = styled(Box)(({ theme }) => ({
@@ -102,6 +106,9 @@ export const SocialWrapper = styled(Box)(({ theme }) => ({
   width: '20%',
   justifyContent: 'flex-end',
   gap: '10px',
+  'a': {
+    cursor: 'pointer',
+  },
   [ theme.breakpoints.down('md') ]: {
     justifyContent: 'flex-start',
     margin: '10px 0',

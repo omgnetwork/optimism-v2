@@ -8,8 +8,15 @@ export const DaoPageContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   padding: '10px',
   paddingTop: '0px',
-  gap: '20px',
   width: '70%',
+  [theme.breakpoints.between('md', 'lg')]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [theme.breakpoints.between('sm', 'md')]: {
+    width: '90%',
+    padding: '0px',
+  },
   [theme.breakpoints.down('sm')]: {
     width: '100%',
     padding: '0px',
