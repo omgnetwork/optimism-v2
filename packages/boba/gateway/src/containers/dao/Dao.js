@@ -54,13 +54,13 @@ function DAO() {
             <S.DaoWalletContainer>
               <Box sx={{ padding: '24px 0px' }}>
                 <S.DaoWalletHead>
-                  <Typography variant="h3">Boba Wallet</Typography>
+                  <Typography variant="h3">Wallet</Typography>
                   {
                     !accountEnabled ?
-                      <Typography variant="body2" sx={{color: '#FF6A55'}}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnect</Typography>
+                      <Typography variant="body2" sx={{color: '#FF6A55'}}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
                       : <Typography variant="body2" sx={{color: '#BAE21A'}}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
                 </S.DaoWalletHead>
-                <Typography variant="body3" sx={{ opacity: "0.6" }}>Only used on Boba, please switch to boba.</Typography>
+                <Typography variant="body3" sx={{ opacity: "0.6" }}>Please connect to Boba to vote and propose.</Typography>
               </Box>
               <S.DividerLine />
               <Box sx={{ padding: '24px 0px' }}>
@@ -82,7 +82,7 @@ function DAO() {
                 {
                   !layer ?
                     <S.DaoWalletPickerContainer>
-                      <WalletPicker label="connect Wallet" />
+                      <WalletPicker label="Connect Wallet" />
                     </S.DaoWalletPickerContainer> :
                     <S.DaoWalletAction>
                       <Button
@@ -119,13 +119,13 @@ function DAO() {
                   disabled={!accountEnabled}
                   onClick={() => {
                     if(Number(votes + votesX) < Number(proposalThreshold)) {
-                        dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a new proposal.`))
+                        dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
                     } else {
                         dispatch(openModal('newProposalModal'))
                     }
                   }}
                 >
-                  Create new proposals
+                  Create new proposal
                 </Button>
                 <Typography variant="body3">At least {proposalThreshold} BOBA + xBOBA are needed to create a new proposal</Typography>
               </Box>
