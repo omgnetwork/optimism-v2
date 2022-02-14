@@ -443,7 +443,7 @@ describe('Basic RPC tests', () => {
     })
   })
 
-  describe('Replica RPC forawd test', () => {
+  describe('Replica RPC forward test', () => {
     it('should correctly process a valid transaction', async () => {
       const tx = defaultTransactionFactory()
       tx.gasPrice = await gasPriceForL2()
