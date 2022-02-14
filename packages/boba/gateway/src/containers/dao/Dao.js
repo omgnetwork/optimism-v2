@@ -30,6 +30,8 @@ import * as S from './Dao.styles'
 import * as styles from './Dao.module.scss'
 import PageTitle from 'components/pageTitle/PageTitle'
 import { Circle } from '@mui/icons-material'
+import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import AlertIcon from 'components/icons/AlertIcon'
 
 function DAO() {
 
@@ -39,8 +41,8 @@ function DAO() {
   const balanceX = useSelector(selectDaoBalanceX)
   const votes = useSelector(selectDaoVotes)
   const votesX = useSelector(selectDaoVotesX)
-  const proposalThreshold = useSelector(selectProposalThreshold)  
-  
+  const proposalThreshold = useSelector(selectProposalThreshold)
+
   let layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
 
@@ -56,9 +58,9 @@ function DAO() {
                 <S.DaoWalletHead>
                   <Typography variant="h3">Wallet</Typography>
                   {
-                    !accountEnabled ?
-                      <Typography variant="body2" sx={{color: '#FF6A55'}}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
-                      : <Typography variant="body2" sx={{color: '#BAE21A'}}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
+                    (!accountEnabled || layer === 'L1') ?
+                      <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
+                      : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
                 </S.DaoWalletHead>
                 <Typography variant="body3" sx={{ opacity: "0.6" }}>Please connect to Boba to vote and propose.</Typography>
               </Box>
@@ -82,46 +84,58 @@ function DAO() {
                 {
                   !layer ?
                     <S.DaoWalletPickerContainer>
-                      <WalletPicker label="Connect Wallet" />
-                    </S.DaoWalletPickerContainer> :
-                    <S.DaoWalletAction>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        onClick={() => { dispatch(openModal('delegateDaoModal')) }}
-                        disabled={!accountEnabled}
-                      >
-                        Delegate BOBA
-                      </Button>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        onClick={() => { dispatch(openModal('delegateDaoXModal')) }}
-                        disabled={!accountEnabled}
-                      >
-                        Delegate xBOBA
-                      </Button>
-                    </S.DaoWalletAction>
+                      <WalletPicker label="Connect to Boba" layer={'L2'} />
+                    </S.DaoWalletPickerContainer> : layer === 'L2' ?
+                      <S.DaoWalletAction>
+                        <Button
+                          color="primary"
+                          variant="outlined"
+                          onClick={() => { dispatch(openModal('delegateDaoModal')) }}
+                          disabled={!accountEnabled}
+                        >
+                          Delegate BOBA
+                        </Button>
+                        <Button
+                          color="primary"
+                          variant="outlined"
+                          onClick={() => { dispatch(openModal('delegateDaoXModal')) }}
+                          disabled={!accountEnabled}
+                        >
+                          Delegate xBOBA
+                        </Button>
+                      </S.DaoWalletAction>
+                      : <S.LayerAlert>
+                        <S.AlertInfo>
+                          <AlertIcon />
+                          <S.AlertText
+                            variant="body3"
+                            component="p"
+                          >
+                            You are on Mainnet. To use the Boba DAO, SWITCH to Boba
+                          </S.AlertText>
+                        </S.AlertInfo>
+                        <LayerSwitcher isButton={true} />
+                      </S.LayerAlert>
                 }
               </Box>
               <S.DividerLine />
-              <Box sx={{ 
-                  width: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '10px',
-                  padding: '24px 0px' 
-                }}>
+              <Box sx={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                padding: '24px 0px'
+              }}>
                 <Button
                   fullWidth={true}
                   color="neutral"
                   variant="outlined"
                   disabled={!accountEnabled}
                   onClick={() => {
-                    if(Number(votes + votesX) < Number(proposalThreshold)) {
-                        dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
+                    if (Number(votes + votesX) < Number(proposalThreshold)) {
+                      dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
                     } else {
-                        dispatch(openModal('newProposalModal'))
+                      dispatch(openModal('newProposalModal'))
                     }
                   }}
                 >
@@ -135,20 +149,6 @@ function DAO() {
             </S.DaoProposalContainer>
           </S.DaoPageContent>
 
-          {/* {layer === 'L1' &&
-            <S.LayerAlert>
-              <S.AlertInfo>
-                <AlertIcon />
-                <S.AlertText
-                  variant="body2"
-                  component="p"
-                >
-                  You are on Mainnet. To use the Boba DAO, SWITCH to Boba
-                </S.AlertText>
-              </S.AlertInfo>
-              <LayerSwitcher />
-            </S.LayerAlert>
-          } */}
           {/* {!layer &&
             <S.LayerAlert>
               <S.AlertInfo>

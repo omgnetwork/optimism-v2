@@ -95,17 +95,13 @@ export const TableHeading = styled(Box)(({ theme }) => ({
 export const LayerAlert = styled(Box)(({ theme }) => ({
   width: "100%",
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
-  gap: '30px',
-  borderRadius: '8px',
   margin: '20px 0px',
-  padding: '25px',
-  background: theme.palette.background.secondary,
-  [theme.breakpoints.up('md')]: {
-    padding: '25px 50px',
-  },
-
+  'Button': {
+    width: '100%'
+  }
 }));
 
 export const AlertText = styled(Typography)(({ theme }) => ({
