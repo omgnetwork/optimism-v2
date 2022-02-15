@@ -187,7 +187,7 @@ class Nft extends React.Component {
               spacing={2}
               sx={{ gap: '10px'}}
             >
-              {[...Object.keys(list),...Object.keys(list),...Object.keys(list),...Object.keys(list),].map((v, i) => {
+              {Object.keys(list).map((v, i) => {
                 const key_UUID = `nft_` + i
                   return (
                     <ListNFT
