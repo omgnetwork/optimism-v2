@@ -328,14 +328,11 @@ const turingParse = (
       restoredSequencerTransaction: toHexString(sequencerTransaction),
     })
   } else {
-    console.log(
-      'Found a LEGACY TX:',
-      {
-        turingLength,
-        turing: '0x', // this will be '0x'
-        restoredSequencerTransaction: toHexString(sequencerTransaction),
-      }
-    )
+    console.log('Found a LEGACY TX:', {
+      turingLength,
+      turing: '0x', // this will be '0x'
+      restoredSequencerTransaction: toHexString(sequencerTransaction),
+    })
   }
   return [sequencerTransaction, turing]
 }

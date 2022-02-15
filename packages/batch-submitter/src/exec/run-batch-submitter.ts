@@ -249,7 +249,7 @@ export const run = async () => {
     env.PROPOSER_HD_PATH || env.HD_PATH
   )
 
-    const VALIDATE_TX_BATCH = config.bool(
+  const VALIDATE_TX_BATCH = config.bool(
     'validate-tx-batch',
     env.VALIDATE_TX_BATCH ? env.VALIDATE_TX_BATCH === 'true' : false
   )

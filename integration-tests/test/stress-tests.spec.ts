@@ -180,33 +180,36 @@ describe('stress tests', () => {
       )
     }).timeout(STRESS_TEST_TIMEOUT)
 
-    it.only(`${numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (all parallel)`, async () => {
-      await Promise.all([
-        executeL1ToL2TransactionsParallel(env, wallets, {
-          contract: L2SimpleStorage,
-          functionName: 'setValue',
-          functionParams: [`0x${'42'.repeat(32)}`],
-        }),
-        executeL2ToL1TransactionsParallel(env, wallets, {
-          contract: L1SimpleStorage,
-          functionName: 'setValue',
-          functionParams: [`0x${'42'.repeat(32)}`],
-        }),
-        executeL2TransactionsParallel(env, wallets, {
-          contract: L2SimpleStorage,
-          functionName: 'setValueNotXDomain',
-          functionParams: [`0x${'42'.repeat(32)}`],
-        }),
-      ])
+    it.only(
+      `${numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (all parallel)`,
+      async () => {
+        await Promise.all([
+          executeL1ToL2TransactionsParallel(env, wallets, {
+            contract: L2SimpleStorage,
+            functionName: 'setValue',
+            functionParams: [`0x${'42'.repeat(32)}`],
+          }),
+          executeL2ToL1TransactionsParallel(env, wallets, {
+            contract: L1SimpleStorage,
+            functionName: 'setValue',
+            functionParams: [`0x${'42'.repeat(32)}`],
+          }),
+          executeL2TransactionsParallel(env, wallets, {
+            contract: L2SimpleStorage,
+            functionName: 'setValueNotXDomain',
+            functionParams: [`0x${'42'.repeat(32)}`],
+          }),
+        ])
 
-      expect((await L2SimpleStorage.totalCount()).toNumber()).to.equal(
-        wallets.length * 2
-      )
+        expect((await L2SimpleStorage.totalCount()).toNumber()).to.equal(
+          wallets.length * 2
+        )
 
-      expect((await L1SimpleStorage.totalCount()).toNumber()).to.equal(
-        wallets.length
-      )
-    }).timeout(STRESS_TEST_TIMEOUT)
+        expect((await L1SimpleStorage.totalCount()).toNumber()).to.equal(
+          wallets.length
+        )
+      }
+    ).timeout(STRESS_TEST_TIMEOUT)
   })
 
   // These tests depend on an archive node due to the historical `eth_call`s
