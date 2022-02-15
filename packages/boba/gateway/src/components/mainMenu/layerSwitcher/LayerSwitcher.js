@@ -29,7 +29,7 @@ import truncate from 'truncate-middle';
 import WalletPicker from 'components/walletpicker/WalletPicker.js'
 import Button from 'components/button/Button.js'
 
-function LayerSwitcher({ isButton = false, size }) {
+function LayerSwitcher({ isButton = false, size, fullWidth = false }) {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -73,6 +73,7 @@ function LayerSwitcher({ isButton = false, size }) {
               type="primary"
               variant="contained"
               size='small'
+              fullWidth={fullWidth}
               onClick={() => dispatchSwitchLayer('L2')}
             >
               Switch
@@ -81,6 +82,7 @@ function LayerSwitcher({ isButton = false, size }) {
               type="primary"
               variant="contained"
               size='small'
+              fullWidth={fullWidth}
               onClick={() => dispatchSwitchLayer('L1')}
             >
               Switch

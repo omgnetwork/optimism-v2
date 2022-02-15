@@ -35,6 +35,13 @@ export const menuItems = [
     title: "DAO",
     url: "/dao"
   },
+  {
+    key: 'NFT',
+    icon: "NFTIcon",
+    title: "NFT",
+    url: "/nft"
+  },
+
   // {
   //   key: 'MORE',
   //   title: "More",

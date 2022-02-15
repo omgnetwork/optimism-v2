@@ -23,7 +23,8 @@ import networkService from 'services/networkService'
 
 function WalletPicker({
   label = 'Connect',
-  layer,
+  fullWidth = false,
+  size = 'small'
 }) {
 
   const dispatch = useDispatch()
@@ -49,15 +50,6 @@ function WalletPicker({
         return false
       }
       
-      if (!!layer) {
-        // console.log("WP: Account IS enabled for", initialized)
-        // console.log("WP: Setting layer", layer)
-        // dispatch(setLayer(layer))
-        // dispatch(setEnableAccount(true))
-        console.log(["[initialized]", initialized])
-        // return true
-      }
-      
       if (initialized === 'L1' || initialized === 'L2') {
         console.log("WP: Account IS enabled for", initialized)
         dispatch(setLayer(initialized))
@@ -66,7 +58,7 @@ function WalletPicker({
       }
     }
 
-  }, [ dispatch, accountEnabled, network, layer ])
+  }, [ dispatch, accountEnabled, network ])
 
   useEffect(() => {
     // auto connect to MM if we just switched chains
@@ -79,8 +71,9 @@ function WalletPicker({
       <Button
         type="primary"
         variant="contained"
-        size='small'
+        size={size}
         disabled={accountEnabled}
+        fullWidth={fullWidth}
         onClick={() => dispatchBootAccount()}
       >
         {label}

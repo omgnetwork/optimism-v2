@@ -91,7 +91,7 @@ function DAO() {
                 {
                   !layer ?
                     <S.DaoWalletPickerContainer>
-                      <WalletPicker label="Connect to Boba" layer={'L2'} />
+                      <WalletPicker label="Connect to Boba"/>
                     </S.DaoWalletPickerContainer> : layer === 'L2' ?
                       <S.DaoWalletAction>
                         <Button
@@ -139,12 +139,11 @@ function DAO() {
                   variant="outlined"
                   disabled={!accountEnabled}
                   onClick={() => {
-                    dispatch(openModal('newProposalModal'))
-                    // if (Number(votes + votesX) < Number(proposalThreshold)) {
-                    //   dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
-                    // } else {
-                    //   dispatch(openModal('newProposalModal'))
-                    // }
+                    if (Number(votes + votesX) < Number(proposalThreshold)) {
+                      dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
+                    } else {
+                      dispatch(openModal('newProposalModal'))
+                    }
                   }}
                 >
                   Create new proposal
