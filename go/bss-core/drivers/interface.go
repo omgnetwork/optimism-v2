@@ -19,6 +19,10 @@ type L1Client interface {
 	// provide a basis for setting a reasonable default.
 	EstimateGas(context.Context, ethereum.CallMsg) (uint64, error)
 
+	// HeaderByNumber returns a block header from the current canonical chain.
+	// If number is nil, the latest known header is returned.
+	HeaderByNumber(context.Context, *big.Int) (*types.Header, error)
+
 	// NonceAt returns the account nonce of the given account. The block number
 	// can be nil, in which case the nonce is taken from the latest known block.
 	NonceAt(context.Context, common.Address, *big.Int) (uint64, error)
@@ -29,6 +33,10 @@ type L1Client interface {
 	// If the transaction was a contract creation use the TransactionReceipt
 	// method to get the contract address after the transaction has been mined.
 	SendTransaction(context.Context, *types.Transaction) error
+
+	// SuggestGasTipCap retrieves the currently suggested gas tip cap after 1559
+	// to allow a timely execution of a transaction.
+	SuggestGasTipCap(context.Context) (*big.Int, error)
 
 	// TransactionReceipt returns the receipt of a transaction by transaction
 	// hash. Note that the receipt is not available for pending transactions.

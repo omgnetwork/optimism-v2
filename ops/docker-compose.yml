@@ -305,7 +305,7 @@ services:
       - l1_chain
       - dtl
       - l2geth
-    image: bobanetwork/batch-submitter:latest
+    image: bobanetwork/go-batch-submitter:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.batch-submitter-service
