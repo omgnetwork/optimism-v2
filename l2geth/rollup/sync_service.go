@@ -961,7 +961,7 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 	// Allow 0 gas price for interacting with certain contracts
 	var isWhitelist = common.Big0
 	if tx.To() != nil {
-		isWhitelist, err = s.checkWhitelist(tx.To())
+		isWhitelist = s.checkWhitelist(tx.To())
 	}
 
 	if tx.GasPrice().Cmp(common.Big0) == 0 {
@@ -1262,14 +1262,14 @@ func GetWhitelistSlot(contractAddress *common.Address) common.Hash {
 }
 
 // Return 1 if the contract is whitelisted
-func (s *SyncService) checkWhitelist(contractAddress *common.Address) (*big.Int, error) {
+func (s *SyncService) checkWhitelist(contractAddress *common.Address) *big.Int {
 	var err error
 	state, err := s.bc.State()
 	if err != nil {
-		return big.NewInt(0), err
+		return big.NewInt(0)
 	}
-	keyUser := GetWhitelistSlot(contractAddress)
-	valueUser := state.GetState(rcfg.OvmWhitelistAddress, keyUser)
-	isWhitelist := valueUser.Big()
-	return isWhitelist, nil
+	keySlot := GetWhitelistSlot(contractAddress)
+	value := state.GetState(rcfg.OvmWhitelistAddress, keySlot)
+	isWhitelist := value.Big()
+	return isWhitelist
 }
