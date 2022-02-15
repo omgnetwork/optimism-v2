@@ -1,4 +1,4 @@
-package batchsubmitter
+package bsscore
 
 import (
 	"bytes"
@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum-optimism/optimism/go/batch-submitter/metrics"
-	"github.com/ethereum-optimism/optimism/go/batch-submitter/txmgr"
+	"github.com/ethereum-optimism/optimism/go/bss-core/metrics"
+	"github.com/ethereum-optimism/optimism/go/bss-core/txmgr"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -55,12 +55,11 @@ type Driver interface {
 	) (*types.Transaction, error)
 
 	// SubmitBatchTx using the passed transaction as a template, signs and
-	// publishes an otherwise identical transaction after setting the provided
-	// gas price. The final transaction is returned to the caller.
+	// publishes the transaction unmodified apart from sampling the current gas
+	// price. The final transaction is returned to the caller.
 	SubmitBatchTx(
 		ctx context.Context,
 		tx *types.Transaction,
-		gasPrice *big.Int,
 	) (*types.Transaction, error)
 }
 
@@ -194,15 +193,11 @@ func (s *Service) eventLoop() {
 
 			// Construct the transaction submission clousure that will attempt
 			// to send the next transaction at the given nonce and gas price.
-			sendTx := func(
-				ctx context.Context,
-				gasPrice *big.Int,
-			) (*types.Transaction, error) {
+			sendTx := func(ctx context.Context) (*types.Transaction, error) {
 				log.Info(name+" attempting batch tx", "start", start,
-					"end", end, "nonce", nonce,
-					"gasPrice", gasPrice)
+					"end", end, "nonce", nonce)
 
-				tx, err := s.cfg.Driver.SubmitBatchTx(ctx, tx, gasPrice)
+				tx, err := s.cfg.Driver.SubmitBatchTx(ctx, tx)
 				if err != nil {
 					return nil, err
 				}
@@ -213,7 +208,6 @@ func (s *Service) eventLoop() {
 					"end", end,
 					"nonce", nonce,
 					"tx_hash", tx.Hash(),
-					"gasPrice", gasPrice,
 				)
 
 				return tx, nil

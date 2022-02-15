@@ -118,6 +118,11 @@ type Config struct {
 	// LogLevel is the lowest log level that will be output.
 	LogLevel string
 
+	// LogTerminal if true, prints to stdout in terminal format, otherwise
+	// prints using JSON. If SentryEnable is true this flag is ignored, and logs
+	// are printed using JSON.
+	LogTerminal bool
+
 	// SentryEnable if true, logs any error messages to sentry. SentryDsn
 	// must also be set if SentryEnable is true.
 	SentryEnable bool
@@ -132,14 +137,6 @@ type Config struct {
 	// BlockOffset is the offset between the CTC contract start and the L2 geth
 	// blocks.
 	BlockOffset uint64
-
-	// MaxGasPriceInGwei is the maximum gas price in gwei we will allow in order
-	// to confirm a transaction.
-	MaxGasPriceInGwei uint64
-
-	// GasRetryIncrement is the step size (in gwei) by which we will ratchet the
-	// gas price in order to get a transaction confirmed.
-	GasRetryIncrement uint64
 
 	// SequencerPrivateKey the private key of the wallet used to submit
 	// transactions to the CTC contract.
@@ -171,6 +168,9 @@ type Config struct {
 
 	// MetricsPort is the port at which the metrics server is running.
 	MetricsPort uint64
+
+	// DisableHTTP2 disables HTTP2 support.
+	DisableHTTP2 bool
 }
 
 // NewConfig parses the Config from the provided flags or environment variables.
@@ -195,12 +195,12 @@ func NewConfig(ctx *cli.Context) (Config, error) {
 		SafeMinimumEtherBalance: ctx.GlobalUint64(flags.SafeMinimumEtherBalanceFlag.Name),
 		ClearPendingTxs:         ctx.GlobalBool(flags.ClearPendingTxsFlag.Name),
 		/* Optional Flags */
+		LogLevel:            ctx.GlobalString(flags.LogLevelFlag.Name),
+		LogTerminal:         ctx.GlobalBool(flags.LogTerminalFlag.Name),
 		SentryEnable:        ctx.GlobalBool(flags.SentryEnableFlag.Name),
 		SentryDsn:           ctx.GlobalString(flags.SentryDsnFlag.Name),
 		SentryTraceRate:     ctx.GlobalDuration(flags.SentryTraceRateFlag.Name),
 		BlockOffset:         ctx.GlobalUint64(flags.BlockOffsetFlag.Name),
-		MaxGasPriceInGwei:   ctx.GlobalUint64(flags.MaxGasPriceInGweiFlag.Name),
-		GasRetryIncrement:   ctx.GlobalUint64(flags.GasRetryIncrementFlag.Name),
 		SequencerPrivateKey: ctx.GlobalString(flags.SequencerPrivateKeyFlag.Name),
 		ProposerPrivateKey:  ctx.GlobalString(flags.ProposerPrivateKeyFlag.Name),
 		Mnemonic:            ctx.GlobalString(flags.MnemonicFlag.Name),
@@ -209,6 +209,7 @@ func NewConfig(ctx *cli.Context) (Config, error) {
 		MetricsServerEnable: ctx.GlobalBool(flags.MetricsServerEnableFlag.Name),
 		MetricsHostname:     ctx.GlobalString(flags.MetricsHostnameFlag.Name),
 		MetricsPort:         ctx.GlobalUint64(flags.MetricsPortFlag.Name),
+		DisableHTTP2:        ctx.GlobalBool(flags.HTTP2DisableFlag.Name),
 	}
 
 	err := ValidateConfig(&cfg)
@@ -223,10 +224,6 @@ func NewConfig(ctx *cli.Context) (Config, error) {
 // ensure that it is well-formed.
 func ValidateConfig(cfg *Config) error {
 	// Sanity check log level.
-	if cfg.LogLevel == "" {
-		cfg.LogLevel = "debug"
-	}
-
 	_, err := log.LvlFromString(cfg.LogLevel)
 	if err != nil {
 		return err
