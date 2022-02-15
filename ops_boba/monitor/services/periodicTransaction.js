@@ -1,7 +1,7 @@
 const ethers = require('ethers')
 const configs = require('./utilities/configs')
 const { logger } = require('./utilities/logger')
-const bobaJson = require('../artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json')
+const bobaJson = require('@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json')
 
 const provider = new ethers.providers.JsonRpcProvider(configs.l2Url)
 
