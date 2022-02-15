@@ -1251,7 +1251,7 @@ func (s *SyncService) IngestTransaction(tx *types.Transaction) error {
 	return s.applyTransaction(tx)
 }
 
-// Get slot in whitelist contract
+// Get slot in the whitelist contract
 func GetWhitelistSlot(contractAddress *common.Address) common.Hash {
 	position := common.Big1
 	hasher := sha3.NewLegacyKeccak256()
@@ -1261,7 +1261,7 @@ func GetWhitelistSlot(contractAddress *common.Address) common.Hash {
 	return common.BytesToHash(digest)
 }
 
-// Return if the contract is whitelisted
+// Return 1 if the contract is whitelisted
 func (s *SyncService) checkWhitelist(contractAddress *common.Address) (*big.Int, error) {
 	var err error
 	state, err := s.bc.State()
