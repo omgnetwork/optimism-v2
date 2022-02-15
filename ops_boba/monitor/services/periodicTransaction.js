@@ -3,7 +3,7 @@ const configs = require('./utilities/configs')
 const { logger } = require('./utilities/logger')
 const bobaJson = require('@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json')
 
-const provider = new ethers.providers.JsonRpcProvider(configs.l2Url)
+const provider = new ethers.providers.JsonRpcProvider(configs.periodicL2Web3Url)
 
 const wallet = configs.periodicTransactionPrivateKey
   ? new ethers.Wallet(configs.periodicTransactionPrivateKey, provider)
