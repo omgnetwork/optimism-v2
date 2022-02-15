@@ -32,9 +32,9 @@ func TestBatchElementFromBlock(t *testing.T) {
 	require.Equal(t, element.BlockNumber, expBlockNumber)
 	require.True(t, element.IsSequencerTx())
 	require.Equal(t, element.Tx.Tx(), expTx)
-
+	turing := []byte{0}
 	queueMeta := l2types.NewTransactionMeta(
-		new(big.Int).SetUint64(expBlockNumber), 0, nil,
+		new(big.Int).SetUint64(expBlockNumber), 0, turing, nil,
 		l2types.QueueOriginL1ToL2, nil, nil, nil,
 	)
 
