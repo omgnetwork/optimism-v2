@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react'
-import { Typography } from '@mui/material'
+import { Typography, Grid } from '@mui/material'
 
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
@@ -89,7 +89,7 @@ class listNFT extends React.Component {
     } = this.state
 
     return (
-      <div className={styles.ListNFT}>
+      <Grid item sm={3} className={styles.ListNFT}>
 
         <img
           src={URL}
@@ -104,7 +104,7 @@ class listNFT extends React.Component {
               {name} ({symbol})
             </Typography>
 
-            {meta.collection !== '' &&
+           {/*  {meta.collection !== '' &&
               <Typography variant="body3">
                 Collection: 
                 <Typography variant="body3" component="span" className={styles.muted}>
@@ -142,10 +142,10 @@ class listNFT extends React.Component {
                   {attr.trait_value}
                 </Typography>
               </Typography>)
-            })}
+            })} */}
           </div>
         </div>
-      </div>
+      </Grid>
     )
   }
 }

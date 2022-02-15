@@ -76,8 +76,9 @@ import Account from 'containers/account/Account'
 import Transactions from 'containers/transactions/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
-import NFT from 'containers/nft/Nft'
+import NFT from 'containers/wallet/nft/Nft'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
+import Wallet from 'containers/wallet/Wallet'
 
 import { Box, Container } from '@mui/material'
 
@@ -86,6 +87,7 @@ import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
+
 
 
 function Home() {
@@ -254,6 +256,9 @@ function Home() {
           }
           {pageDisplay === "NFT" &&
             <NFT />
+          }
+          {pageDisplay === "Wallet" &&
+            <Wallet />
           }
           {pageDisplay === "Farm" &&
             <FarmWrapper />

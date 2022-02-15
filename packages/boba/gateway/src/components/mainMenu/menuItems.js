@@ -1,6 +1,6 @@
 export const menuItems = [
   {
-    key: 'AccountNow',
+    key: 'Wallet',
     icon: "WalletIcon",
     title: "Wallet",
     url: "/"

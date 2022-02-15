@@ -1,5 +1,12 @@
 import { styled } from '@mui/material/styles'
-import { Box, Typography, Grid } from "@mui/material"
+import { Box, Typography, Grid, Divider } from "@mui/material"
+
+export const NFTPageContent = styled(Grid)(({theme}) => ({
+  marginTop: '20px',
+  padding: '10px',
+  borderRadius: '20px',
+  background: theme.palette.background.secondary,
+}))
 
 export const TableHeading = styled(Box)(({ theme }) => ({
   padding: "20px",
@@ -14,13 +21,14 @@ export const TableHeading = styled(Box)(({ theme }) => ({
 }))
 
 export const LayerAlert = styled(Box)(({ theme }) => ({
-  width: "100%",
+  width: "50%",
+  margin: '20px auto',
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'space-between',
   alignItems: 'center',
   gap: '30px',
-  borderRadius: '8px',
-  margin: '20px 0px',
+  borderRadius: '12px',
   padding: '25px',
   background: theme.palette.background.secondary,
   [theme.breakpoints.up('md')]: {
@@ -138,4 +146,12 @@ export const BpIcon = styled('span')(({ theme }) => ({
     background:
       theme.palette.mode === 'dark' ? 'rgba(57,75,89,.5)' : 'rgba(206,217,224,.5)',
   },
+}))
+
+
+export const DividerLine = styled(Divider)(({ theme }) => ({
+  background: `${ theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  boxSizing: 'border-box',
+  boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
+  width: '100%'
 }))
