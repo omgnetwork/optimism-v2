@@ -13,18 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Circle } from '@mui/icons-material';
-import { Box, LinearProgress, Link, Typography } from '@mui/material';
+import { Circle } from '@mui/icons-material'
+import { Box, LinearProgress, Link, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { castProposalVote, executeProposal, queueProposal } from 'actions/daoAction';
-import { openAlert, openError } from 'actions/uiAction';
-import Button from 'components/button/Button';
-import moment from 'moment';
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import * as S from "./Proposal.styles";
-
-
+import { castProposalVote, executeProposal, queueProposal } from 'actions/daoAction'
+import { openAlert, openError } from 'actions/uiAction'
+import Button from 'components/button/Button'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import * as S from "./Proposal.styles"
 
 const useStyles = makeStyles({
     colorPrimary: {
@@ -49,7 +47,7 @@ function Proposal({
             if (proposal.totalVotes > 0) {
                 setVotePercent(Math.round((100 * proposal.forVotes) / proposal.totalVotes))
             } else {
-                setVotePercent(50);
+                setVotePercent("NA")
             }
         };
         init()
@@ -173,7 +171,9 @@ function Proposal({
                         display: 'flex',
                         justifyContent: 'space-between',
                     }}>
-                        <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', fontWeight: '700' }}>For: {votePercent}%</Typography>
+                        {votePercent !== 'NA' && 
+                            <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', fontWeight: '700' }}>For: {votePercent}%</Typography>
+                        }
                         <Typography style={{ fontSize: '0.7em', lineHeight: '0.9em', color: 'rgba(255, 255, 255, 0.3)' }}>Total: {proposal.totalVotes}</Typography>
                     </Box>
                     <Box sx={{ width: '100%', my: 2 }}>

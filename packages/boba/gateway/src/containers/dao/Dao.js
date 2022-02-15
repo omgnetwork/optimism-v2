@@ -74,20 +74,20 @@ function DAO() {
               <S.DividerLine />
               <Box sx={{ padding: '24px 0px' }}>
                 <Typography variant="h4">Balances</Typography>
-                <Typography variant="body1" style={{ opacity: '0.7' }}>BOBA:</Typography>
-                <Typography variant="h3" >{!!layer ? Number(balance) : '--'}</Typography>
-                <Typography variant="body1" style={{ opacity: '0.7' }}>xBOBA:</Typography>
-                <Typography variant="h3" >{!!layer ? Number(balanceX) : '--'}</Typography>
+                <Typography variant="body1" style={{ opacity: '0.5' }}>BOBA:</Typography>
+                <Typography variant="h4" >{!!layer ? Math.round(Number(balance)) : '--'}</Typography>
+                <Typography variant="body1" style={{ opacity: '0.5' }}>xBOBA:</Typography>
+                <Typography variant="h4" >{!!layer ? Math.round(Number(balanceX)) : '--'}</Typography>
               </Box>
               <S.DividerLine />
               <Box sx={{ padding: '24px 0px' }}>
-                <Typography variant="h4">Available Votes</Typography>
-                <Typography variant="body1" style={{ opacity: '0.7' }}>Boba:</Typography>
-                <Typography variant="h3" >{!!layer ? Number(votes) : '--'}</Typography>
-                <Typography variant="body1" style={{ opacity: '0.7' }}>xBoba:</Typography>
-                <Typography variant="h3" >{!!layer ? Number(votesX) : '--'}</Typography>
-                <Typography variant="body1" style={{ opacity: '0.7' }}>Total:</Typography>
-                <Typography variant="h3" >{!!layer ? Number(votes) + Number(votesX) : '--'}</Typography>
+                <Typography variant="h4">Votes</Typography>
+                <Typography variant="body1" style={{ opacity: '0.5' }}>Boba:</Typography>
+                <Typography variant="h4" >{!!layer ? Math.round(Number(votes)) : '--'}</Typography>
+                <Typography variant="body1" style={{ opacity: '0.5' }}>xBoba:</Typography>
+                <Typography variant="h4" >{!!layer ? Math.round(Number(votesX)) : '--'}</Typography>
+                <Typography variant="body1" style={{ opacity: '0.5' }}>Total:</Typography>
+                <Typography variant="h4" >{!!layer ? Math.round(Number(votes) + Number(votesX)) : '--'}</Typography>
                 {
                   !layer ?
                     <S.DaoWalletPickerContainer>

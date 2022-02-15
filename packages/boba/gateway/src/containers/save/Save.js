@@ -192,9 +192,9 @@ class Save extends React.Component {
                 spacing={1}
               >
                 <S.GridItemTag item md={1}><Typography variant="body2">Amount</Typography></S.GridItemTag>
-                <S.GridItemTag item md={3}><Typography variant="body2">Deposited On</Typography></S.GridItemTag>
                 <S.GridItemTag item md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
                 <S.GridItemTag item md={1}><Typography variant="body2">Status</Typography></S.GridItemTag>
+                <S.GridItemTag item md={3}><Typography variant="body2">Deposited</Typography></S.GridItemTag>
                 <S.GridItemTag item md={4}><Typography variant="body2">Next Unstake Window</Typography></S.GridItemTag>
                 <S.GridItemTag item md={2}><Typography variant="body2">Actions</Typography></S.GridItemTag>
               </Grid>

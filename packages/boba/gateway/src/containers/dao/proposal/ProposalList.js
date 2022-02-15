@@ -18,9 +18,9 @@ import { useSelector } from 'react-redux'
 
 import { Typography } from '@mui/material'
 
-import * as S from './ProposalList.styles'
 import Proposal from 'components/Proposal/Proposal'
 
+import * as S from './ProposalList.styles'
 import * as styles from './proposalList.module.scss'
 
 import { selectProposals } from 'selectors/daoSelector'
@@ -29,10 +29,7 @@ import { selectLoading } from 'selectors/loadingSelector'
 import { orderBy } from 'lodash'
 import Select from 'components/select/Select'
 
-
 const PER_PAGE = 8
-
-
 
 function ProposalList() {
 
@@ -44,7 +41,7 @@ function ProposalList() {
     const proposals = useSelector(selectProposals)
     // TODO: make use of this to filter the proposals
     const options = [
-        { value: 'All', title: 'All' },
+        {value: 'All', title: 'All'},
         {value: 'Pending', title: 'Pending'},
         {value: 'Active', title: 'Active'},
         {value: 'Canceled', title: 'Canceled'},
@@ -58,7 +55,7 @@ function ProposalList() {
       
     const onActionChange = (e) => {
         setSelectedState(e.target.value);
-   }
+    }
     
     const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
