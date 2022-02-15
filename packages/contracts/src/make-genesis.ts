@@ -110,6 +110,9 @@ export const makeL2GenesisFile = async (
     },
     BobaTuringHelper: {
       Self: predeploys.BobaTuringHelper
+    },
+    BobaWhitelist: {
+      _owner: cfg.deployer,
     }
   }
 
@@ -141,7 +144,7 @@ export const makeL2GenesisFile = async (
         dump[predeployAddress].storage[utils.hexZeroPad(indexOwner, 32)] = cfg.deployer
         const indexAddress = BigNumber.from('1').toHexString();
         dump[predeployAddress].storage[utils.hexZeroPad(indexAddress, 32)] = predeploys.BobaTuringHelper
-        break
+        continue
       }
       const storageLayout = await getStorageLayout(predeployName)
       // Calculate the mapping keys

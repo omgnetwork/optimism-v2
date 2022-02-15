@@ -10,6 +10,7 @@ import (
 // UsingOVM is used to enable or disable functionality necessary for the OVM.
 var UsingOVM bool
 var OvmTuringCreditAddress common.Address
+var OvmWhitelistAddress common.Address
 
 var (
 	// l2GasPriceSlot refers to the storage slot that the L2 gas price is stored
@@ -41,4 +42,5 @@ var (
 func init() {
 	UsingOVM = os.Getenv("USING_OVM") == "true"
 	OvmTuringCreditAddress = common.HexToAddress(os.Getenv("TURING_CREDIT_ADDRESS"))
+	OvmWhitelistAddress = common.HexToAddress(os.Getenv("BOBA_WHITELIST_ADDRESS"))
 }

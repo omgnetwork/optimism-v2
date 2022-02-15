@@ -16,6 +16,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/ethdb"
 	"github.com/ethereum-optimism/optimism/l2geth/event"
 	"github.com/ethereum-optimism/optimism/l2geth/log"
+	"golang.org/x/crypto/sha3"
 
 	"github.com/ethereum-optimism/optimism/l2geth/core/rawdb"
 	"github.com/ethereum-optimism/optimism/l2geth/core/types"
@@ -957,7 +958,18 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 		return fmt.Errorf("invalid transaction: %w", core.ErrInsufficientFunds)
 	}
 
+	// Allow 0 gas price for interacting with certain contracts
+	var isWhitelist = common.Big0
+	if tx.To() != nil {
+		isWhitelist, err = s.checkWhitelist(tx.To())
+	}
+
 	if tx.GasPrice().Cmp(common.Big0) == 0 {
+		// Allow 0 gas price transactions only if the target contract is whitelisted
+		if isWhitelist.Cmp(common.Big1) == 0 {
+			log.Info("Found whitelisted contract address:", "contract address", tx.To().String())
+			return nil
+		}
 		// Allow 0 gas price transactions only if it is the owner of the gas
 		// price oracle
 		gpoOwner := s.GasPriceOracleOwnerAddress()
@@ -1237,4 +1249,27 @@ func stringify(i *uint64) string {
 // validation and applies the transaction
 func (s *SyncService) IngestTransaction(tx *types.Transaction) error {
 	return s.applyTransaction(tx)
+}
+
+// Get slot in whitelist contract
+func GetWhitelistSlot(contractAddress *common.Address) common.Hash {
+	position := common.Big1
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(contractAddress.Bytes(), 32))
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	return common.BytesToHash(digest)
+}
+
+// Return if the contract is whitelisted
+func (s *SyncService) checkWhitelist(contractAddress *common.Address) (*big.Int, error) {
+	var err error
+	state, err := s.bc.State()
+	if err != nil {
+		return big.NewInt(0), err
+	}
+	keyUser := GetWhitelistSlot(contractAddress)
+	valueUser := state.GetState(rcfg.OvmWhitelistAddress, keyUser)
+	isWhitelist := valueUser.Big()
+	return isWhitelist, nil
 }
