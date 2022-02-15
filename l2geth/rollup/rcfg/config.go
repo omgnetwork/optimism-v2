@@ -9,7 +9,6 @@ import (
 )
 
 // UsingOVM is used to enable or disable functionality necessary for the OVM.
-var UsingOVM bool
 var (
 	UsingOVM          bool
 	SuicideForkNumber uint64
