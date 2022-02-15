@@ -212,6 +212,7 @@ services:
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
       DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 31338
       DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 0
+      DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 0
       RETRIES: 200
     ports:
       - ${DTL_PORT:-7878}:7878
@@ -327,6 +328,8 @@ services:
       dockerfile: ./ops/docker/Dockerfile.integration-tests
     entrypoint: ./integration-tests.sh
     environment:
+      VERIFIER_URL: http://verifier:8545
+      REPLICA_URL: http://replica:8545
       L1_URL: http://l1_chain:8545
       L2_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
