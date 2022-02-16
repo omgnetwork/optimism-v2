@@ -62,19 +62,19 @@ contract ERC721min is ERC721 {
 
         string[4] memory part;
 
-        string memory colorEye = "C15AA2";
+        string memory colorEye = "rgb(61,224,39)";
         if(attribute_a > 128){
-            colorEye = "54B948";
+            colorEye = "rgb(219,39,43)";
         }
 
-        string memory colorBody = "500000";
+        string memory colorBody = "rgb(128,224,255)";
         if(attribute_b > 128){
-            colorBody = "200000";
+            colorBody = "rgb(64,224,99)";
         }
-      
-        part[0] = "<svg x='0px' y='0px' viewBox='0 0 300 300' style='enable-background:new 0 0 300 300;' xml:space='preserve'><style type='text/css'>.st0{fill:#";
-        part[1] = ";stroke:#000000;stroke-width:6;stroke-miterlimit:10;} .st1{fill:none;stroke:#000000;stroke-width:6;stroke-miterlimit:10;} .st2{fill:#FFFFFF;stroke:#000000;stroke-width:6;stroke-miterlimit:10;} .st3{fill:#";
-        part[2] = ";stroke:#000000;stroke-width:6;stroke-miterlimit:10;} .st4{fill:none;stroke:#000000;stroke-width:10;stroke-miterlimit:10;}</style>";
+
+        part[0] = "<svg xmlns='http://www.w3.org/2000/svg' version='1.2' x='0px' y='0px' viewBox='0 0 300 300' style='enable-background:new 0 0 300 300;' xml:space='preserve'><style type='text/css'>.st0{fill:";
+        part[1] = ";stroke:black;stroke-width:6;stroke-miterlimit:10;} .st1{fill:none;stroke:black;stroke-width:6;stroke-miterlimit:10;} .st2{fill:white;stroke:black;stroke-width:6;stroke-miterlimit:10;} .st3{fill:";
+        part[2] = ";stroke:black;stroke-width:6;stroke-miterlimit:10;} .st4{fill:none;stroke:black;stroke-width:10;stroke-miterlimit:10;}</style>";
         part[3] = "<circle class='st0' cx='148.5' cy='154.4' r='90.9'/>"
                     "<path class='st1' d='M123.1,67.1c-2.8-6-14.4-20.7-4-24c7.7-2.8,13,14,21.5,13.1c9.4-0.4-14.6-35.3,6.9-36.8 "
                         "c3.3-0.2,10.3,0,12.8,9.5c1.3,9-6.3,12-0.7,15.1c9,3.7,17.4-11.2,23.9-3.1c5.9,10-4.7,17.6-10.1,24.1'/> "
