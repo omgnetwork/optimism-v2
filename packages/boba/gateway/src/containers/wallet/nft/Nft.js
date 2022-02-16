@@ -5,7 +5,7 @@ import { isEqual } from 'lodash'
 import ListNFT from 'components/listNFT/listNFT'
 
 import * as S from './Nft.styles'
-import * as styles from './Nft.module.scss'
+// import * as styles from './Nft.module.scss'
 
 import { Box, Grid, Typography } from '@mui/material'
 
@@ -14,7 +14,7 @@ import Button from 'components/button/Button'
 
 import networkService from 'services/networkService'
 
-import ListContract from 'components/listContract/listContract'
+// import ListContract from 'components/listContract/listContract'
 
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import AlertIcon from 'components/icons/AlertIcon'
@@ -114,10 +114,97 @@ class Nft extends React.Component {
     return (
       <>
 
-        <Grid container spacing={2}>
+        <S.NFTPageContainer>
+          <S.NFTActionContent>
+            <S.NFTFormContent>
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                  <BobaGlassIcon />
+                  <Typography variant="body1" >
+                    Stake Boba
+                  </Typography>
+                </Box>
+                <S.DividerLine />
+              </Box>
+              <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px'
+              }}>
+                <Typography variant="body3" sx={{ opacity: 0.65 }}>
+                  Contract Address
+                </Typography>
+
+                <Input
+                  placeholder='Address 0x...'
+                  value={contractAddress}
+                  onChange={this.handleInputAddress}
+                // paste
+                />
+
+                <Typography variant="body3" sx={{ opacity: 0.65 }}>
+                  Token Id
+                </Typography>
+                <Input
+                  sx={{ marginTop: '20px' }}
+                  placeholder='tokenID - e.g. 3'
+                  value={tokenID}
+                  onChange={this.handleInputID}
+                // paste
+                />
+              </Box>
+              <Button
+                type="primary"
+                variant="contained"
+                fullWidth={true}
+                onClick={(i) => { this.addNFT() }}
+                disabled={loading || contractAddress === '' || tokenID === ''}
+                sx={{ flex: 1, marginTop: '20px', marginBottom: '20px' }}
+              >
+                {loading ? 'Adding NFT...' : 'Add NFT'}
+              </Button>
+            </S.NFTFormContent>
+            <S.NFTFormContent>
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{ mb: 2, px: 1, display: 'flex', alignItems: 'center' }}>
+                  <Typography variant="body1" >
+                    Guess you need
+                  </Typography>
+                </Box>
+                <S.DividerLine />
+              </Box>
+            </S.NFTFormContent>
+          </S.NFTActionContent>
+          <S.NFTListContainer>
+            <Grid
+              container
+              direction="row"
+              item
+              sx={{ gap: '10px' }}
+            >
+              {Object.keys(list).map((v, i) => {
+                const key_UUID = `nft_` + i
+                return (
+                  <ListNFT
+                    key={key_UUID}
+                    name={list[ v ].name}
+                    symbol={list[ v ].symbol}
+                    address={list[ v ].address}
+                    UUID={list[ v ].UUID}
+                    URL={list[ v ].url}
+                    meta={list[ v ].meta}
+                    tokenID={list[ v ].tokenID}
+                  />)
+              })
+              }
+            </Grid>
+          </S.NFTListContainer>
+        </S.NFTPageContainer>
+
+        {/*  <Grid container spacing={2}>
           <S.NFTPageContent item xs={4} >
-            {/* <Typography variant="h3" component="h3" sx={{fontWeight: "700", marginBottom: '20px'}}>Add NFTs</Typography> */}
-            {/* {Object.keys(list).map((v, i) => {
+            <Typography variant="h3" component="h3" sx={{fontWeight: "700", marginBottom: '20px'}}>Add NFTs</Typography>
+            {Object.keys(list).map((v, i) => {
               const key_UUID = `nft_` + i
               return (
                 <ListContract
@@ -127,20 +214,20 @@ class Nft extends React.Component {
                   symbol={list[v].symbol}
                   UUID={list[v].UUID}
                 />)
-            })} */}
+            })}
 
-            {/* <Typography variant="body3" component="p" sx={{ mt: 1, mb: 2, fontSize: '0.7em', marginTop: '20px', marginRight: '40px' }}>
+            <Typography variant="body3" component="p" sx={{ mt: 1, mb: 2, fontSize: '0.7em', marginTop: '20px', marginRight: '40px' }}>
               To add an NFT, please add its address and tokenID and click 'Add NFT'. If you do not know your tokenID,
               you can look it up in the blockexplorer. It is shown as a parameter in the mint or transfer event.
-            </Typography> */}
+            </Typography>
             <Box sx={{ mb: 2 }}>
-                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-                  <BobaGlassIcon />
-                  <Typography variant="body1" >
-                    Stake Boba
-                  </Typography>
-                </Box>
-                <S.DividerLine />
+              <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                <BobaGlassIcon />
+                <Typography variant="body1" >
+                  Stake Boba
+                </Typography>
+              </Box>
+              <S.DividerLine />
             </Box>
             <Typography variant="body3">
               Contract Address
@@ -150,7 +237,7 @@ class Nft extends React.Component {
               placeholder='Address 0x...'
               value={contractAddress}
               onChange={this.handleInputAddress}
-              // paste
+            // paste
             />
 
             <Typography variant="body3">
@@ -161,7 +248,7 @@ class Nft extends React.Component {
               placeholder='tokenID - e.g. 3'
               value={tokenID}
               onChange={this.handleInputID}
-              // paste
+            // paste
             />
 
             <Button
@@ -175,7 +262,7 @@ class Nft extends React.Component {
               {loading ? 'Adding NFT...' : 'Add NFT'}
             </Button>
           </S.NFTPageContent>
-          
+
           <Grid item xs={8} >
             <Grid
               container
@@ -185,26 +272,26 @@ class Nft extends React.Component {
               xs={12}
               item
               spacing={2}
-              sx={{ gap: '10px'}}
+              sx={{ gap: '10px' }}
             >
               {Object.keys(list).map((v, i) => {
                 const key_UUID = `nft_` + i
-                  return (
-                    <ListNFT
-                      key={key_UUID}
-                      name={list[ v ].name}
-                      symbol={list[ v ].symbol}
-                      address={list[ v ].address}
-                      UUID={list[ v ].UUID}
-                      URL={list[ v ].url}
-                      meta={list[ v ].meta}
-                      tokenID={list[ v ].tokenID}
-                    />)
-                })
+                return (
+                  <ListNFT
+                    key={key_UUID}
+                    name={list[ v ].name}
+                    symbol={list[ v ].symbol}
+                    address={list[ v ].address}
+                    UUID={list[ v ].UUID}
+                    URL={list[ v ].url}
+                    meta={list[ v ].meta}
+                    tokenID={list[ v ].tokenID}
+                  />)
+              })
               }
             </Grid>
           </Grid>
-        </Grid>
+        </Grid> */}
 
       </>
     )

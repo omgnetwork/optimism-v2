@@ -24,29 +24,34 @@ export const PageContainer = styled(Box)(({ theme }) => ({
 
 }));
 
-export const PageContent = styled(Box)(({ theme }) => ({
-  padding: '10px',
-}))
 
-export const PageSwitcher = styled.div`
-  padding: 3px;
-  background: rgba(255, 255, 255, 0.04);
-  cursor: pointer;
-  display: flex;
-  width: fit-content;
-  border-radius: 12px;
-  height: 48px;
-  margin-bottom: 20px;
-  span {
-    padding: 2px 15px;
-    font-weight: bold;
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    &.active {
-      color: #031313;
-      background: #BAE21A;
+export const PageSwitcher = styled(Box)(({ theme }) => ({
+  width: 'fit-content',
+  padding: '3px',
+  background: 'rgba(255, 255, 255, 0.04)',
+  cursor: 'pointer',
+  display: 'flex',
+  borderRadius: '12px',
+  height: '48px',
+  marginBottom: '20px',
+  'span': {
+    padding: '2px 15px',
+    fontWeight: 'bold',
+    borderRadius: '12px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    '&.active': {
+      color: '#031313',
+      background: '#BAE21A',
     }
-  }
-`;
+  },
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%',
+    padding: '0px',
+    'span': {
+      width: '50%'
+    }
+  },
+
+}));

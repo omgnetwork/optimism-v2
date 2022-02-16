@@ -20,6 +20,7 @@ import { Typography, Grid } from '@mui/material'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 import * as styles from './listNFT.module.scss'
+import * as S from './listNFT.styles';
 
 class listNFT extends React.Component {
 
@@ -89,22 +90,25 @@ class listNFT extends React.Component {
     } = this.state
 
     return (
-      <Grid item sm={3} className={styles.ListNFT}>
+      <S.ListNFTItem item>
 
         <img
           src={URL}
           alt="NFT URI"
           width={'100%'}
         />
-
+        <div className={styles.topContainer}>  
+          <Typography variant="body1">
+            {name} ({symbol})
+          </Typography>
+        </div>
+        
         <div className={styles.topContainer}>
           <div className={styles.Table2}>
           
-            <Typography variant="h4">
-              {name} ({symbol})
-            </Typography>
+            
 
-           {/*  {meta.collection !== '' &&
+            {/* {meta.collection !== '' &&
               <Typography variant="body3">
                 Collection: 
                 <Typography variant="body3" component="span" className={styles.muted}>
@@ -145,7 +149,7 @@ class listNFT extends React.Component {
             })} */}
           </div>
         </div>
-      </Grid>
+      </S.ListNFTItem>
     )
   }
 }

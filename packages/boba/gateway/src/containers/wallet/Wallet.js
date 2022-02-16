@@ -2,15 +2,16 @@ import { Circle } from "@mui/icons-material";
 import { Typography } from '@mui/material';
 import PageTitle from "components/pageTitle/PageTitle";
 import Nft from "containers/wallet/nft/Nft";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useSelector } from 'react-redux';
 import { selectAccountEnabled, selectLayer } from "selectors/setupSelector";
+import Token from "./token/Token";
 import * as S from './wallet.styles';
 
 
 function Wallet() {
 
-  const [page, setPage] = useState('TOKEN')
+  const [ page, setPage ] = useState('TOKEN')
   const layer = useSelector(selectLayer());
   const accountEnabled = useSelector(selectAccountEnabled())
 
@@ -39,10 +40,9 @@ function Wallet() {
         (!accountEnabled || layer === 'L1') ?
           <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
           : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
-      
-      <S.PageContent>
-        <Nft />
-      </S.PageContent>
+
+      {page === 'TOKEN' ? <Token /> : <Nft />}
+
     </S.PageContainer>
   )
 }
