@@ -114,14 +114,15 @@ class listNFT extends React.Component {
           />
           <div className={styles.topContainer}>
             <Typography variant="body1">
-              {name} ({symbol})
+              {/* {name} ({symbol}) */}
+              {meta.name}
             </Typography>
           </div>
         </S.ListNFTItem>
         <S.ListNFTItem active={'true'} item onClick={this.handleClick}>
           <div className={styles.topContainer}>
             <Typography variant="body1">
-              {name} ({symbol})
+            {meta.name}
             </Typography>
             <S.DividerLine />
           </div>

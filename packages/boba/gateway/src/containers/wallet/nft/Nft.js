@@ -175,29 +175,38 @@ class Nft extends React.Component {
               </Box>
             </S.NFTFormContent> */}
           </S.NFTActionContent>
-          <S.NFTListContainer>
-            <Grid
-              container
-              direction="row"
-              item
-              sx={{ gap: '10px' }}
-            >
-              {Object.keys(list).map((v, i) => {
-                const key_UUID = `nft_` + i
-                return (
-                  <ListNFT
-                    key={key_UUID}
-                    name={list[ v ].name}
-                    symbol={list[ v ].symbol}
-                    address={list[ v ].address}
-                    UUID={list[ v ].UUID}
-                    URL={list[ v ].url}
-                    meta={list[ v ].meta}
-                    tokenID={list[ v ].tokenID}
-                  />)
-              })
-              }
-            </Grid>
+          <S.NFTListContainer dataempty={Object.keys(list).length === 0}>
+            {Object.keys(list).length === 0 ?
+              <Box>
+                  <Typography variant="body2"  sx={{opacity: 0.65}} >
+                      Please enter the contract address and tokenID to add NFT for display. 
+                  </Typography>  
+                  <Typography variant="body2"  sx={{opacity: 0.65}} >
+                      If you don't know your tokenID, you can look it up in blockexplorer. It appears as a parameter in mint or transfer events.
+                  </Typography>  
+              </Box>
+              : <Grid
+                container
+                direction="row"
+                item
+                sx={{ gap: '10px' }}
+              >
+                {Object.keys(list).map((v, i) => {
+                  const key_UUID = `nft_` + i
+                  return (
+                    <ListNFT
+                      key={key_UUID}
+                      name={list[ v ].name}
+                      symbol={list[ v ].symbol}
+                      address={list[ v ].address}
+                      UUID={list[ v ].UUID}
+                      URL={list[ v ].url}
+                      meta={list[ v ].meta}
+                      tokenID={list[ v ].tokenID}
+                    />)
+                })
+                }
+              </Grid>}
           </S.NFTListContainer>
         </S.NFTPageContainer>
 

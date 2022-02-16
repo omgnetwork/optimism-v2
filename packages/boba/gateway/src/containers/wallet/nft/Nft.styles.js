@@ -2,10 +2,9 @@ import { styled } from '@mui/material/styles'
 import { Box, Typography, Grid, Divider } from "@mui/material"
 
 export const NFTPageContainer = styled(Box)(({ theme }) => ({
-  margin: '0px auto',
+  margin: '20px auto',
   display: 'flex',
   justifyContent: 'space-around',
-  marginTop: '20px',
   width: '100%',
   gap: '10px',
   [theme.breakpoints.between('md', 'lg')]: {
@@ -48,9 +47,12 @@ export const NFTFormContent = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const NFTListContainer = styled(Grid)(({ theme }) => ({
+export const NFTListContainer = styled(Grid)(({ theme, dataempty }) => ({
   width: '63%',
-  [theme.breakpoints.down('sm')]: {
+  background: !!dataempty ? theme.palette.background.secondary : 'none',
+  padding: !!dataempty ? '10px' : 0,
+  borderRadius: !!dataempty ? '20px' : 0,
+  [ theme.breakpoints.down('sm') ]: {
     width: '100%',
   },
 }));
