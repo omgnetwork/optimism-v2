@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles'
 import { Box, Typography, Grid, Divider } from "@mui/material"
-import { display } from '@mui/system';
+import stakeBg from 'images/boba2/stake-balance-bg.png'
 
 export const StakePageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
@@ -25,14 +25,15 @@ export const StakePageContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const StakeEarnContainer = styled(Box)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.04)',
-  backdropFilter: 'blur(10px)',
   borderRadius: '20px',
   padding: '24px',
-  paddingBottom: '0px',
   minHeight: '150px',
   marginBottom: '10px',
-  width: '100%'
+  width: '100%',
+  backdropFilter: 'blur(10px)',
+  background: `url(${stakeBg}) rgba(255, 255, 255, 0.04) no-repeat`,
+  backgroundPosition: '100% 0%',
+  backgroundSize: '40%'
 }))
 export const StakeInputContainer = styled(Box)(({ theme }) => ({
   background: 'rgba(255, 255, 255, 0.04)',
@@ -45,12 +46,35 @@ export const StakeInputContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   width: '100%'
 }))
+
+export const StakeHeadContainer = styled(Box)(({ theme }) => ({
+  background: 'rgba(255, 255, 255, 0.04)',
+  backdropFilter: 'blur(10px)',
+  borderRadius: '20px',
+  padding: '10px 20px',
+  width: '100%',
+  marginBottom: '10px'
+}))
+
 export const StakeContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
   background: 'rgba(255, 255, 255, 0.04)',
   backdropFilter: 'blur(10px)',
   borderRadius: '20px',
   padding: '24px',
   minHeight: '400px',
+  width: '100%'
+}))
+
+export const StakeItemContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  background: 'rgba(255, 255, 255, 0.04)',
+  backdropFilter: 'blur(10px)',
+  borderRadius: '20px',
   width: '100%'
 }))
 

@@ -1,15 +1,15 @@
-export const menuItems = [
-  {
-    key: 'Wallet',
-    icon: "WalletIcon",
-    title: "Wallet",
-    url: "/"
-  },
+export const menuItems = [  
   {
     key: 'Ecosystem',
     icon: "SafeIcon",
     title: "Ecosystem",
     url: "/Ecosystem"
+  },
+  {
+    key: 'Wallet',
+    icon: "WalletIcon",
+    title: "Wallet",
+    url: "/"
   },
   // {
   //   key: 'Bridge',

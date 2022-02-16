@@ -39,7 +39,6 @@ function Proposal({
 
     const dispatch = useDispatch()
     const classes = useStyles();
-    const [ dropDownBox, setDropDownBox ] = useState(false)
     const [ votePercent, setVotePercent ] = useState(undefined)
 
     useEffect(() => {
@@ -98,7 +97,7 @@ function Proposal({
     const endTime = moment.unix(proposal.endTimestamp).format('lll')
 
     return (
-        <S.Wrapper dropDownBox={dropDownBox}>
+        <S.Wrapper>
             <S.GridContainer container
                 spacing={1}
                 direction="row"
@@ -112,7 +111,7 @@ function Proposal({
                     <Typography variant="body2" style={{ fontWeight: '700', textDecoration: 'underline' }}>
                         Proposal {proposal.id} : <FormatDescription description={proposal.description} />
                     </Typography>
-                    <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center',my: '10px' }}>
+                    <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', my: '10px' }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             <Typography style={{ fontSize: '0.8em', opacity: '0.65', lineHeight: '1.2em' }}>
                                 Voting Time
@@ -171,7 +170,7 @@ function Proposal({
                         display: 'flex',
                         justifyContent: 'space-between',
                     }}>
-                        {votePercent !== 'NA' && 
+                        {votePercent !== 'NA' &&
                             <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', fontWeight: '700' }}>For: {votePercent}%</Typography>
                         }
                         <Typography style={{ fontSize: '0.7em', lineHeight: '0.9em', color: 'rgba(255, 255, 255, 0.3)' }}>Total: {proposal.totalVotes}</Typography>
@@ -224,7 +223,7 @@ function Proposal({
                                 onClick={(e) => { updateVote(proposal.id, 0, 'Cast Vote Against') }}
                             >Vote Against</Button>
                         }
-                        {proposal.state === 'Active' && !proposal.hasVoted && 
+                        {proposal.state === 'Active' && !proposal.hasVoted &&
                             <Button
                                 type="outline"
                                 variant="outlined"
