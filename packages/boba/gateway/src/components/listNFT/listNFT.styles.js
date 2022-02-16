@@ -1,5 +1,5 @@
-import { styled } from '@mui/material/styles'
-import { Box, Typography, Grid, Divider } from "@mui/material"
+import { Grid } from "@mui/material";
+import { styled } from '@mui/material/styles';
 
 
 export const ListNFTItem = styled(Grid)(({ theme }) => ({

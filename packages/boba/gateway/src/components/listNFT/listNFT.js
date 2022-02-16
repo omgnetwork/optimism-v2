@@ -14,13 +14,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react'
-import { Typography, Grid } from '@mui/material'
-
-import { connect } from 'react-redux'
+import { Typography } from '@mui/material'
 import { isEqual } from 'lodash'
+import React from 'react'
+import { connect } from 'react-redux'
 import * as styles from './listNFT.module.scss'
-import * as S from './listNFT.styles';
+import * as S from './listNFT.styles'
+
 
 class listNFT extends React.Component {
 
