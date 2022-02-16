@@ -164,7 +164,7 @@ class Nft extends React.Component {
                 {loading ? 'Adding NFT...' : 'Add NFT'}
               </Button>
             </S.NFTFormContent>
-            <S.NFTFormContent>
+            {/* <S.NFTFormContent>
               <Box sx={{ mb: 2 }}>
                 <Box sx={{ mb: 2, px: 1, display: 'flex', alignItems: 'center' }}>
                   <Typography variant="body1" >
@@ -173,7 +173,7 @@ class Nft extends React.Component {
                 </Box>
                 <S.DividerLine />
               </Box>
-            </S.NFTFormContent>
+            </S.NFTFormContent> */}
           </S.NFTActionContent>
           <S.NFTListContainer>
             <Grid
