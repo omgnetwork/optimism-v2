@@ -18,6 +18,7 @@ import { Typography } from '@mui/material'
 import { isEqual } from 'lodash'
 import React from 'react'
 import { connect } from 'react-redux'
+import ReactCardFlip from 'react-card-flip'
 import * as styles from './listNFT.module.scss'
 import * as S from './listNFT.styles'
 
@@ -43,8 +44,15 @@ class listNFT extends React.Component {
       address,
       UUID,
       URL,
-      meta
+      meta,
+      isFlipped: false,
     }
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(e) {
+    e.preventDefault();
+    this.setState(prevState => ({ isFlipped: !prevState.isFlipped }));
   }
 
   componentDidUpdate(prevState) {
@@ -86,75 +94,74 @@ class listNFT extends React.Component {
       name,
       symbol,
       URL,
+      isFlipped,
       meta
     } = this.state
 
     let imgSource = URL
-    if(URL.substring(0,4)==='<svg') {
+    if (URL.substring(0, 4) === '<svg') {
       imgSource = `data:image/svg+xml;utf8,${URL}`
     }
 
     return (
-      <S.ListNFTItem item>
+      <ReactCardFlip isFlipped={isFlipped} >
+        <S.ListNFTItem item onClick={this.handleClick}>
 
-        <img 
-          src={imgSource}
-          alt="NFT URI"
-          width={'100%'} 
-        />
-        <div className={styles.topContainer}>  
-          <Typography variant="body1">
-            {name} ({symbol})
-          </Typography>
-        </div>
-        
-        <div className={styles.topContainer}>
-          <div className={styles.Table2}>
-          
-            
-
-            {/* {meta.collection !== '' &&
-              <Typography variant="body3">
-                Collection: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {meta.collection}
-                </Typography>
-              </Typography>
-            }
-            {meta.rank !== '' &&
-              <Typography variant="body3">
-                Rank: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {meta.rank}
-                </Typography>
-              </Typography>
-            }
-            {meta.rarity_score !== '' &&
-              <Typography variant="body3">
-                Rarity: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {meta.rarity_score}
-                </Typography>
-              </Typography>
-            }
-            {(meta.attributes || []).map((attr, index) => {
-              return (<Typography variant="body3" key={index}>{attr.trait_type}: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {attr.value}
-                </Typography>
-              </Typography>)
-            })}
-            {(meta.traits || []).map((attr, index) => {
-              return (<Typography variant="body3" key={index}>
-                {attr.trait_type}: 
-                <Typography variant="body3" component="span" className={styles.muted}>
-                  {attr.trait_value}
-                </Typography>
-              </Typography>)
-            })} */}
+          <img
+            src={imgSource}
+            alt="NFT URI"
+            width={'100%'}
+          />
+          <div className={styles.topContainer}>
+            <Typography variant="body1">
+              {name} ({symbol})
+            </Typography>
           </div>
-        </div>
-      </S.ListNFTItem>
+        </S.ListNFTItem>
+        <S.ListNFTItem active={'true'} item onClick={this.handleClick}>
+          <div className={styles.topContainer}>
+            <Typography variant="body1">
+              {name} ({symbol})
+            </Typography>
+            <S.DividerLine />
+          </div>
+
+          <div className={styles.topContainer}>
+            <div className={styles.Table2}>
+              {meta.collection !== '' &&
+                <Typography variant="body3">
+                  Collection:
+                    {meta.collection}
+                </Typography>
+              }
+              {meta.rank !== '' &&
+                <Typography variant="body3">
+                  Rank:
+                    {meta.rank}
+                </Typography>
+              }
+              {meta.rarity_score !== '' &&
+                <Typography variant="body3">
+                  Rarity:
+                    {meta.rarity_score}
+                </Typography>
+              }
+              {(meta.attributes || []).map((attr, index) => {
+                return (<Typography variant="body3" key={index}>{attr.trait_type}:
+                    {attr.value}
+                </Typography>)
+              })}
+              {(meta.traits || []).map((attr, index) => {
+                return (<Typography variant="body3" key={index}>
+                  {attr.trait_type}:
+                    {attr.trait_value}
+                </Typography>)
+              })}
+            </div>
+          </div>
+        </S.ListNFTItem>
+      </ReactCardFlip>
+
     )
   }
 }

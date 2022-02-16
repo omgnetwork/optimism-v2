@@ -254,9 +254,6 @@ function Home() {
           {pageDisplay === "BobaScope" &&
             <BobaScope />
           }
-          {pageDisplay === "NFT" &&
-            <NFT />
-          }
           {pageDisplay === "Wallet" &&
             <Wallet />
           }

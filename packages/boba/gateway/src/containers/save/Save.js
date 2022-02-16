@@ -22,17 +22,14 @@ import { isEqual } from 'lodash'
 
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 
-import ListSave from 'components/listSave/listSave'
-
 import AlertIcon from 'components/icons/AlertIcon'
 
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
 
 import * as S from './Save.styles'
-import * as styles from './Save.module.scss'
 
-import { Box, Typography, Grid, Divider } from '@mui/material'
+import { Box, Typography, Grid  } from '@mui/material'
 import { Circle } from '@mui/icons-material'
 
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
@@ -108,7 +105,7 @@ class Save extends React.Component {
       accountEnabled,
       netLayer
     } = this.state
-
+    console.log(['stakeInfo',stakeInfo])
     const { isMobile } = this.props
     /* 
         if (netLayer === 'L1') {
