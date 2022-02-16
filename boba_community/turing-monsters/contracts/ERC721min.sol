@@ -15,8 +15,11 @@ interface Helper {
  */
 contract ERC721min is ERC721 {
 
+    event MintedRandom(uint256);
+    //event ColorCreate(uint8, uint8, uint8);
+
     // Optional mapping for token URIs
-    mapping(uint256 => string) private _tokenURIs;
+    mapping(uint256 => uint256) private _tokenURIs;
 
     address public helperAddr;
     Helper myHelper;
@@ -39,11 +42,12 @@ contract ERC721min is ERC721 {
 
     function mint(address to, uint256 tokenId) public {
       uint256 turingRAND = myHelper.TuringRandom();
+      emit MintedRandom(turingRAND);
       _mint(to, tokenId);
-      _setTokenURI(tokenId, Strings.toString(turingRAND));
+      _setTokenURI(tokenId, turingRAND);
     }
 
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
+    function _setTokenURI(uint256 tokenId, uint256 _tokenURI) internal virtual {
         require(_exists(tokenId), "ERC721URIStorage: URI set of nonexistent token");
         _tokenURIs[tokenId] = _tokenURI;
     }
@@ -52,7 +56,7 @@ contract ERC721min is ERC721 {
 
         require(_exists(tokenId), "ERC721getSVG: URI get of nonexistent token");
 
-        string memory genome = _tokenURIs[tokenId];
+        uint256 genome = _tokenURIs[tokenId];
         bytes memory i_bytes = abi.encodePacked(genome);
 
         uint8 attribute_a = uint8(i_bytes[0]);
@@ -62,9 +66,9 @@ contract ERC721min is ERC721 {
 
         string[5] memory part;
 
-        string memory colorEye = Strings.toString(attribute_a);
-        string memory colorBody = Strings.toString(attribute_b);
-        string memory colorExtra = Strings.toString(attribute_c);
+        string memory colorEye   = string(abi.encodePacked(Strings.toString(attribute_a), ",", Strings.toString(attribute_b), ",", Strings.toString(attribute_c)));
+        string memory colorBody  = string(abi.encodePacked(Strings.toString(attribute_b), ",", Strings.toString(attribute_c), ",", Strings.toString(attribute_a)));
+        string memory colorExtra = string(abi.encodePacked(Strings.toString(attribute_c), ",", Strings.toString(attribute_a), ",", Strings.toString(attribute_b)));
 
         // Alternative approach 
         // string memory colorBody = "rgb(128,224,255)";
@@ -74,8 +78,8 @@ contract ERC721min is ERC721 {
 
         part[0] = "<svg xmlns='http://www.w3.org/2000/svg' version='1.2' x='0px' y='0px' viewBox='0 0 300 300' style='enable-background:new 0 0 300 300;' xml:space='preserve'>"
                   "<style type='text/css'>.st0{fill:rgb(";
-        part[1] = ",224,39);stroke:black;stroke-width:6;stroke-miterlimit:10;} .st1{fill:rgb(128,";
-        part[2] = ",255);stroke:black;stroke-width:6;stroke-miterlimit:10;} .st2{fill:rgb(128,224,";
+        part[1] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st1{fill:rgb(";
+        part[2] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st2{fill:rgb(";
         part[3] = ");stroke:black;stroke-width:6;stroke-miterlimit:10;} .st3{fill:none;stroke:black;stroke-width:10;stroke-miterlimit:10;}</style>";
         part[4] = "<path class='st0' d='M57.6,152.6c-1.5,13.8-22.2,27.3-25.5,30.4c-3.3,3.1-3.7,9.7-0.5,16.4c4.3,5.5,8.1,15.7,21.1,10c4-1.6,12.9-10,15.9-11.4'/>"
                   "<path class='st0' d='M236.8,172.2c2.1,1.8,8.7,7.2,11.4,8.3s5.9,1.3,8.4-0.1c1.7-1,14.6-18.2,15.4-21.6c1-4.3-0.4-9.2-3.6-12.3c-3.3-3.2-22.3-11.8-30.8-10.9'/>"
