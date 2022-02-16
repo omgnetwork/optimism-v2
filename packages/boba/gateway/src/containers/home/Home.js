@@ -76,7 +76,6 @@ import Account from 'containers/account/Account'
 import Transactions from 'containers/transactions/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
-import NFT from 'containers/wallet/nft/Nft'
 import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
 

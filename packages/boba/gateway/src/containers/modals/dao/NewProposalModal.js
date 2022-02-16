@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
-import { Box, Typography, useMediaQuery } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -24,9 +24,6 @@ import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 import Select from 'react-select'
-
-import { useTheme } from '@emotion/react'
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import { createDaoProposal } from 'actions/daoAction'
 import { selectProposalThreshold } from 'selectors/daoSelector'
@@ -48,9 +45,7 @@ function NewProposalModal({ open }) {
 
     const loading = false //ToDo useSelector(selectLoading([ 'PROPOSAL_DAO/CREATE' ]))
 
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-
+    
     const proposalThreshold = useSelector(selectProposalThreshold)
 
     const onActionChange = (e) => {

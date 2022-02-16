@@ -16,11 +16,9 @@ limitations under the License. */
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
-import { useTheme } from '@emotion/react'
+import { Box, Typography } from '@mui/material'
 
 import { closeModal, openAlert, openError } from 'actions/uiAction';
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
@@ -43,9 +41,6 @@ function DelegateDaoXModal({ open }) {
     const disabled = !recipient;
 
     const loading = false //ToDo useSelector(selectLoading([ 'DELEGATE_DAO/CREATE' ]))
-
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
     const wAddress = networkService.account ? networkService.account : ''
 
