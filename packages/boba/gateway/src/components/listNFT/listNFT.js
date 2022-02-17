@@ -104,7 +104,7 @@ class listNFT extends React.Component {
     }
 
     return (
-      <ReactCardFlip isFlipped={isFlipped} >
+      <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical" >
         <S.ListNFTItem item onClick={this.handleClick}>
 
           <img
@@ -112,7 +112,11 @@ class listNFT extends React.Component {
             alt="NFT URI"
             width={'100%'}
           />
-          <div className={styles.topContainer}>
+          <div
+            style={{
+              padding: '10px 5px'
+            }}
+            className={styles.topContainer}>
             <Typography variant="body1">
               {/* {name} ({symbol}) */}
               {meta.name}

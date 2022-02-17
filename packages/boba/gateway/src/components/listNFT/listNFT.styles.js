@@ -5,15 +5,16 @@ import { styled } from '@mui/material/styles';
 export const ListNFTItem = styled(Grid)(({ theme,active }) => ({
   borderRadius: '20px',
   maxWidth: '180px',
+  minWidth: '180px',
   margin: '10px',
   background: theme.palette.background.secondary,
   overflow: 'hidden',
+  border: '1px solid transparent',
   '&: hover': {
     border: '1px solid transparent',
     borderImage: 'linear-gradient(118deg, #CBFE00 0%, #1cd6d1 100%)',
     borderImageSlice: 1,
   },
-  border: active ? '1px solid transparent': 'none',
   borderImage: active ? 'linear-gradient(118deg, #CBFE00 0%, #1cd6d1 100%)' : 'none',
   borderImageSlice: 1,
   padding: active ? '10px' : '0px',
