@@ -43,38 +43,27 @@ $ yarn install
 $ yarn build
 ```
 
-Then, add your Infura key to `boba_community/fraud-detector/deployments/mainnet/env`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io). 
+Then, add your Infura key to `boba_community/fraud-detector/docker-compose-fraud-detector.yml`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io). 
 
 ```bash
+x-l1_rpc_dtl: &l1_rpc_dtl
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
 
-#boba_community/fraud-detector/deployments/mainnet/env
-
-TARGET_NAME="mainnet"
-L1_RPC_ENDPOINT="https://mainnet.infura.io/v3/YOUR_INFURA_KEY_HERE"
-L2_RPC_ENDPOINT="https://mainnet.boba.network"
-ETH1_CTC_DEPLOYMENT_HEIGHT=13502893
-ADDRESS_MANAGER="0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
-L2_CHAIN_ID=288
-
+x-l1_node_web3_url: &l1_node_web3_url
+  L1_NODE_WEB3_URL: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
 ```
 
 Next, navigate to `boba_community/fraud-detector` and build the needed Docker images:
 
 ```
 $ cd boba_community/fraud-detector
-$ docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/local/env build
-```
-
-You may need to create the default docker network:
-
-```
-$ docker network create ops_default
+$ docker-compose -f docker-compose-fraud-detector.yml build
 ```
 
 Finally, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
 
 ```
-$ docker-compose -f docker-compose-fraud-detector.yml --env-file deployments/mainnet/env up
+$ docker-compose -f docker-compose-fraud-detector.yml up
 ```
 
 The system will start and the `Verifier L2 Geth` will begin to sync with the Boba L2 via data it deposited into the core Boba contracts on Ethereum Mainnet. **The sync process can take 1/2 hour to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:
