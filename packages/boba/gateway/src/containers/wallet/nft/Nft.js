@@ -121,7 +121,7 @@ class Nft extends React.Component {
                 <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
                   <BobaGlassIcon />
                   <Typography variant="body1" >
-                    Stake Boba
+                    Add NFT
                   </Typography>
                 </Box>
                 <S.DividerLine />
@@ -146,7 +146,6 @@ class Nft extends React.Component {
                   Token Id
                 </Typography>
                 <Input
-                  sx={{ marginTop: '20px' }}
                   placeholder='tokenID - e.g. 3'
                   value={tokenID}
                   onChange={this.handleInputID}

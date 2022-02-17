@@ -39,6 +39,8 @@ import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
 import ListSave from 'components/listSave/ListSave'
 
+import { logAmount } from 'util/amountConvert'
+
 class Save extends React.Component {
 
   constructor(props) {
@@ -54,11 +56,16 @@ class Save extends React.Component {
       netLayer
     } = this.props.setup
 
+    const { 
+      layer2,
+    } = this.props.balance
+
     this.state = {
       stakeInfo,
       accountEnabled,
       netLayer,
       loading: false,
+      layer2,
     }
 
   }
@@ -78,6 +85,12 @@ class Save extends React.Component {
       accountEnabled,
       netLayer
     } = this.props.setup
+
+    const { layer2 } = this.props.balance
+
+    if (!isEqual(prevState.balance.layer2, layer2)) {
+     this.setState({ layer2 })
+    }
 
     if (!isEqual(prevState.fixed.stakeInfo, stakeInfo)) {
       this.setState({ stakeInfo })
@@ -103,8 +116,31 @@ class Save extends React.Component {
     const {
       stakeInfo,
       accountEnabled,
-      netLayer
+      netLayer,
+      layer2,
     } = this.state
+
+
+  let bobaBalance = layer2.filter((i) => {
+      if (i.symbol === 'BOBA') return true
+      return false
+    })
+
+    let bobaWeiString = '0'
+    if (typeof(bobaBalance[0]) !== 'undefined') {
+      console.log("bobaBalance:",bobaBalance[0])
+      bobaWeiString = bobaBalance[0].balance.toString()
+    }
+
+    //console.log("omgWeiString:",omgWeiString)
+
+    let l2BalanceBOBA = Number(logAmount(bobaWeiString, 18))
+
+    let totalBOBAstaked = 0
+    Object.keys(stakeInfo).map((v, i) => {
+      totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[i].depositAmount)
+      console.log(Number(stakeInfo[i].depositAmount))
+    })
 
 
     /* 
@@ -169,14 +205,14 @@ class Save extends React.Component {
               <S.StakeItem sx={{ my: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-around', flexDirection: 'column' }}>
                   <Typography variant="body2" sx={{ opacity: 0.65 }}>
-                    Your staked
+                    Total staked
                   </Typography>
                   <Typography variant="h3" >
-                    0 Boba
+                    {totalBOBAstaked} Boba
                   </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.65 }}>
+                  {/*<Typography variant="body2" sx={{ opacity: 0.65 }}>
                     ≈ $0
-                  </Typography>
+                  </Typography>*/}
                 </Box>
               </S.StakeItem>
             </S.StakeEarnContainer>
@@ -189,7 +225,7 @@ class Save extends React.Component {
                 }}
               >
                 <Typography variant="body2"> Boba Balance:</Typography>
-                <Typography variant="body2"> -- </Typography>
+                <Typography variant="body2"> {l2BalanceBOBA} </Typography>
               </Box>
               <Input
                 value={0}
@@ -199,7 +235,7 @@ class Save extends React.Component {
                 newStyle
               />
               {!netLayer ?
-                <WalletPicker fullWidth={true} label="Connet wallet" /> :
+                <WalletPicker fullWidth={true} label="Connect wallet" /> :
                 netLayer === 'L2' ?
                   <Button
                     color="primary"
@@ -218,7 +254,7 @@ class Save extends React.Component {
                         variant="body3"
                         component="p"
                       >
-                        You are on Mainnet. To use the Boba DAO, SWITCH to Boba
+                        You are on Mainnet. To stake, SWITCH to Boba
                       </S.AlertText>
                     </S.AlertInfo>
                     <LayerSwitcher fullWidth={true} isButton={true} />
@@ -231,7 +267,7 @@ class Save extends React.Component {
               </Typography>
               <Box>
                 <Typography variant="body2">
-                  <Circle sx={{ height: "6px", color: '#BAE21A', mr: 1, width: "6px" }} /> STAKING PERIOD:
+                  <Circle sx={{ height: "6px", color: '#BAE21A', mr: 1, width: "6px" }} /> STAKING PERIOD
                 </Typography>
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
                   Each staking period lasts 2 weeks. If you do not unstake after a staking period, your stake will be automatically renewed.
@@ -239,7 +275,7 @@ class Save extends React.Component {
               </Box>
               <Box>
                 <Typography variant="body2" >
-                  <Circle sx={{ height: "6px", color: '#BAE21A', mr: 1, width: "6px" }} /> UNSTAKING WINDOW:
+                  <Circle sx={{ height: "6px", color: '#BAE21A', mr: 1, width: "6px" }} /> UNSTAKING WINDOW
                 </Typography>
                 <Typography variant="body3" sx={{ opacity: 0.65 }}>
                   The first two days of every staking period, except for the first staking period, are the unstaking window. You can only unstake during the unstaking window.
@@ -302,6 +338,7 @@ class Save extends React.Component {
 const mapStateToProps = state => ({
   fixed: state.fixed,
   setup: state.setup,
+  balance: state.balance,
 })
 
 export default connect(mapStateToProps)(Save)
