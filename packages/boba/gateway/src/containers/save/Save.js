@@ -56,7 +56,7 @@ class Save extends React.Component {
       netLayer
     } = this.props.setup
 
-    const { 
+    const {
       layer2,
     } = this.props.balance
 
@@ -89,7 +89,7 @@ class Save extends React.Component {
     const { layer2 } = this.props.balance
 
     if (!isEqual(prevState.balance.layer2, layer2)) {
-     this.setState({ layer2 })
+      this.setState({ layer2 })
     }
 
     if (!isEqual(prevState.fixed.stakeInfo, stakeInfo)) {
@@ -121,15 +121,15 @@ class Save extends React.Component {
     } = this.state
 
 
-  let bobaBalance = layer2.filter((i) => {
+    let bobaBalance = layer2.filter((i) => {
       if (i.symbol === 'BOBA') return true
       return false
     })
 
     let bobaWeiString = '0'
-    if (typeof(bobaBalance[0]) !== 'undefined') {
-      console.log("bobaBalance:",bobaBalance[0])
-      bobaWeiString = bobaBalance[0].balance.toString()
+    if (typeof (bobaBalance[ 0 ]) !== 'undefined') {
+      console.log("bobaBalance:", bobaBalance[ 0 ])
+      bobaWeiString = bobaBalance[ 0 ].balance.toString()
     }
 
     //console.log("omgWeiString:",omgWeiString)
@@ -138,8 +138,8 @@ class Save extends React.Component {
 
     let totalBOBAstaked = 0
     Object.keys(stakeInfo).map((v, i) => {
-      totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[i].depositAmount)
-      console.log(Number(stakeInfo[i].depositAmount))
+      totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[ i ].depositAmount)
+      console.log(Number(stakeInfo[ i ].depositAmount))
     })
 
 

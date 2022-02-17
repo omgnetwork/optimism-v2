@@ -1,5 +1,6 @@
 import { Circle } from "@mui/icons-material";
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import LayerSwitcher from "components/mainMenu/layerSwitcher/LayerSwitcher";
 import PageTitle from "components/pageTitle/PageTitle";
 import Nft from "containers/wallet/nft/Nft";
 import React, { useState } from "react";
@@ -17,7 +18,15 @@ function Wallet() {
 
   return (
     <S.PageContainer>
-      <PageTitle title={`${layer === 'L1' ? 'Ethereum' : 'Boba'} Wallet`} />
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        gap: '20px'
+      }}>
+        <PageTitle title={`${!layer ? '': layer === 'L1' ? 'Ethereum' : 'Boba'} Wallet`} />
+        <LayerSwitcher isIcon={true}/>
+      </Box>
       <S.PageSwitcher>
         <Typography
           className={page === 'TOKEN' ? 'active' : ''}
