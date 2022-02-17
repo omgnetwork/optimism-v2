@@ -1,4 +1,4 @@
-FROM bobanetwork/data-transport-layer
+FROM bobanetwork/data-transport-layer:release
 ARG TARGET_NAME
 
 COPY boba_community/fraud-detector/deployments/${TARGET_NAME}/state-dump.latest.json /opt/optimism/packages/data-transport-layer/state-dumps/state-dump.latest.json

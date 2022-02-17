@@ -6,10 +6,6 @@ version: "3"
 #     --env-file deployments/local/env \
 #     build
 # For non-local targets, INFURA_API_KEY must also be set
-networks:
-  default:
-    external: true
-    name: ops_default
 
 services:
   verifier_dtl:
@@ -38,12 +34,9 @@ services:
   verifier_l2geth:
     depends_on:
       - verifier_dtl
-    image: bobanetwork/l2geth:${TARGET_NAME}
+    image: bobanetwork/l2geth:release
     deploy:
       replicas: 1
-    build:
-      context: ../..
-      dockerfile: ./ops/docker/Dockerfile.geth
     entrypoint: sh ./geth.sh
     env_file:
       - ../../ops/envs/geth.env
@@ -58,6 +51,8 @@ services:
         BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
         BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
         ROLLUP_POLL_INTERVAL_FLAG: "10s"
+        EMERGENCY_FORK_NUMBER: "310215"
+        ROLLUP_ENFORCE_FEES: 'true'
     ports:
       - ${VERIFIER_HTTP_PORT:-8547}:8545
       - ${VERIFIER_WS_PORT:-8548}:8546
