@@ -25,6 +25,8 @@ let L2ERC20: Contract
 let Proxy__L1LiquidityPool: Contract
 let Proxy__L2LiquidityPool: Contract
 
+let BobaWhitelist: Contract
+
 const initialSupply_6 = utils.parseUnits('10000', 6)
 const initialSupply_8 = utils.parseUnits('10000', 8)
 const initialSupply_18 = utils.parseEther('10000000000')
@@ -62,6 +64,10 @@ const deployFn: DeployFunction = async (hre) => {
     xL2GovernanceERC20Json.bytecode,
     (hre as any).deployConfig.deployer_l2
   )
+
+  BobaWhitelist = getContractFactory('BobaWhitelist')
+    .connect((hre as any).deployConfig.deployer_l2)
+    .attach((hre as any).deployConfig.BobaWhitelistAddress) as any
 
   let tokenAddressL1 = null
   let tokenDecimals = null
@@ -274,6 +280,13 @@ const deployFn: DeployFunction = async (hre) => {
   )
   await addController.wait()
   console.log(`L2 LP has the power to mint and burn xBOBA`)
+
+  // Add Boba token in whitelist contract
+  const addWhitelist = await BobaWhitelist.addWhitelistedERC20Contract(
+    deployments['TK_L2BOBA'].address
+  )
+  await addWhitelist.wait()
+  console.log(`BOBA was added to Boba whitelist contract`)
 }
 
 deployFn.tags = ['L1ERC20', 'test']

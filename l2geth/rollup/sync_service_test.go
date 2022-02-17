@@ -3,6 +3,7 @@ package rollup
 import (
 	"context"
 	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/big"
@@ -23,6 +24,8 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/event"
 	"github.com/ethereum-optimism/optimism/l2geth/params"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
+
+	"golang.org/x/crypto/sha3"
 )
 
 // Test that the timestamps are updated correctly.
@@ -716,7 +719,7 @@ func TestFeeGasPriceOracleOwnerTransactions(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Verify the fee of the signed tx, ensure it does not error
-	if err := service.verifyFee(signedTx); err != nil {
+	if err := service.verifyFee(signedTx, nil); err != nil {
 		t.Fatal(err)
 	}
 	// Generate a new random key that is not the owner
@@ -732,12 +735,109 @@ func TestFeeGasPriceOracleOwnerTransactions(t *testing.T) {
 	}
 	// Attempt to verify the fee of the bad tx
 	// It should error and be a errZeroGasPriceTx
-	if err := service.verifyFee(badSignedTx); err != nil {
+	if err := service.verifyFee(badSignedTx, nil); err != nil {
 		if !errors.Is(errZeroGasPriceTx, err) {
 			t.Fatal(err)
 		}
 	} else {
 		t.Fatal("err is nil")
+	}
+}
+
+func TestFeeToWhitelistContractTransactions(t *testing.T) {
+	rcfg.OvmWhitelistAddress = common.HexToAddress("0x4200000000000000000000000000000000000023")
+	service, _, _, err := newTestSyncService(true, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	signer := types.NewEIP155Signer(big.NewInt(420))
+	// Fees must be enforced for this test
+	service.enforceFees = true
+	// Generate a key
+	key, _ := crypto.GenerateKey()
+	// Load state db
+	state, err := service.bc.State()
+	if err != nil {
+		t.Fatal("cannot get state db")
+	}
+	// Mock tx
+	tx := mockTx()
+	// Make sure the gas price is 0 on the dummy tx
+	if tx.GasPrice().Cmp(common.Big0) != 0 {
+		t.Fatal("gas price not 0")
+	}
+	// Sign the dummy tx with the owner key
+	signedTx, err := types.SignTx(tx, signer, key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Store key to boba whitlist contract
+	target := signedTx.To()
+	position := common.Big1
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(target.Bytes(), 32))
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	keySlot := common.BytesToHash(digest)
+	state.SetState(rcfg.OvmWhitelistAddress, keySlot, common.BigToHash(common.Big1))
+	hash, _ := state.Commit(false)
+	// Check whitelist
+	if err := service.verifyFee(signedTx, &hash); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestFeeWhitelistERC20ContractTransaction(t *testing.T) {
+	rcfg.OvmWhitelistAddress = common.HexToAddress("0x4200000000000000000000000000000000000023")
+	txData, err := hex.DecodeString("095ea7b3000000000000000000000000a9b99d5cf2d8dd2ddf482bac441892d1f0166c83ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
+	targetAddress := common.HexToAddress("0xa9b99d5cf2d8dd2ddf482bac441892d1f0166c83")
+
+	service, _, _, err := newTestSyncService(true, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	signer := types.NewEIP155Signer(big.NewInt(420))
+	// Fees must be enforced for this test
+	service.enforceFees = true
+	// Generate a key
+	key, _ := crypto.GenerateKey()
+	// Load state db
+	state, err := service.bc.State()
+	if err != nil {
+		t.Fatal("cannot get state db")
+	}
+	// Mock tx
+	tx := mockTxWithData(txData)
+	// Make sure the gas price is 0 on the dummy tx
+	if tx.GasPrice().Cmp(common.Big0) != 0 {
+		t.Fatal("gas price not 0")
+	}
+	// Sign the dummy tx with the owner key
+	signedTx, err := types.SignTx(tx, signer, key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Store key to boba whitlist contract
+	// Write target address in whitelistContract
+	position := common.Big1
+	hasher := sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(targetAddress.Bytes(), 32))
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest := hasher.Sum(nil)
+	keySlot := common.BytesToHash(digest)
+	state.SetState(rcfg.OvmWhitelistAddress, keySlot, common.BigToHash(common.Big1))
+	// Write ERC20 address in whitelistERC20Contract
+	position = common.Big2
+	hasher = sha3.NewLegacyKeccak256()
+	hasher.Write(common.LeftPadBytes(tx.To().Bytes(), 32))
+	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
+	digest = hasher.Sum(nil)
+	keySlot = common.BytesToHash(digest)
+	state.SetState(rcfg.OvmWhitelistAddress, keySlot, common.BigToHash(common.Big1))
+	hash, _ := state.Commit(false)
+	// Check whitelist
+	if err := service.verifyFee(signedTx, &hash); err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -1111,6 +1211,34 @@ func mockTx() *types.Transaction {
 
 	gasLimit := uint64(0)
 	data := []byte{0x00, 0x00}
+	l1BlockNumber := big.NewInt(0)
+
+	tx := types.NewTransaction(0, target, big.NewInt(0), gasLimit, big.NewInt(0), data)
+	meta := types.NewTransactionMeta(
+		l1BlockNumber,
+		timestamp,
+		[]byte{0},
+		&l1TxOrigin,
+		types.QueueOriginSequencer,
+		nil,
+		nil,
+		nil,
+	)
+	tx.SetTransactionMeta(meta)
+	return tx
+}
+
+func mockTxWithData(data []byte) *types.Transaction {
+	address := make([]byte, 20)
+	rand.Read(address)
+
+	target := common.BytesToAddress(address)
+	timestamp := uint64(0)
+
+	rand.Read(address)
+	l1TxOrigin := common.BytesToAddress(address)
+
+	gasLimit := uint64(0)
 	l1BlockNumber := big.NewInt(0)
 
 	tx := types.NewTransaction(0, target, big.NewInt(0), gasLimit, big.NewInt(0), data)

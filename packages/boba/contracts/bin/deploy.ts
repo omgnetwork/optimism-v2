@@ -65,6 +65,10 @@ const main = async () => {
     'BobaTuringHelper'
   )
 
+  const BobaWhitelistAddress = await addressManager.getAddress(
+    'BobaWhitelist'
+  )
+
   const watcher = new Watcher({
     l1: {
       provider: l1Provider,
@@ -91,6 +95,7 @@ const main = async () => {
     fastRelayerAddress,
     BobaTuringCreditAddress,
     BobaTuringHelperAddress,
+    BobaWhitelistAddress,
     watcher,
   })
 }

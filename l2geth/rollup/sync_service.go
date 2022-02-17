@@ -6,17 +6,18 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"github.com/ethereum-optimism/optimism/l2geth/accounts/abi"
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/core"
 	"github.com/ethereum-optimism/optimism/l2geth/core/state"
 	"github.com/ethereum-optimism/optimism/l2geth/ethdb"
 	"github.com/ethereum-optimism/optimism/l2geth/event"
 	"github.com/ethereum-optimism/optimism/l2geth/log"
-	"golang.org/x/crypto/sha3"
 
 	"github.com/ethereum-optimism/optimism/l2geth/core/rawdb"
 	"github.com/ethereum-optimism/optimism/l2geth/core/types"
@@ -24,6 +25,8 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/eth/gasprice"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/fees"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
+
+	"golang.org/x/crypto/sha3"
 )
 
 var (
@@ -37,6 +40,8 @@ var (
 	// with gas price zero and fees are currently enforced
 	errZeroGasPriceTx = errors.New("cannot accept 0 gas price transaction")
 	float1            = big.NewFloat(1)
+	abiReader         abi.ABI
+	abiData           = `[{"type" : "function","name" : "approve","constant" : false,"inputs" : [ { "name" : "spender", "type" : "address"}, { "name" : "amount", "type" : "uint256" } ],"outputs": [{"name": "", "type":"bool"}], "stateMutability": "nonpayable"}]`
 )
 
 // SyncService implements the main functionality around pulling in transactions
@@ -218,6 +223,12 @@ func NewSyncService(ctx context.Context, cfg Config, txpool *core.TxPool, bc *co
 		if !service.verifier {
 			service.setSyncStatus(true)
 		}
+	}
+	// Load abi reader
+	var err error
+	abiReader, err = abi.JSON(strings.NewReader(abiData))
+	if err != nil {
+		log.Warn("Cannot initialized abi reader")
 	}
 	return &service, nil
 }
@@ -933,7 +944,7 @@ func (s *SyncService) applyBatchedTransaction(tx *types.Transaction) error {
 }
 
 // verifyFee will verify that a valid fee is being paid.
-func (s *SyncService) verifyFee(tx *types.Transaction) error {
+func (s *SyncService) verifyFee(tx *types.Transaction, hash *common.Hash) error {
 	fee, err := fees.CalculateTotalFee(tx, s.RollupGpo)
 	if err != nil {
 		return fmt.Errorf("invalid transaction: %w", err)
@@ -958,17 +969,25 @@ func (s *SyncService) verifyFee(tx *types.Transaction) error {
 		return fmt.Errorf("invalid transaction: %w", core.ErrInsufficientFunds)
 	}
 
-	// Allow 0 gas price for interacting with certain contracts
-	var isWhitelist = common.Big0
-	if tx.To() != nil {
-		isWhitelist = s.checkWhitelist(tx.To())
-	}
-
 	if tx.GasPrice().Cmp(common.Big0) == 0 {
-		// Allow 0 gas price transactions only if the target contract is whitelisted
-		if isWhitelist.Cmp(common.Big1) == 0 {
-			log.Info("Found whitelisted contract address:", "contract address", tx.To().String())
-			return nil
+		// Check the tx.To() is the whitelist ERC20 contract
+		if tx.To() != nil {
+			// Allow 0 gas price only if the ERC20s approve certain contracts
+			isWhitlistERC20Contract := s.checkWhitelistContract(tx.To(), common.Big2, hash)
+			if isWhitlistERC20Contract.Cmp(common.Big1) == 0 {
+				// Check the method of tx
+				allowZeroApprovement := s.checkApprovementMethod(tx, hash)
+				if allowZeroApprovement.Cmp(common.Big1) == 0 {
+					log.Info("Found whitelist ERC20 contract address and verfied the method:", "contract address", tx.To().String())
+					return nil
+				}
+			}
+			// Allow 0 gas price transactions only if the target contract is whitelist
+			isWhitelistContract := s.checkWhitelistContract(tx.To(), common.Big1, hash)
+			if isWhitelistContract.Cmp(common.Big1) == 0 {
+				log.Info("Found whitelist contract address:", "contract address", tx.To().String())
+				return nil
+			}
 		}
 		// Allow 0 gas price transactions only if it is the owner of the gas
 		// price oracle
@@ -1029,7 +1048,7 @@ func (s *SyncService) ValidateAndApplySequencerTransaction(tx *types.Transaction
 	}
 	s.txLock.Lock()
 	defer s.txLock.Unlock()
-	if err := s.verifyFee(tx); err != nil {
+	if err := s.verifyFee(tx, nil); err != nil {
 		return err
 	}
 	log.Trace("Sequencer transaction validation", "hash", tx.Hash().Hex())
@@ -1252,8 +1271,7 @@ func (s *SyncService) IngestTransaction(tx *types.Transaction) error {
 }
 
 // Get slot in the whitelist contract
-func GetWhitelistSlot(contractAddress *common.Address) common.Hash {
-	position := common.Big1
+func GetWhitelistContractSlot(contractAddress *common.Address, position *big.Int) common.Hash {
 	hasher := sha3.NewLegacyKeccak256()
 	hasher.Write(common.LeftPadBytes(contractAddress.Bytes(), 32))
 	hasher.Write(common.LeftPadBytes(position.Bytes(), 32))
@@ -1261,15 +1279,40 @@ func GetWhitelistSlot(contractAddress *common.Address) common.Hash {
 	return common.BytesToHash(digest)
 }
 
-// Return 1 if the contract is whitelisted
-func (s *SyncService) checkWhitelist(contractAddress *common.Address) *big.Int {
+// Return 1 if the contract is whitelist
+func (s *SyncService) checkWhitelistContract(contractAddress *common.Address, position *big.Int, hash *common.Hash) *big.Int {
+	var state *state.StateDB
 	var err error
-	state, err := s.bc.State()
-	if err != nil {
-		return big.NewInt(0)
+	if hash != nil {
+		state, err = s.bc.StateAt(*hash)
+	} else {
+		state, err = s.bc.State()
 	}
-	keySlot := GetWhitelistSlot(contractAddress)
+	if err != nil {
+		return common.Big0
+	}
+	// position 1: whitslist contract
+	// position 2: whitelist ERC20 contract - can only use 0 gas price for
+	// approving the transaction that goes to contracts in position 1
+	keySlot := GetWhitelistContractSlot(contractAddress, position)
 	value := state.GetState(rcfg.OvmWhitelistAddress, keySlot)
 	isWhitelist := value.Big()
 	return isWhitelist
+}
+
+// Return 1 if the approvement can use 0 gas price
+func (s *SyncService) checkApprovementMethod(tx *types.Transaction, hash *common.Hash) *big.Int {
+	// Verify the method first
+	method, err := abiReader.MethodById(tx.Data()[0:4])
+	if err != nil {
+		return common.Big0
+	}
+	// Decode the tx.Data()
+	method_input, err := method.Inputs.UnpackValues(tx.Data()[4:])
+	if err != nil {
+		return common.Big0
+	}
+	// Get address
+	targetAddress := method_input[0].(common.Address)
+	return s.checkWhitelistContract(&targetAddress, common.Big1, hash)
 }
