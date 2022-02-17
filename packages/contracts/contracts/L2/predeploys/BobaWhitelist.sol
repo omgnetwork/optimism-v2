@@ -39,7 +39,10 @@ contract BobaWhitelist is Ownable {
    *
    * @param _whitelistedContract a whitelisted contract address
    */
-  function addWhitelistedContract(address _whitelistedContract) public onlyOwner {
+  function addWhitelistedContract(address _whitelistedContract)
+    public
+    onlyOwner
+  {
     whitelistedContracts[_whitelistedContract] = true;
 
     emit AddWhitelistedContract(owner(), _whitelistedContract);
@@ -50,7 +53,10 @@ contract BobaWhitelist is Ownable {
    *
    * @param _whitelistedContract a whitelisted contract address
    */
-  function removeWhitelistedContract(address _whitelistedContract) public onlyOwner {
+  function removeWhitelistedContract(address _whitelistedContract)
+    public
+    onlyOwner
+  {
     whitelistedContracts[_whitelistedContract] = false;
 
     emit RemoveWhitelistedContract(owner(), _whitelistedContract);
@@ -61,7 +67,10 @@ contract BobaWhitelist is Ownable {
    *
    * @param _whitelistedERC20Contract a whitelisted ERC20 contract address
    */
-  function addWhitelistedERC20Contract(address _whitelistedERC20Contract) public onlyOwner {
+  function addWhitelistedERC20Contract(address _whitelistedERC20Contract)
+    public
+    onlyOwner
+  {
     whitelistedERC20Contracts[_whitelistedERC20Contract] = true;
 
     emit AddWhitelistedERC20Contract(owner(), _whitelistedERC20Contract);
@@ -72,7 +81,10 @@ contract BobaWhitelist is Ownable {
    *
    * @param _whitelistedERC20Contract a whitelisted ERC20 contract address
    */
-  function removeWhitelistedERC20Contract(address _whitelistedERC20Contract) public onlyOwner {
+  function removeWhitelistedERC20Contract(address _whitelistedERC20Contract)
+    public
+    onlyOwner
+  {
     whitelistedERC20Contracts[_whitelistedERC20Contract] = false;
 
     emit RemoveWhitelistedERC20Contract(owner(), _whitelistedERC20Contract);

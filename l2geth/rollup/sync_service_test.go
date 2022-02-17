@@ -790,6 +790,9 @@ func TestFeeToWhitelistContractTransactions(t *testing.T) {
 func TestFeeWhitelistERC20ContractTransaction(t *testing.T) {
 	rcfg.OvmWhitelistAddress = common.HexToAddress("0x4200000000000000000000000000000000000023")
 	txData, err := hex.DecodeString("095ea7b3000000000000000000000000a9b99d5cf2d8dd2ddf482bac441892d1f0166c83ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
+	if err != nil {
+		t.Fatal(err)
+	}
 	targetAddress := common.HexToAddress("0xa9b99d5cf2d8dd2ddf482bac441892d1f0166c83")
 
 	service, _, _, err := newTestSyncService(true, nil)
