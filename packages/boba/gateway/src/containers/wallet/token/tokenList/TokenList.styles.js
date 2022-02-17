@@ -11,20 +11,22 @@ export const Content = styled(Box)`
 `;
 
 
-export const TableBody = styled(Box)`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 50px;
-  text-align: center;
-  borderBottom: '1px solid rgba(255, 255, 255, 0.04)';
-`;
+export const TableBody = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  textAlign: 'center',
+  borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+  [ theme.breakpoints.down('sm') ]: {
+    gap: '10px'
+  }
+}))
 
 export const TableCell = styled(Box)`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 33.33%;
+  width: 20%;
 `;
 
 export const TextTableCell = styled(Typography)`

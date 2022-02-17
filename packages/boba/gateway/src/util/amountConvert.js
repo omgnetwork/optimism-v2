@@ -57,10 +57,6 @@ export function toWei_String(amount, decimals) {
 }
 
 export function amountToUsd(amount, lookupPrice, token) {
-  console.log([
-    'amount, lookupPrice, token',
-    amount, lookupPrice, token
-  ])
   if (token.symbol === 'ETH' && !!lookupPrice['ethereum']) {
     return amount * lookupPrice['ethereum'].usd
   } else if (token.symbol === 'OMG' && !!lookupPrice['omisego']) {
@@ -68,6 +64,6 @@ export function amountToUsd(amount, lookupPrice, token) {
   } else if (!!lookupPrice[token.symbol.toLowerCase()]) {
     return amount * lookupPrice[token.symbol.toLowerCase()].usd
   } else {
-    return false
+    return 0
   }
 }

@@ -10,6 +10,8 @@ export const TokenPageContainer = styled(Box)(({ theme }) => ({
   [ theme.breakpoints.down('sm') ]: {
     width: '100%',
     padding: '0px',
+    overflowX: 'scroll',
+    display: 'block'
   },
 }));
 
@@ -37,6 +39,10 @@ export const TokenPageContent = styled(Box)(({ theme }) => ({
   gap: '10px',
   height: 'fit-content',
   background: theme.palette.background.secondary,
+  [ theme.breakpoints.down('sm') ]: {
+    width: 'fit-content',
+    minWidth: '100%'
+  },
 }))
 
 export const TableHeading = styled(Box)(({ theme }) => ({

@@ -100,7 +100,11 @@ function TokenPage({
           <S.TableHeading>
             {tokenTableHeads.map((item) => {
               return (
-                <S.TableHeadingItem key={item.label} variant="body2" component="div">{item.label}</S.TableHeadingItem>
+                <S.TableHeadingItem
+                  sx={{
+                    width: item.size
+                  }}
+                  key={item.label} variant="body2" component="div">{item.label}</S.TableHeadingItem>
               )
             })}
           </S.TableHeading>
