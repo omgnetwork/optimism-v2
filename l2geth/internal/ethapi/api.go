@@ -1750,7 +1750,7 @@ func (s *PublicTransactionPoolAPI) SendRawTransaction(ctx context.Context, encod
 		callArgs := CallArgs{
 			From:     &from,
 			To:       tx.To(),
-			GasPrice: nil,
+			GasPrice: (*hexutil.Big)(tx.GasPrice()),
 			Value:    (*hexutil.Big)(tx.Value()),
 			Data:     &tdBytes,
 		}
