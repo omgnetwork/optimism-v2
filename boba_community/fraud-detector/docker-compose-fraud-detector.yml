@@ -57,7 +57,7 @@ services:
     depends_on:
      - verifier_dtl
      - verifier_l2geth
-    image: bobanetwork/fraud-detector:${TARGET_NAME}
+    image: bobanetwork/fraud-detector:latest
     deploy:
       replicas: 1
     build:
