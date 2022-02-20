@@ -1,0 +1,44 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "SelfDestruction",
+  "sourceName": "contracts/SelfDestruction.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "data",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "destruct",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_data",
+          "type": "bytes32"
+        }
+      ],
+      "name": "setData",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052636162636460005534801561001857600080fd5b506098806100276000396000f3fe6080604052348015600f57600080fd5b5060043610603c5760003560e01c80632b68b9c614604157806341657ee614604957806373d4a13a146059575b600080fd5b60473080ff5b005b604760543660046073565b600055565b606160005481565b60405190815260200160405180910390f35b600060208284031215608457600080fd5b503591905056fea164736f6c6343000809000a",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b5060043610603c5760003560e01c80632b68b9c614604157806341657ee614604957806373d4a13a146059575b600080fd5b60473080ff5b005b604760543660046073565b600055565b606160005481565b60405190815260200160405180910390f35b600060208284031215608457600080fd5b503591905056fea164736f6c6343000809000a",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
