@@ -234,10 +234,10 @@ var (
 	OpRinkebyChainID = big.NewInt(28)
 
 	// OpMainnetSDUpdateForkNum is the height at which the SD update fork activates on Mainnet.
-	OpMainnetSDUpdateForkNum = big.NewInt(3135900)
+	OpMainnetSDUpdateForkNum = big.NewInt(310215)
 
 	// OpRinkebySDUpdateForkNum is the height at which the SD update fork activates on Rinkeby.
-	OpRinkebySDUpdateForkNum = big.NewInt(1094820)
+	OpRinkebySDUpdateForkNum = big.NewInt(147805)
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and
