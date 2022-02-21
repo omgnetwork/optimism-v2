@@ -102,7 +102,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         // need to keep track of the original length so the pointer system for accessing
         // the individual transactions works correctly
         const sequencerTransaction_original_length = sequencerTransaction.length
-        let turing = Buffer.from('0')
+        let turing = Buffer.from([]) // initialize to empty buffer, not to .from('0')
         ;[sequencerTransaction, turing] = turingParse(
           sequencerTransaction,
           turing
@@ -161,7 +161,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           queueIndex: queueIndex.toNumber(),
           decoded: null,
           confirmed: true,
-          turing: '0x00',
+          turing: '0x',
         })
 
         enqueuedCount++
@@ -289,10 +289,10 @@ const turingParse = (
   // methodID for GetResponse is 7d93616c -> [125 147 97 108]
   // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
 
-  console.log('Turing:', {
-    turingVersion,
-    turingLength,
-  })
+  // console.log('Turing:', {
+  //   turingVersion,
+  //   turingLength,
+  // })
 
   if (
     turingVersion === 1 &&
@@ -303,39 +303,36 @@ const turingParse = (
       toHexString(sequencerTransaction.slice(-turingLength))
     )
     const turingCall = turingCandidate.slice(0, 8).toLowerCase()
-    console.log('turingCall', { turingCall })
+    // console.log('turingCall', { turingCall })
     if (turingCall === '7d93616c' || turingCall === '493d57d6') {
       // we are all set!
       // we have a Turing v1 payload
       turing = sequencerTransaction.slice(-turingLength)
       sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
       // The `3` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
-      console.log('Found a Turing payload at (neg) position:', {
-        turingLength,
-        turing: toHexString(turing),
-        restoredSequencerTransaction: toHexString(sequencerTransaction),
-      })
+      // console.log('Found a Turing payload:', {
+      //   turingLength,
+      //   turing: toHexString(turing),
+      //   restoredSequencerTransaction: toHexString(sequencerTransaction),
+      // })
     } else {
       // unknown/corrupted/legacy format
-      // In this case, will add '0x00', the default, by doing nothing
+      // In this case, will add '0x', the default, by doing nothing
     }
   } else if (turingVersion === 1 && turingLength === 0) {
     // The `3` chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
     sequencerTransaction = sequencerTransaction.slice(3)
-    console.log('Found a Turing NULL payload (normal TX) at (neg) position:', {
-      turingLength,
-      turing: toHexString(turing), // this will be '0x00'
-      restoredSequencerTransaction: toHexString(sequencerTransaction),
-    })
+    // console.log('Found a normal TX:', {
+    //   turingLength,
+    //   turing: '0x', // this will be '0x'
+    //   restoredSequencerTransaction: toHexString(sequencerTransaction),
+    // })
   } else {
-    console.log(
-      'Found a Turing LEGACY payload (normal TX) at (neg) position:',
-      {
-        turingLength,
-        turing: toHexString(turing), // this will be '0x00'
-        restoredSequencerTransaction: toHexString(sequencerTransaction),
-      }
-    )
+    // console.log('Found a LEGACY TX:', {
+    //   turingLength,
+    //   turing: '0x', // this will be '0x'
+    //   restoredSequencerTransaction: toHexString(sequencerTransaction),
+    // })
   }
   return [sequencerTransaction, turing]
 }
