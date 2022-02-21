@@ -40,13 +40,10 @@ function Wallet() {
 
   return (
     <S.PageContainer>
-      <S.WalletTitleContainer>
-        <PageTitle sx={{ m: 0 }} title={`Wallet`} />
-      </S.WalletTitleContainer>
       <S.PageSwitcher>
         <Typography
           className={page === 'TOKEN' ? 'active' : ''}
-          onClick={() => { setPage('TOKEN'); console.log('Switch to Wallet') }}
+          onClick={() => { setPage('TOKEN'); console.log('Switching to Wallet') }}
           variant="body2"
           component="span"
           color="white">
@@ -54,7 +51,7 @@ function Wallet() {
         </Typography>
         <Typography
           className={page === 'NFT' ? 'active' : ''}
-          onClick={() => { setPage('NFT'); console.log('Switch to NFT') }}
+          onClick={() => { setPage('NFT'); console.log('Switching to NFT') }}
           variant="body2"
           component="span"
           color="white">
@@ -64,8 +61,8 @@ function Wallet() {
       {
         !accountEnabled ?
           <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
-          : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
-
+          : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
+      }
       {page === 'TOKEN' ?
         <Box sx={{my:2}}>
           {!!accountEnabled ? <Tabs
@@ -82,4 +79,4 @@ function Wallet() {
   )
 }
 
-export default React.memo(Wallet);
+export default React.memo(Wallet)

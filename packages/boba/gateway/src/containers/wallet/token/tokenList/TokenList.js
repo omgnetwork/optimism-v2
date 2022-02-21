@@ -240,7 +240,6 @@ function TokenList({
       <S.TableBody>
         <S.TableCell sx={{ gap: "10px", justifyContent: "flex-start" }}>
           <img src={logo} alt="logo" width={42} height={42} />
-
           <S.TextTableCell variant="body2" component="div">
             {token.symbol}
           </S.TextTableCell>

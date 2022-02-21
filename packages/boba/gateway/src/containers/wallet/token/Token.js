@@ -1,20 +1,20 @@
-import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { fetchLookUpPrice } from 'actions/networkAction';
-import AlertIcon from 'components/icons/AlertIcon';
-import WalletPicker from 'components/walletpicker/WalletPicker';
-import { isEqual } from 'lodash';
-import React, { useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector';
-import { selectLoading } from 'selectors/loadingSelector';
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector';
-import { selectTokens } from 'selectors/tokenSelector';
-import * as S from './Token.styles';
-import { tokenTableHeads } from './token.tableHeads';
-import TokenList from './tokenList/TokenList';
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { fetchLookUpPrice } from 'actions/networkAction'
+import AlertIcon from 'components/icons/AlertIcon'
+import WalletPicker from 'components/walletpicker/WalletPicker'
+import { isEqual } from 'lodash'
+import React, { useCallback, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
+import { selectLoading } from 'selectors/loadingSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectTokens } from 'selectors/tokenSelector'
+import * as S from './Token.styles'
+import { tokenTableHeads } from './token.tableHeads'
+import TokenList from './tokenList/TokenList'
 
-import lightLoader from 'images/boba2/loading_light.gif';
-import darkLoader from 'images/boba2/loading_dark.gif';
+import lightLoader from 'images/boba2/loading_light.gif'
+import darkLoader from 'images/boba2/loading_dark.gif'
 
 function TokenPage({
   isEmpty = false
@@ -37,7 +37,6 @@ function TokenPage({
   const disabled = depositLoading || exitLoading
 
   const loaderImage = (theme.palette.mode === 'light') ? lightLoader : darkLoader;
-
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
@@ -67,15 +66,13 @@ function TokenPage({
         <S.AlertText
           variant="body2"
           component="p"
-          align="center"
         >
-          You have not connected your wallet. connect to MetaMask
+          Connect your wallet to see your balances, transfer, and bridge
         </S.AlertText>
       </S.AlertInfo>
-      <WalletPicker label='Connect to wallet' />
+      <WalletPicker />
     </S.LayerAlert>
   }
-
 
   if (isEmpty) {
 
@@ -105,13 +102,17 @@ function TokenPage({
     return (
       <S.TokenPageContainer>
         <S.TokenPageContent>
-          <S.TableHeading>
+          <S.TableHeading sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: !isMobile ? 'space-between' : 'flex-start'
+          }}>
             {tokenTableHeads.map((item) => {
               return (
                 <S.TableHeadingItem
                   sx={{
-                    width: !isMobile ? item.size : '10%',
-                    flex: !isMobile ? item.flex : 0
+                    width: item.size,
+                    flex: item.flex,
                   }}
                   key={item.label} variant="body2" component="div">{item.label}</S.TableHeadingItem>
               )
@@ -150,5 +151,4 @@ function TokenPage({
 
 }
 
-
-export default React.memo(TokenPage);
+export default React.memo(TokenPage)

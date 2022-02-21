@@ -21,6 +21,6 @@ export const tokenTableHeads = [
         label: 'Actions',
         isSort: false,
         size: '40%',
-        flex: 0,
+        flex: 2,
     }
 ]
