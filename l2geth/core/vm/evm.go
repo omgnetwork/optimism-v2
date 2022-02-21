@@ -21,7 +21,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -274,15 +273,15 @@ func bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 	return ret
 }
 
-type turingCacheEntry struct {
-	expires time.Time
-	value   []byte
-}
+// type turingCacheEntry struct {
+// 	expires time.Time
+// 	value   []byte
+// }
 
-var turingCache struct {
-	lock    sync.RWMutex
-	entries map[common.Hash]*turingCacheEntry
-}
+// var turingCache struct {
+// 	lock    sync.RWMutex
+// 	entries map[common.Hash]*turingCacheEntry
+// }
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
@@ -480,7 +479,7 @@ func bobaTuringCall(input []byte, caller common.Address) (hexutil.Bytes, int) {
 		"ResponseString", responseString)
 
 	// build the modified calldata
-	ret = make([]byte, startIDXpayload+4)
+	ret := make([]byte, startIDXpayload+4)
 	copy(ret, inputHexUtil[0:startIDXpayload+4]) // take the original input
 	ret[35] = 2                                  // change byte 3 + 32 = 35 (rType) to indicate a valid response
 	ret = append(ret, responseString...)         // and tack on the payload
@@ -573,7 +572,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
 	var updated_input hexutil.Bytes
-	var turingErr int
+	// var turingErr int
 
 	// Sanity and depth checks
 	if isTuring2 || isGetRand2 {
@@ -603,7 +602,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				// mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
 				// log.Debug("TURING preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
 
-				updated_input, turingErr = bobaTuringCall(input, caller.Address())
+				updated_input, _ = bobaTuringCall(input, caller.Address())
 
 				// if turingErr == 20 {
 				// 	log.Debug("TURING returning ErrTuringWouldBlock")

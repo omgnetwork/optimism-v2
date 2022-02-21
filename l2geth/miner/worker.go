@@ -515,11 +515,6 @@ func (w *worker) mainLoop() {
 					delete(w.pendingTasks, h)
 				}
 				w.pendingMu.Unlock()
-			// } else if err.Error() == "turing retry needed" {
-			// 	// no error message here
-			// 	if ev.ErrCh != nil {
-			// 		ev.ErrCh <- err
-			// 	}
 			} else {
 				log.Error("Problem committing transaction", "msg", err)
 				if ev.ErrCh != nil {
@@ -979,11 +974,7 @@ func (w *worker) commitNewTx(tx *types.Transaction) error {
 	wCt := w.commitTransactions(txs, w.coinbase, nil)
 	if wCt == 1 {
 		return errors.New("Cannot commit transaction in miner")
-	} 
-	// else if wCt == 2 {
-	// 	log.Debug("TURING w.commitTransactions returned Turing retry code")
-	// 	return core.ErrTuringRetry
-	// }
+	}
 	return w.commit(nil, w.fullTaskHook, tstart)
 }
 
