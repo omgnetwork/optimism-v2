@@ -12,13 +12,13 @@ export const tokenTableHeads = [
         flex: 1,
     },
     {
-        label: 'value',
+        label: 'Value',
         isSort: false,
         size: '20%',
         flex: 1,
     },
     {
-        label: '',
+        label: 'Actions',
         isSort: false,
         size: '40%',
         flex: 0,

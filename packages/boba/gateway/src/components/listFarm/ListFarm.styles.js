@@ -9,7 +9,7 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
     //padding: '30px 10px',
     background: '#1A1D1F',
     borderRadius: '20px',
-    padding: '20px',
+    padding: '10px 20px',
   },
   [theme.breakpoints.up('md')]: {
     padding: '10px',
@@ -18,15 +18,16 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
 
 export const GridContainer = styled(Grid)(({theme})=>({
   [theme.breakpoints.down('md')]:{
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    width: '100%',
+    margin: 'auto'
   }
 }))
 
-export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
+export const GridItemTag = styled(Grid)(({ theme, item, ...props }) => ({
   display: 'flex',
   alignItems: 'center',
   [ theme.breakpoints.down('md') ]: {
-    flexDirection: 'column',
     padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`
   }
 }))
@@ -56,6 +57,7 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
     gap: '5px',
     padding: '5px',
     width: '100%',
+    margin: '0',
   },
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
