@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { fetchLookUpPrice } from 'actions/networkAction';
 import AlertIcon from 'components/icons/AlertIcon';
 import WalletPicker from 'components/walletpicker/WalletPicker';
@@ -13,24 +13,32 @@ import * as S from './Token.styles';
 import { tokenTableHeads } from './token.tableHeads';
 import TokenList from './tokenList/TokenList';
 
+import lightLoader from 'images/boba2/loading_light.gif';
+import darkLoader from 'images/boba2/loading_dark.gif';
+
 function TokenPage({
   isEmpty = false
 }) {
 
   const dispatch = useDispatch()
-  
-  const accountEnabled = useSelector(selectAccountEnabled())  
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  const accountEnabled = useSelector(selectAccountEnabled())
   const tokenList = useSelector(selectTokens)
   const networkLayer = useSelector(selectLayer())
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
-  
-  const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
-  const exitLoading = useSelector(selectLoading(['EXIT/CREATE']))
+
+  const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
+  const exitLoading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
+  const balanceLoading = useSelector(selectLoading([ 'BALANCE/GET' ]))
 
   const disabled = depositLoading || exitLoading
-  
-  
+
+  const loaderImage = (theme.palette.mode === 'light') ? lightLoader : darkLoader;
+
+
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
     const symbolList = Object.values(tokenList).map((i) => {
@@ -54,21 +62,21 @@ function TokenPage({
 
   if (!networkLayer) {
     return <S.LayerAlert>
-        <S.AlertInfo>
-          <AlertIcon />
-          <S.AlertText
-            variant="body2"
-            component="p"
-            align="center"
-          >
-            You have not connected your wallet. connect to MetaMask
-          </S.AlertText>
-        </S.AlertInfo>
-        <WalletPicker label='Connect to wallet' />
-      </S.LayerAlert>
+      <S.AlertInfo>
+        <AlertIcon />
+        <S.AlertText
+          variant="body2"
+          component="p"
+          align="center"
+        >
+          You have not connected your wallet. connect to MetaMask
+        </S.AlertText>
+      </S.AlertInfo>
+      <WalletPicker label='Connect to wallet' />
+    </S.LayerAlert>
   }
-  
-  
+
+
   if (isEmpty) {
 
     return (
@@ -93,7 +101,7 @@ function TokenPage({
     )
 
   } else {
-    
+
     return (
       <S.TokenPageContainer>
         <S.TokenPageContent>
@@ -102,13 +110,14 @@ function TokenPage({
               return (
                 <S.TableHeadingItem
                   sx={{
-                    width: item.size
+                    width: !isMobile ? item.size : '10%',
+                    flex: !isMobile ? item.flex : 0
                   }}
                   key={item.label} variant="body2" component="div">{item.label}</S.TableHeadingItem>
               )
             })}
           </S.TableHeading>
-          {networkLayer === 'L2' ? childBalance.map((i, index) => {
+          {networkLayer === 'L2' ? !balanceLoading || !!childBalance.length ? childBalance.map((i, index) => {
             return (
               <TokenList
                 key={i.currency}
@@ -118,18 +127,22 @@ function TokenPage({
                 disabled={disabled}
               />
             )
-          }) :
-            rootBalance.map((i, index) => {
-              return (
-                <TokenList
-                  key={i.currency}
-                  token={i}
-                  chain={'L2'}
-                  networkLayer={networkLayer}
-                  disabled={disabled}
-                />
-              )
-            })}
+          }) : <S.LoaderContainer>
+            <img src={loaderImage} height="100%" alt="balance loading" />
+          </S.LoaderContainer> : null}
+          {networkLayer === 'L1' ? !balanceLoading || !!rootBalance.length ? rootBalance.map((i, index) => {
+            return (
+              <TokenList
+                key={i.currency}
+                token={i}
+                chain={'L1'}
+                networkLayer={networkLayer}
+                disabled={disabled}
+              />
+            )
+          }) : <S.LoaderContainer>
+            <img src={loaderImage} height="100%" alt="balance loading" />
+          </S.LoaderContainer> : null}
         </S.TokenPageContent>
       </S.TokenPageContainer>
     )

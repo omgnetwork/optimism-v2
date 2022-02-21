@@ -18,15 +18,10 @@ function Wallet() {
 
   return (
     <S.PageContainer>
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        gap: '20px'
-      }}>
-        <PageTitle title={`${!layer ? '': layer === 'L1' ? 'Ethereum' : 'Boba'} Wallet`} />
-        <LayerSwitcher isIcon={true}/>
-      </Box>
+      <S.WalletTitleContainer>
+        <PageTitle sx={{m:0}} title={`${!layer ? '': layer === 'L1' ? 'Ethereum' : 'Boba'} Wallet`} />
+        {!!accountEnabled ? <LayerSwitcher isIcon={true}/>:  null}
+      </S.WalletTitleContainer>
       <S.PageSwitcher>
         <Typography
           className={page === 'TOKEN' ? 'active' : ''}

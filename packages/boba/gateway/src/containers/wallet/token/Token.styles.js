@@ -45,6 +45,19 @@ export const TokenPageContent = styled(Box)(({ theme }) => ({
   },
 }))
 
+export const LoaderContainer = styled(Box)(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: '20px',
+  height: '400px',
+  background: theme.palette.background.secondary,
+  [ theme.breakpoints.down('sm') ]: {
+    height: '200px',
+  },
+}))
+
 export const TableHeading = styled(Box)(({ theme }) => ({
   width: '100%',
   padding: "10px",

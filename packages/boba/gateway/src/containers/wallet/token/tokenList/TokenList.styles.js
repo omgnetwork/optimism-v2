@@ -1,14 +1,18 @@
 import { styled } from '@mui/material/styles'
 import { Box, Typography } from '@mui/material';
 
-export const Content = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 5px;
-  width: 100%;
-  padding: 10px;
-`;
+export const Content = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '20px',
+  marginBottom: '5px',
+  width: '100%',
+  padding: '10px',
+  borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+  [ theme.breakpoints.down('sm') ]: {
+    padding: '10px 5px',
+  }
+}))
 
 
 export const TableBody = styled(Box)(({ theme }) => ({
@@ -16,20 +20,36 @@ export const TableBody = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   textAlign: 'center',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
   [ theme.breakpoints.down('sm') ]: {
     gap: '10px'
   }
 }))
 
-export const TableCell = styled(Box)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20%;
-`;
+export const TableCell = styled(Box)(({ theme, isMobile }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '20%',
+  [ theme.breakpoints.down('sm') ]: {
+    minWidth: '20%',
+    width: isMobile ? '10%' : 'unset'
+  }
+}));
+
 
 export const TextTableCell = styled(Typography)`
   opacity: ${(props) => !props.enabled ? "0.4" : "1.0"};
   font-weight: 700;
 `;
+
+
+export const DropdownWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  flexDirection: 'row',
+  gap: '10px',
+  [ theme.breakpoints.down('sm') ]: {
+    gap: '5px'
+  }
+}))

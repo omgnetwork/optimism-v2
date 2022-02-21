@@ -25,6 +25,16 @@ export const PageContainer = styled(Box)(({ theme }) => ({
 }));
 
 
+export const WalletTitleContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  gap: '20px',
+  [ theme.breakpoints.down('md') ]: {
+    margin: '10px 0px'
+  }
+}));
+
 export const PageSwitcher = styled(Box)(({ theme }) => ({
   width: 'fit-content',
   padding: '3px',
