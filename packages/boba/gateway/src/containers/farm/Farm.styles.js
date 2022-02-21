@@ -1,6 +1,29 @@
 import { styled } from '@mui/material/styles'
 import { Box, Typography, Grid } from "@mui/material"
 
+export const EarnPageContainer = styled(Box)(({ theme }) => ({
+  margin: '0px auto',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  padding: '10px',
+  paddingTop: '0px',
+  width: '70%',
+  [theme.breakpoints.between('md', 'lg')]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [theme.breakpoints.between('sm', 'md')]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: '0px',
+  },
+  
+}));
+
 export const TableHeading = styled(Box)(({ theme }) => ({
   padding: "20px",
   borderTopLeftRadius: "6px",
@@ -96,12 +119,21 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const FarmActionContainer = styled(Box)(({theme})=>({
+export const FarmAction = styled(Box)(({theme})=>({
   display: 'flex',
   justifyContent: 'space-around',
   alignItems: 'center',
   [theme.breakpoints.down('md')]: {
     width: '100%'
+  }
+}))
+
+export const EarnActionContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column'
   }
 }))
 
@@ -139,3 +171,33 @@ export const BpIcon = styled('span')(({ theme }) => ({
       theme.palette.mode === 'dark' ? 'rgba(57,75,89,.5)' : 'rgba(206,217,224,.5)',
   },
 }))
+
+export const PageSwitcher = styled(Box)(({ theme }) => ({
+  width: 'fit-content',
+  padding: '3px',
+  background: 'rgba(255, 255, 255, 0.04)',
+  cursor: 'pointer',
+  display: 'flex',
+  borderRadius: '12px',
+  height: '48px',
+  'span': {
+    padding: '2px 15px',
+    fontWeight: 'bold',
+    borderRadius: '12px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    '&.active': {
+      color: '#031313',
+      background: '#BAE21A',
+    }
+  },
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%',
+    padding: '0px',
+    'span': {
+      width: '50%'
+    }
+  },
+
+}));

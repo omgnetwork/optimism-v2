@@ -1,10 +1,11 @@
 import { Circle } from "@mui/icons-material";
 import { Box, Typography } from '@mui/material';
-import LayerSwitcher from "components/mainMenu/layerSwitcher/LayerSwitcher";
+import { switchChain } from "actions/setupAction";
 import PageTitle from "components/pageTitle/PageTitle";
+import Tabs from 'components/tabs/Tabs'
 import Nft from "containers/wallet/nft/Nft";
-import React, { useState } from "react";
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
 import { selectAccountEnabled, selectLayer } from "selectors/setupSelector";
 import Token from "./token/Token";
 import * as S from './wallet.styles';
@@ -13,14 +14,34 @@ import * as S from './wallet.styles';
 function Wallet() {
 
   const [ page, setPage ] = useState('TOKEN')
+  const [ chain, setChain ] = useState('TOKEN')
+
+  const dispatch = useDispatch();
+
   const layer = useSelector(selectLayer());
   const accountEnabled = useSelector(selectAccountEnabled())
+
+  useEffect(() => {
+    if (layer === 'L2') {
+      setChain('Boba Wallet')
+    } else if (layer === 'L1') {
+      setChain('Ethereum Wallet')
+    }
+  }, [ layer ])
+
+
+  const handleSwitch = (l) => {
+    if (l === 'Ethereum Wallet') {
+      dispatch(switchChain('L1'))
+    } else if (l === 'Boba Wallet') {
+      dispatch(switchChain('L2'))
+    }
+  }
 
   return (
     <S.PageContainer>
       <S.WalletTitleContainer>
-        <PageTitle sx={{m:0}} title={`${!layer ? '': layer === 'L1' ? 'Ethereum' : 'Boba'} Wallet`} />
-        {!!accountEnabled ? <LayerSwitcher isIcon={true}/>:  null}
+        <PageTitle sx={{ m: 0 }} title={`Wallet`} />
       </S.WalletTitleContainer>
       <S.PageSwitcher>
         <Typography
@@ -41,11 +62,21 @@ function Wallet() {
         </Typography>
       </S.PageSwitcher>
       {
-        (!accountEnabled || layer === 'L1') ?
+        !accountEnabled ?
           <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
           : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
 
-      {page === 'TOKEN' ? <Token /> : <Nft />}
+      {page === 'TOKEN' ?
+        <Box sx={{my:2}}>
+          {!!accountEnabled ? <Tabs
+            activeTab={chain}
+            onClick={(t) => handleSwitch(t)}
+            aria-label="Liquidity Pool Tab"
+            tabs={[ "Ethereum Wallet", "Boba Wallet" ]}
+          /> : null}
+          <Token />
+        </Box>
+        : <Nft />}
 
     </S.PageContainer>
   )

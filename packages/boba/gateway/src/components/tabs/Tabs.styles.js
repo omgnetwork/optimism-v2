@@ -24,7 +24,7 @@ export const TabItem = styled(Box)(({ theme }) => ({
    '&.active': {
       color: `${theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.neutral.main}`,
       opacity: 1,
-      borderBottom: `2px solid ${theme.palette.neutral.contrastText}`,
+      borderBottom: `2px solid #BAE21A`,
       marginBottom: '-2px',
       zIndex: 1,
    },
@@ -33,5 +33,3 @@ export const TabItem = styled(Box)(({ theme }) => ({
       textAlign: 'center'
    }
 }))
-
-

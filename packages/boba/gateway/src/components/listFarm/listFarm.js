@@ -216,16 +216,34 @@ class ListFarm extends React.Component {
           <S.GridContainer container
             spacing={2}
             direction="row"
-            justifyContent="flex-start"
+            justifyContent="space-around"
             alignItems="center"
           >
 
             {isMobile &&
               <S.GridItemTag item
                 xs={12}
-                md={2}
-              >
-                <Typography variant="overline" style={{lineHeight: '1em', fontSize: '1.2em'}}>{symbol}</Typography>
+                  md={2}
+                  sx={{
+                    gap: 2,
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <Box
+                    display="flex"
+                    direction="row"
+                    justifyContent="flex-start" gap="10px" alignItems="center" 
+                  >
+                    <img src={logo} alt="logo" width={35} height={35} />
+                    <Typography variant="overline" style={{ lineHeight: '1em', fontSize: '1.2em' }}>{symbol}</Typography>
+                  </Box>
+                  <Box
+                    disabled={disabled}
+                    onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
+                    sx={{ display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : "" }}
+                  >
+                    {accountEnabled ? <ExpandMoreIcon /> : <></>}
+                  </Box>
               </S.GridItemTag>
             }
 
@@ -249,7 +267,7 @@ class ListFarm extends React.Component {
             }
 
             <S.GridItemTag item
-              xs={4}
+              xs={6}
               md={2}
               >
               {isMobile ? (
@@ -263,7 +281,7 @@ class ListFarm extends React.Component {
             </S.GridItemTag>
 
             <S.GridItemTag item
-              xs={4}
+              xs={6}
               md={2}
               >
               {isMobile ? (
@@ -317,19 +335,20 @@ class ListFarm extends React.Component {
               }
               </Typography>
             </S.GridItemTag>
-
-            <S.GridItemTag item
-              xs={3}
-              md={1}
-            >
-              <Box
-                disabled={disabled}
-                onClick={()=>{this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false })}}
-                sx={{display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : ""}}
-              >
-                {accountEnabled ? <ExpandMoreIcon/>: <></>}
-              </Box>
-            </S.GridItemTag>
+              {!isMobile ?
+                <S.GridItemTag item
+                  xs={3}
+                  md={1}
+                >
+                  <Box
+                    disabled={disabled}
+                    onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
+                    sx={{ display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : "" }}
+                  >
+                    {accountEnabled ? <ExpandMoreIcon /> : <></>}
+                  </Box>
+                </S.GridItemTag>
+                : null}
           </S.GridContainer>
         )}
 
@@ -361,7 +380,7 @@ class ListFarm extends React.Component {
                     <Typography sx={{flex: 1}} variant="body2" component="div">{`${symbol}`} Staked</Typography>
                     <Typography sx={{flex: 1}} variant="body2" component="div" color="secondary">0.00</Typography>
                     <Button
-                      variant="contained"
+                      variant="outlined"
                       onClick={() => {this.handleStakeToken()}}
                       disabled={disabled}
                       fullWidth

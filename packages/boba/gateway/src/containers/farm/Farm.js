@@ -33,6 +33,8 @@ import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@mui/material
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import PageTitle from 'components/pageTitle/PageTitle';
+import { Circle } from '@mui/icons-material';
 
 class Farm extends React.Component {
 
@@ -56,11 +58,11 @@ class Farm extends React.Component {
       layer
     }  = this.props.setup
 
-    let initialViewLayer = 'L1 Liquidity Pool'
+    let initialViewLayer = 'Ethereum Pool'
     let initialLayer = 'L1LP'
 
     if (networkService.L1orL2 === 'L2') {
-      initialViewLayer = 'L2 Liquidity Pool'
+      initialViewLayer = 'Boba L2 Pool'
       initialLayer = 'L2LP'
     }
 
@@ -168,16 +170,17 @@ class Farm extends React.Component {
   }
 
   handleChange = (event, t) => {
-    if (t === 'L1 Liquidity Pool')
+    if (t === 'Ethereum Pool') {
       this.setState({
         lpChoice: 'L1LP',
         poolTab: t
       })
-    else if (t === 'L2 Liquidity Pool')
+    } else if (t === 'Boba L2 Pool') {
       this.setState({
         lpChoice: 'L2LP',
         poolTab: t
       })
+    }
   }
 
   handleCheckBox = (e) => {
@@ -209,8 +212,8 @@ class Farm extends React.Component {
     const { isMobile } = this.props
 
     return (
-      <>
-        {/* <PageTitle title="Earn" /> */}
+      <S.EarnPageContainer>
+        <PageTitle title="Earn" />
 
         {!accountEnabled &&
           <S.LayerAlert>
@@ -295,16 +298,28 @@ class Farm extends React.Component {
 
         </S.Wrapper>
 
-        <Box sx={{ my: 3, width: '100%' }}>
-          <S.GridItemTagContainer sx={{ mb: 2, display: 'flex' }}>
-            <Tabs
-              activeTab={poolTab}
-              onClick={(t) => this.handleChange(null, t)}
-              aria-label="Liquidity Pool Tab"
-              tabs={["L1 Liquidity Pool", "L2 Liquidity Pool"]}
-            />
+        <Box sx={{ my: 1, width: '100%' }}>
+          <S.EarnActionContainer sx={{ mb: 2, display: 'flex' }}>
+            <S.PageSwitcher>
+              <Typography
+                className={poolTab === 'Ethereum Pool' ? 'active' : ''}
+                onClick={() => this.handleChange(null, 'Ethereum Pool')}
+                variant="body2"
+                component="span"
+                color="white">
+                Ethereum Pool
+              </Typography>
+              <Typography
+                className={poolTab === 'Boba L2 Pool' ? 'active' : ''}
+                onClick={() => this.handleChange(null, 'Boba L2 Pool')}
+                variant="body2"
+                component="span"
+                color="white">
+                Boba L2 Pool
+              </Typography>
+            </S.PageSwitcher>
 
-            <S.FarmActionContainer>
+            <S.FarmAction>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -329,8 +344,13 @@ class Farm extends React.Component {
                 }
                 label="My Stakes Only"
               />
-            </S.FarmActionContainer>
-          </S.GridItemTagContainer>
+            </S.FarmAction>
+          </S.EarnActionContainer>
+          <Box sx={{my:2}}>
+            {!accountEnabled ?
+              <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
+              : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
+          </Box>
 
           {layer === 'L2' && lpChoice === 'L1LP' &&
             <S.LayerAlert>
@@ -364,7 +384,12 @@ class Farm extends React.Component {
 
           {!isMobile ? (
             <S.TableHeading>
-              <S.GridItemTagContainer container spacing={1} direction="row" justifyContent="left" alignItems="center" >
+              <S.GridItemTagContainer
+                container spacing={1} direction="row" alignItems="center"
+                sx={{
+                  justifyContent:"space-around"
+                }}
+              >
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Token</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Available Balance</Typography></S.GridItemTag>
                 <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Liquidity</Typography></S.GridItemTag>
@@ -419,7 +444,7 @@ class Farm extends React.Component {
             </S.FarmListContainer>
           }
         </Box>
-      </>
+      </S.EarnPageContainer>
     )
   }
 }
