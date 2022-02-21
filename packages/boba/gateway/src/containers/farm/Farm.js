@@ -223,7 +223,7 @@ class Farm extends React.Component {
                 variant="body2"
                 component="p"
               >
-                You have not connected your wallet. To see your balances and contribute to the liquidity pool, connect to MetaMask
+                To see your balances and contribute to the liquidity pool, connect to MetaMask
               </S.AlertText>
             </S.AlertInfo>
             <WalletPicker />

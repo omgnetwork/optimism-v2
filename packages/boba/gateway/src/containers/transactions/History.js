@@ -56,9 +56,9 @@ function History() {
   const dispatch = useDispatch()
 
   const now = new Date()
-  const last_week = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
+  const last_6months = new Date(now.getFullYear(), now.getMonth()-6, now.getDate())
 
-  const [startDate, setStartDate] = useState(last_week)
+  const [startDate, setStartDate] = useState(last_6months)
   const [endDate, setEndDate] = useState(now)
   const layer = useSelector(selectLayer())
 
@@ -70,9 +70,9 @@ function History() {
 
   const transactions = orderedTransactions.filter((i) => {
     if (startDate && endDate) {
-      return (moment.unix(i.timeStamp).isSameOrAfter(startDate) && moment.unix(i.timeStamp).isSameOrBefore(endDate));
+      return (moment.unix(i.timeStamp).isSameOrAfter(startDate) && moment.unix(i.timeStamp).isSameOrBefore(endDate))
     }
-    return true;
+    return true
   })
 
   useInterval(() => {
@@ -93,7 +93,7 @@ function History() {
               variant="body2"
               component="p"
             >
-              You have not connected your wallet. To see your history, connect to MetaMask
+              To see your history, connect to MetaMask
             </S.AlertText>
           </S.AlertInfo>
           <WalletPicker />

@@ -11,6 +11,12 @@ export const menuItems = [
     title: "Wallet",
     url: "/"
   },
+  {
+    key: 'History',
+    icon: "HistoryIcon",
+    title: "History",
+    url: "/history"
+  },
   // {
   //   key: 'Bridge',
   //   icon: "WalletIcon",

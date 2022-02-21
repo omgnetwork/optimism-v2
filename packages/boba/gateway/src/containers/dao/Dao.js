@@ -56,16 +56,17 @@ function DAO() {
       <div className={styles.container}>
         <S.DaoPageContainer>
           <PageTitle title="DAO" />
+            <S.DaoWalletHead>
+            {
+              (layer !== 'L2') ?
+                <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba L2</Typography>
+                : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
+            }
+            </S.DaoWalletHead>
           <S.DaoPageContent>
+
             <S.DaoWalletContainer>
               <Box sx={{ padding: '24px 0px' }}>
-                <S.DaoWalletHead>
-                  <Typography variant="h3">Wallet</Typography>
-                  {
-                    (!accountEnabled || layer === 'L1') ?
-                      <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
-                      : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
-                </S.DaoWalletHead>
                 {!accountEnabled ?
                   <Typography variant="body3" sx={{ opacity: "0.6" }}>Please connect to Boba to vote and propose.</Typography>
                   : <Box sx={{ display: 'flex', alignItems: 'center'}}> <WalletIcon /> &nbsp; <Typography variant="body3">{wAddress}</Typography></Box>

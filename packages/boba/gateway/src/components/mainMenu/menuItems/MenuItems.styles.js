@@ -28,18 +28,18 @@ export const MenuItem = styled(Box)(({ selected, theme }) => ({
   fontWeight: 'normal',
   cursor: 'pointer',
   height: '22px',
-  [ theme.breakpoints.up('md') ]: {
-    '&:before': {
-      'content': '"  "',
-      display: 'inline-block', 
-      visibility: `${selected ? 'visible': 'hidden'}`, 
-      height: '20px',
-      width: '20px',
-      backgroundImage: `url(${bobaIcon})`,
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center',
-    }
-  },
+  // [ theme.breakpoints.up('md') ]: {
+  //   '&:before': {
+  //     'content': '"  "',
+  //     display: 'inline-block', 
+  //     visibility: `${selected ? 'visible': 'hidden'}`, 
+  //     height: '20px',
+  //     width: '20px',
+  //     backgroundImage: `url(${bobaIcon})`,
+  //     backgroundRepeat: 'no-repeat',
+  //     backgroundPosition: 'center',
+  //   }
+  // },
   [ theme.breakpoints.down('md') ]: {
     fontSize: '20px',
     fontWeight: '400',
