@@ -1,7 +1,4 @@
-
-<p align="center">
-  <img src="https://memegenerator.net/img/instances/64161079/data-feed-nomnomnomnom.jpg">
-</p>
+# Price Data Feeds - Overview
 
 Price Feed oracles are an essential part of Boba, which allow smart contracts to work with external data, and open the path to many more use cases
 
