@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles'
-import { Box, Grid } from '@mui/material'
+import { Box, Divider, Grid } from '@mui/material'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
@@ -28,7 +28,8 @@ export const GridItemTag = styled(Grid)(({ theme, item, ...props }) => ({
   display: 'flex',
   alignItems: 'center',
   [ theme.breakpoints.down('md') ]: {
-    padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`
+    padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`,
+    paddingLeft: '0px !important',
   }
 }))
 
@@ -57,10 +58,18 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
     gap: '5px',
     padding: '5px',
     width: '100%',
-    margin: '0',
+    margin: '10px 0 0 0',
   },
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
     gap: '16px',
   },
 }));
+
+
+export const DividerLine = styled(Divider)(({ theme }) => ({
+  background: `${ theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  boxSizing: 'border-box',
+  boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
+  width: '100%'
+}))
