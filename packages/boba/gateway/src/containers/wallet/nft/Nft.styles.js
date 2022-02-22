@@ -7,19 +7,19 @@ export const NFTPageContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'space-around',
   width: '100%',
   gap: '10px',
-  [theme.breakpoints.between('md', 'lg')]: {
-    width: '90%',
-    padding: '0px',
-  },
-  [theme.breakpoints.between('sm', 'md')]: {
-    width: '90%',
-    padding: '0px',
-  },
-  [theme.breakpoints.down('sm')]: {
-    width: '100%',
-    padding: '0px',
-    flexDirection: 'column',
-  },
+  // [theme.breakpoints.between('md', 'lg')]: {
+  //   width: '90%',
+  //   padding: '0px',
+  // },
+  // [theme.breakpoints.between('sm', 'md')]: {
+  //   width: '90%',
+  //   padding: '0px',
+  // },
+  // [theme.breakpoints.down('sm')]: {
+  //   width: '100%',
+  //   padding: '0px',
+  //   flexDirection: 'column',
+  // },
 }));
 
 export const NFTActionContent = styled(Box)(({ theme }) => ({

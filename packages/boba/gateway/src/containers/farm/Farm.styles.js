@@ -21,7 +21,7 @@ export const EarnPageContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     padding: '0px',
   },
-  
+
 }));
 
 export const TableHeading = styled(Box)(({ theme }) => ({
@@ -68,7 +68,7 @@ export const AlertInfo = styled(Box)`
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderRadius: '8px',
-  background: props.dropDownBox ? theme.palette.background.dropdown : theme.palette.background.secondary,
+  // background: props.dropDownBox ? theme.palette.background.dropdown : theme.palette.background.secondary,
   [theme.breakpoints.down('md')]: {
     padding: ' 30px 10px',
   },
@@ -91,6 +91,7 @@ export const GridItemTag = styled(Grid)`
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap:5px;
 `;
 
 export const DropdownWrapper = styled(Box)`

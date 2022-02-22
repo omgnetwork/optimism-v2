@@ -232,7 +232,7 @@ class ListFarm extends React.Component {
                   <Box
                     display="flex"
                     direction="row"
-                    justifyContent="flex-start" gap="10px" alignItems="center" 
+                    justifyContent="flex-start" gap="10px" alignItems="center"
                   >
                     <img src={logo} alt="logo" width={35} height={35} />
                     <Typography variant="overline" style={{ lineHeight: '1em', fontSize: '1.2em' }}>{symbol}</Typography>
@@ -273,7 +273,7 @@ class ListFarm extends React.Component {
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Balance</Typography>
               ) : (null)}
-              <Typography variant="body1">
+              <Typography variant="body2">
                 {poolInfo.tokenBalance ?
                   `${Number(logAmount(poolInfo.tokenBalance, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
                 }
@@ -287,7 +287,7 @@ class ListFarm extends React.Component {
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Liquidity</Typography>
               ) : (null)}
-              <Typography variant="body1" style={{opacity: '0.4'}}>
+              <Typography variant="body2" >
                 {poolInfo.userDepositAmount ?
                   `${Number(logAmount(poolInfo.userDepositAmount, decimals, 2)).toLocaleString(undefined, {maximumFractionDigits:2})}` : `0`
                 }
@@ -296,24 +296,24 @@ class ListFarm extends React.Component {
 
             <S.GridItemTag item
               xs={4}
-              md={1}
+              md={2}
             >
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>APR %</Typography>
               ) : (null)}
-              <Typography variant="body1">
+              <Typography variant="body2">
                 {`${logAmount(poolInfo.APR, 0, 2)}`}
               </Typography>
             </S.GridItemTag>
 
             <S.GridItemTag item
               xs={4}
-              md={1}
+              md={2}
             >
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Your Stake</Typography>
               ) : (null)}
-              <Typography variant="body1">
+              <Typography variant="body2">
                 {accountEnabled ?
                   userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`
                   : <></>
@@ -328,7 +328,7 @@ class ListFarm extends React.Component {
               {isMobile ? (
                 <Typography variant="overline" sx={{opacity: 0.7, paddingRight: '5px'}}>Earned</Typography>
               ) : (null)}
-              <Typography variant="body1">
+              <Typography variant="body2">
               {accountEnabled ?
                 userReward ? `${logAmount(userReward, decimals, 5)}` : `0`
                 : <></>

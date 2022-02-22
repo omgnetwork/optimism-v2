@@ -21,7 +21,6 @@ export const PageContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     padding: '0px',
   },
-
 }));
 
 

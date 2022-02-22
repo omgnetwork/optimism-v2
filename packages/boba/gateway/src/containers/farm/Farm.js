@@ -30,11 +30,12 @@ import networkService from 'services/networkService'
 import * as S from './Farm.styles'
 
 import { Box, FormControlLabel, Checkbox, Typography, Fade } from '@mui/material'
+import Tooltip from 'components/tooltip/Tooltip';
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import PageTitle from 'components/pageTitle/PageTitle';
-import { Circle } from '@mui/icons-material';
+import { Circle, HelpOutline } from '@mui/icons-material';
 
 class Farm extends React.Component {
 
@@ -56,7 +57,7 @@ class Farm extends React.Component {
       baseEnabled,
       accountEnabled,
       layer
-    }  = this.props.setup
+    } = this.props.setup
 
     let initialViewLayer = 'Ethereum Pool'
     let initialLayer = 'L1LP'
@@ -107,7 +108,7 @@ class Farm extends React.Component {
       baseEnabled,
       accountEnabled,
       layer
-    }  = this.props.setup
+    } = this.props.setup
 
     if (!isEqual(prevState.farm.poolInfo, poolInfo)) {
       this.setState({ poolInfo })
@@ -145,27 +146,27 @@ class Farm extends React.Component {
 
     const { layer1, layer2 } = this.state
 
-    if (typeof (layer1) === 'undefined') return [0, 0]
-    if (typeof (layer2) === 'undefined') return [0, 0]
+    if (typeof (layer1) === 'undefined') return [ 0, 0 ]
+    if (typeof (layer2) === 'undefined') return [ 0, 0 ]
 
     if (chain === 'L1') {
       let tokens = Object.entries(layer1)
       for (let i = 0; i < tokens.length; i++) {
-        if (tokens[i][1].address.toLowerCase() === address.toLowerCase()) {
-          return [tokens[i][1].balance, tokens[i][1].decimals]
+        if (tokens[ i ][ 1 ].address.toLowerCase() === address.toLowerCase()) {
+          return [ tokens[ i ][ 1 ].balance, tokens[ i ][ 1 ].decimals ]
         }
       }
     }
     else if (chain === 'L2') {
       let tokens = Object.entries(layer2)
       for (let i = 0; i < tokens.length; i++) {
-        if (tokens[i][1].address.toLowerCase() === address.toLowerCase()) {
-          return [tokens[i][1].balance, tokens[i][1].decimals]
+        if (tokens[ i ][ 1 ].address.toLowerCase() === address.toLowerCase()) {
+          return [ tokens[ i ][ 1 ].balance, tokens[ i ][ 1 ].decimals ]
         }
       }
     }
 
-    return [0, 0]
+    return [ 0, 0 ]
 
   }
 
@@ -229,7 +230,7 @@ class Farm extends React.Component {
             <WalletPicker />
           </S.LayerAlert>
         }
-        
+
         <S.Wrapper dropDownBox={dropDownBox}>
 
           <S.GridItemTagContainer container spacing={2} direction="row" justifyContent="left" alignItems="center" >
@@ -239,18 +240,21 @@ class Farm extends React.Component {
               md={10}
             >
               <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
-                <span style={{fontWeight: '700'}}>EARNINGS</span>: The bridges collect fees and then immediately distribute
+                When someone uses the bridge you invested, the bridge charges a fee, which will be immediately distributed to the stakeholders.
+              </Typography>
+              {/* <Typography variant="body2" sx={{ mt: 2, fontSize: '0.8em' }}>
+                <span style={{ fontWeight: '700' }}>EARNINGS</span>: The bridges collect fees and then immediately distribute
                 them to stakers. The bridges are not farms. Your earnings only increase when someone uses the
                 bridge you have staked into.
                 <br />
-                <span style={{fontWeight: '700'}}>YIELD</span>: the historical yield, which
+                <span style={{ fontWeight: '700' }}>YIELD</span>: the historical yield, which
                 reflects the fees people paid to bridge and the previous usage patterns for each pool.
                 There is no fixed yield and yields can vary widely as bridge activity changes.
                 <br />
-                <span style={{fontWeight: '700'}}>LIQUIDITY</span>: the total funds staked by liquidity providers. When people bridge, liquidity moves from one chain to another.
+                <span style={{ fontWeight: '700' }}>LIQUIDITY</span>: the total funds staked by liquidity providers. When people bridge, liquidity moves from one chain to another.
                 <br />
-                <span style={{fontWeight: '700'}}>AVAILABLE BALANCE</span>: the amount of funds currently in each pool.
-              </Typography>
+                <span style={{ fontWeight: '700' }}>AVAILABLE BALANCE</span>: the amount of funds currently in each pool.
+              </Typography> */}
             </S.GridItemTag>
 
             <S.GridItemTag
@@ -346,7 +350,7 @@ class Farm extends React.Component {
               />
             </S.FarmAction>
           </S.EarnActionContainer>
-          <Box sx={{my:2}}>
+          <Box sx={{ my: 2 }}>
             {!accountEnabled ?
               <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
               : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>}
@@ -387,16 +391,56 @@ class Farm extends React.Component {
               <S.GridItemTagContainer
                 container spacing={1} direction="row" alignItems="center"
                 sx={{
-                  justifyContent:"space-around"
+                  justifyContent: "space-around"
                 }}
               >
-                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Token</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Available Balance</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={4} md={2}><Typography variant="body2">Liquidity</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Yield %</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Your Stake</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Earned</Typography></S.GridItemTag>
-                <S.GridItemTag item xs={3} md={1}><Typography variant="body2">Actions</Typography></S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}>
+                  <Typography variant="body2" sx={{
+                    opacity: 0.65
+                  }}>Token</Typography>
+                </S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}>
+                  <Typography variant="body2" sx={{
+                    opacity: 0.65
+                  }} whiteSpace="nowrap">Available Balance
+                  </Typography>
+                  <Tooltip title="Available Balance refers to the amount of funds currently in each pool.">
+                    <HelpOutline sx={{opacity: 0.65}} />
+                  </Tooltip>
+                </S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}>
+                  <Typography variant="body2" sx={{
+                    opacity: 0.65
+                  }} whiteSpace="nowrap">Total Staked
+                  </Typography>
+                    <Tooltip title="Total staked denotes the funds staked by liquidity providers.">
+                      <HelpOutline sx={{opacity: 0.65}} />
+                    </Tooltip>
+                </S.GridItemTag>
+                <S.GridItemTag item xs={4} md={2}>
+                  <Typography variant="body2" sx={{
+                    opacity: 0.65
+                  }} whiteSpace="nowrap">Past APR %
+                  </Typography>
+                  <Tooltip title="The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.">
+                    <HelpOutline sx={{opacity: 0.65}} />
+                  </Tooltip>
+                </S.GridItemTag>
+                <S.GridItemTag item xs={3} md={2}>
+                  <Typography variant="body2" sx={{
+                    opacity: 0.65
+                  }} whiteSpace="nowrap">Your Stake</Typography>
+                </S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}>
+                  <Typography variant="body2" sx={{
+                    opacity: 0.65
+                  }}>Earned</Typography>
+                </S.GridItemTag>
+                <S.GridItemTag item xs={3} md={1}>
+                  <Typography variant="body2" sx={{
+                    opacity: 0.65
+                  }}>Actions</Typography>
+                </S.GridItemTag>
               </S.GridItemTagContainer>
             </S.TableHeading>
           ) : (null)}
@@ -405,15 +449,15 @@ class Farm extends React.Component {
             <S.FarmListContainer>
               {Object.keys(poolInfo.L1LP).map((v, i) => {
                 const ret = this.getBalance(v, 'L1')
-                if (showMDO && Number(ret[0]) === 0) return null
+                if (showMDO && Number(ret[ 0 ]) === 0) return null
                 return (
                   <ListFarm
                     key={i}
-                    poolInfo={poolInfo.L1LP[v]}
-                    userInfo={userInfo.L1LP[v]}
+                    poolInfo={poolInfo.L1LP[ v ]}
+                    userInfo={userInfo.L1LP[ v ]}
                     L1orL2Pool={lpChoice}
-                    balance={ret[0]}
-                    decimals={ret[1]}
+                    balance={ret[ 0 ]}
+                    decimals={ret[ 1 ]}
                     isMobile={isMobile}
                     showStakesOnly={showMSO}
                     accountEnabled={accountEnabled}
@@ -426,15 +470,15 @@ class Farm extends React.Component {
             <S.FarmListContainer>
               {Object.keys(poolInfo.L2LP).map((v, i) => {
                 const ret = this.getBalance(v, 'L2')
-                if (showMDO && Number(ret[0]) === 0) return null
+                if (showMDO && Number(ret[ 0 ]) === 0) return null
                 return (
                   <ListFarm
                     key={i}
-                    poolInfo={poolInfo.L2LP[v]}
-                    userInfo={userInfo.L2LP[v]}
+                    poolInfo={poolInfo.L2LP[ v ]}
+                    userInfo={userInfo.L2LP[ v ]}
                     L1orL2Pool={lpChoice}
-                    balance={ret[0]}
-                    decimals={ret[1]}
+                    balance={ret[ 0 ]}
+                    decimals={ret[ 1 ]}
                     isMobile={isMobile}
                     showStakesOnly={showMSO}
                     accountEnabled={accountEnabled}

@@ -13,8 +13,8 @@ import * as S from './wallet.styles';
 
 function Wallet() {
 
-  const [ page, setPage ] = useState('TOKEN')
-  const [ chain, setChain ] = useState('TOKEN')
+  const [ page, setPage ] = useState('Token')
+  const [ chain, setChain ] = useState('')
 
   const dispatch = useDispatch();
 
@@ -31,31 +31,42 @@ function Wallet() {
 
 
   const handleSwitch = (l) => {
-    if (l === 'Ethereum Wallet') {
-      dispatch(switchChain('L1'))
-    } else if (l === 'Boba Wallet') {
-      dispatch(switchChain('L2'))
+    if (l === 'Token') {
+      setPage('Token');
+    } else if (l === 'NFT') {
+      setPage('NFT');
     }
   }
+
+  console.log([ 'page', page ]);
+  console.log([ 'chain', chain ]);
 
   return (
     <S.PageContainer>
       <S.PageSwitcher>
         <Typography
-          className={page === 'TOKEN' ? 'active' : ''}
-          onClick={() => { setPage('TOKEN'); console.log('Switching to Wallet') }}
+          className={chain === 'Ethereum Wallet' ? 'active' : ''}
+          onClick={() => {
+            if (!!accountEnabled) {
+              dispatch(switchChain('L1'))
+            }
+          }}
           variant="body2"
           component="span"
           color="white">
-          Token
+          Ethereum Wallet
         </Typography>
         <Typography
-          className={page === 'NFT' ? 'active' : ''}
-          onClick={() => { setPage('NFT'); console.log('Switching to NFT') }}
+          className={chain === 'Boba Wallet' ? 'active' : ''}
+          onClick={() => {
+            if (!!accountEnabled) {
+              dispatch(switchChain('L2'))
+            }
+          }}
           variant="body2"
           component="span"
           color="white">
-          NFT
+          Boba Wallet
         </Typography>
       </S.PageSwitcher>
       {
@@ -63,18 +74,15 @@ function Wallet() {
           <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
           : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
       }
-      {page === 'TOKEN' ?
-        <Box sx={{my:2}}>
-          {!!accountEnabled ? <Tabs
-            activeTab={chain}
-            onClick={(t) => handleSwitch(t)}
-            aria-label="Liquidity Pool Tab"
-            tabs={[ "Ethereum Wallet", "Boba Wallet" ]}
-          /> : null}
-          <Token />
-        </Box>
-        : <Nft />}
-
+      <Box sx={{ mt: 2 }}>
+        <Tabs
+          activeTab={page}
+          onClick={(t) => handleSwitch(t)}
+          aria-label="Page Tab"
+          tabs={[ "Token", "NFT" ]}
+        />
+      </Box>
+      {page === 'Token' ? <Token /> : <Nft />}
     </S.PageContainer>
   )
 }
