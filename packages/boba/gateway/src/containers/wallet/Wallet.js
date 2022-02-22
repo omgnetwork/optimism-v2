@@ -1,7 +1,6 @@
 import { Circle } from "@mui/icons-material";
 import { Box, Typography } from '@mui/material';
 import { switchChain } from "actions/setupAction";
-import PageTitle from "components/pageTitle/PageTitle";
 import Tabs from 'components/tabs/Tabs'
 import Nft from "containers/wallet/nft/Nft";
 import React, { useEffect, useState } from "react";

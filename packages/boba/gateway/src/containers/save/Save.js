@@ -137,13 +137,13 @@ class Save extends React.Component {
     let l2BalanceBOBA = Number(logAmount(bobaWeiString, 18))
 
     let totalBOBAstaked = 0
-    Object.keys(stakeInfo).map((v, i) => {
+    Object.keys(stakeInfo).forEach((v, i) => {
       totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[ i ].depositAmount)
       console.log(Number(stakeInfo[ i ].depositAmount))
     })
 
 
-    /* 
+    /*
         if (netLayer === 'L1') {
           return <div className={styles.container}>
             <S.LayerAlert>
@@ -160,8 +160,8 @@ class Save extends React.Component {
             </S.LayerAlert>
           </div>
         }
-    
-    
+
+
         if (!netLayer) {
           return <div className={styles.container}>
             <S.LayerAlert>

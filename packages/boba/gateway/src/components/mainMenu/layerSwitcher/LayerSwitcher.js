@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Box, IconButton, Typography, useMediaQuery } from '@mui/material'
+import { IconButton, Typography, useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/styles'
 import { switchChain } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
@@ -68,7 +68,7 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
     return (
       <S.LayerSwitcherWrapperMobile>
         <S.LayerWrapper>
-          {!layer ? <WalletPicker /> : layer === 'L1' ? 
+          {!layer ? <WalletPicker /> : layer === 'L1' ?
             <Button
               type="primary"
               variant="contained"
@@ -92,7 +92,7 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
       </S.LayerSwitcherWrapperMobile>
     )
   }
-  
+
   if (isIcon) {
     return (
       <S.LayerSwitcherIconWrapper>

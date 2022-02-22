@@ -23,7 +23,6 @@ import { isEqual } from 'lodash';
 import { getFarmInfo } from 'actions/farmAction'
 
 import ListFarm from 'components/listFarm/listFarm'
-import Tabs from 'components/tabs/Tabs'
 import AlertIcon from 'components/icons/AlertIcon'
 import networkService from 'services/networkService'
 

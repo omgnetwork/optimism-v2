@@ -91,8 +91,8 @@ class listNFT extends React.Component {
   render() {
 
     const {
-      name,
-      symbol,
+      // name,
+      // symbol,
       URL,
       isFlipped,
       meta

@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import { Box, Divider, Typography } from '@mui/material';
-import { height } from '@mui/system';
 
 export const LayerSwitcherWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',

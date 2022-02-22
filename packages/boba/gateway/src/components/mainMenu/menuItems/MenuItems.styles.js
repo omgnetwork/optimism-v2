@@ -1,4 +1,4 @@
-import bobaIcon from 'images/boba2/boba2Icon.svg'
+// import bobaIcon from 'images/boba2/boba2Icon.svg'
 import { Box } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
@@ -7,8 +7,8 @@ export const Nav = styled('nav')(({ theme }) => ({
   height: '25px',
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'center', 
-  alignItems: 'center', 
+  justifyContent: 'center',
+  alignItems: 'center',
   gap: '10px',
   flexWrap: 'wrap',
   [theme.breakpoints.down('md')]: {
@@ -31,8 +31,8 @@ export const MenuItem = styled(Box)(({ selected, theme }) => ({
   // [ theme.breakpoints.up('md') ]: {
   //   '&:before': {
   //     'content': '"  "',
-  //     display: 'inline-block', 
-  //     visibility: `${selected ? 'visible': 'hidden'}`, 
+  //     display: 'inline-block',
+  //     visibility: `${selected ? 'visible': 'hidden'}`,
   //     height: '20px',
   //     width: '20px',
   //     backgroundImage: `url(${bobaIcon})`,
@@ -48,5 +48,5 @@ export const MenuItem = styled(Box)(({ selected, theme }) => ({
   '&:hover': {
     color: `${theme.palette.secondary.main}`,
   },
-  
+
 }))
