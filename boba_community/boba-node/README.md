@@ -24,7 +24,7 @@ $ cd boba_community/boba-node
 $ docker compose pull
 ```
 
-Then, add your Infura key to `boba_community/boba-node/docker-compose-replica.yaml`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io).
+Then, add your Infura key to `boba_community/boba-node/docker-compose.yaml`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io) or any other node provider.
 
 ```bash
 x-l1_rpc_dtl: &l1_rpc_dtl
