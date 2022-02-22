@@ -58,22 +58,6 @@ function TokenPage({
     getLookupPrice()
   }, [ getLookupPrice, accountEnabled ])
 
-
-  if (!networkLayer) {
-    return <S.LayerAlert>
-      <S.AlertInfo>
-        <AlertIcon />
-        <S.AlertText
-          variant="body2"
-          component="p"
-        >
-          Connect your wallet to see your balances, transfer, and bridge
-        </S.AlertText>
-      </S.AlertInfo>
-      <WalletPicker />
-    </S.LayerAlert>
-  }
-
   if (isEmpty) {
 
     return (

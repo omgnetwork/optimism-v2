@@ -182,7 +182,7 @@ class Save extends React.Component {
     return (
       <S.StakePageContainer>
         <Box sx={{ my: 1 }}>
-          <PageTitle title="Boba Stake" />
+          <PageTitle title="Stake" />
           {(netLayer !== 'L2') ?
             <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Not connected to Boba L2</Typography>
             : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected </Typography>

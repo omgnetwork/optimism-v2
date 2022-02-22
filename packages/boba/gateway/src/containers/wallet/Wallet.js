@@ -1,14 +1,18 @@
-import { Circle } from "@mui/icons-material";
-import { Box, Typography } from '@mui/material';
-import { switchChain } from "actions/setupAction";
+import { Circle } from "@mui/icons-material"
+import { Box, Typography } from '@mui/material'
+import { switchChain } from "actions/setupAction"
 import Tabs from 'components/tabs/Tabs'
-import Nft from "containers/wallet/nft/Nft";
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import { selectAccountEnabled, selectLayer } from "selectors/setupSelector";
-import Token from "./token/Token";
-import * as S from './wallet.styles';
+import Nft from "containers/wallet/nft/Nft"
+import React, { useEffect, useState } from "react"
+import { useDispatch, useSelector } from 'react-redux'
+import { selectAccountEnabled, selectLayer } from "selectors/setupSelector"
+import Token from "./token/Token"
+import * as S from './wallet.styles'
 
+import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import WalletPicker from 'components/walletpicker/WalletPicker'
+import PageTitle from 'components/pageTitle/PageTitle'
+import AlertIcon from 'components/icons/AlertIcon'
 
 function Wallet() {
 
@@ -37,11 +41,28 @@ function Wallet() {
     }
   }
 
-  console.log([ 'page', page ]);
-  console.log([ 'chain', chain ]);
+  console.log([ 'page', page ])
+  console.log([ 'chain', chain ])
 
   return (
     <S.PageContainer>
+      <PageTitle title="Wallet"/>
+
+        {!accountEnabled &&
+          <S.LayerAlert>
+            <S.AlertInfo>
+              <AlertIcon />
+              <S.AlertText
+                variant="body2"
+                component="p"
+              >
+                Connect your wallet to see your balances, transfer, and bridge
+              </S.AlertText>
+            </S.AlertInfo>
+            <WalletPicker />
+          </S.LayerAlert>
+        }
+
       <S.PageSwitcher>
         <Typography
           className={chain === 'Ethereum Wallet' ? 'active' : ''}

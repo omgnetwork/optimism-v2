@@ -33,8 +33,8 @@ import Tooltip from 'components/tooltip/Tooltip';
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import PageTitle from 'components/pageTitle/PageTitle';
-import { Circle, HelpOutline } from '@mui/icons-material';
+import PageTitle from 'components/pageTitle/PageTitle'
+import { Circle, HelpOutline } from '@mui/icons-material'
 
 class Farm extends React.Component {
 

@@ -21,8 +21,7 @@ export const EarnPageContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     padding: '0px',
   },
-
-}));
+}))
 
 export const TableHeading = styled(Box)(({ theme }) => ({
   padding: "20px",
@@ -49,15 +48,14 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
     padding: '25px 50px',
   },
-
-}));
+}))
 
 export const AlertText = styled(Typography)(({ theme }) => ({
   marginLeft: '10px',
   flex: 4,
   [theme.breakpoints.up('md')]: {
   },
-}));
+}))
 
 export const AlertInfo = styled(Box)`
   display: flex;
@@ -75,7 +73,7 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   [theme.breakpoints.up('md')]: {
     padding: '20px',
   },
-}));
+}))
 
 export const GridItemTagContainer = styled(Grid)(({ theme, ...props }) => ({
   spacing: 2,

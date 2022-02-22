@@ -20,7 +20,9 @@ import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 
-import {useMediaQuery, useTheme} from '@mui/material'
+import { Grid, Typography, Box, useMediaQuery, useTheme } from '@mui/material'
+import { Circle } from '@mui/icons-material'
+
 import moment from 'moment'
 
 import Input from 'components/input/Input'
@@ -42,7 +44,7 @@ import * as S from './History.styles'
 import * as styles from './Transactions.module.scss'
 
 import useInterval from 'util/useInterval'
-
+import PageTitle from 'components/pageTitle/PageTitle'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import AlertIcon from 'components/icons/AlertIcon'
 
@@ -51,7 +53,8 @@ import { POLL_INTERVAL } from 'util/constant'
 function History() {
 
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const netLayer = useSelector(selectLayer())
 
   const dispatch = useDispatch()
 
@@ -82,8 +85,12 @@ function History() {
   }, POLL_INTERVAL)
 
   return (
-    <>
-      {/* <PageTitle title="History" /> */}
+
+    <S.HistoryPageContainer>
+
+      <Box sx={{ my: 1 }}>
+        <PageTitle title="History" />
+      </Box>
 
       {!layer &&
         <S.LayerAlert>
@@ -99,6 +106,7 @@ function History() {
           <WalletPicker />
         </S.LayerAlert>
       }
+
       {layer && <> 
       <S.Header>
         <div className={styles.searchInput}>
@@ -172,7 +180,7 @@ function History() {
         </div>
       </div>
     </>}
-    </>
+    </S.HistoryPageContainer>
   );
 }
 

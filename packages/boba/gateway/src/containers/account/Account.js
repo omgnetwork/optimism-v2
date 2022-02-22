@@ -235,7 +235,7 @@ function Account ({ enabled }) {
 
   return (
     <>
-      {/* <PageTitle title="Bridge"/> */}
+      {/*<PageTitle title="Wallet"/>*/}
 
       {!accountEnabled &&
         <S.LayerAlert>

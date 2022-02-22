@@ -22,7 +22,7 @@ export const StakePageContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     padding: '0px',
   },
-}));
+}))
 
 export const StakeEarnContainer = styled(Box)(({ theme }) => ({
   borderRadius: '20px',
@@ -35,6 +35,7 @@ export const StakeEarnContainer = styled(Box)(({ theme }) => ({
   backgroundPosition: '100% 0%',
   backgroundSize: '40%'
 }))
+
 export const StakeInputContainer = styled(Box)(({ theme }) => ({
   background: 'rgba(255, 255, 255, 0.04)',
   backdropFilter: 'blur(10px)',
@@ -65,7 +66,7 @@ export const StakeContainer = styled(Box)(({ theme }) => ({
   borderRadius: '20px',
   padding: '24px',
   minHeight: '400px',
-  width: '100%'
+  width: '100%',
 }))
 
 export const StakeItemContainer = styled(Box)(({ theme }) => ({
@@ -90,7 +91,6 @@ export const DividerLine = styled(Divider)(({ theme }) => ({
   boxShadow: `${ theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
   width: '100%'
 }))
-
 
 export const TableHeading = styled(Box)(({ theme }) => ({
   padding: "20px",
