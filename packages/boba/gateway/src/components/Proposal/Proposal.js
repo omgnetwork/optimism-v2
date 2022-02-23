@@ -46,7 +46,7 @@ function Proposal({
             if (proposal.totalVotes > 0) {
                 setVotePercent(Math.round((100 * proposal.forVotes) / proposal.totalVotes))
             } else {
-                setVotePercent("NA")
+                setVotePercent(0)
             }
         };
         init()
