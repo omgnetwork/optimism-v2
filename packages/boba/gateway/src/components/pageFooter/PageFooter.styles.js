@@ -11,7 +11,7 @@ export const Wrapper = styled(Box)(({ theme }) => ({
   bottom: 0,
   width: '100%',
   height: '184px',
-  background: `${theme.palette.mode === 'dark' ? '#1A1D1F' : '#FFFFFF'}`,
+  background: theme.background,
   [ theme.breakpoints.down('md') ]: {
     marginTop: 0,
     height: '450px',

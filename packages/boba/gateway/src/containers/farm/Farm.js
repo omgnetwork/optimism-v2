@@ -330,16 +330,14 @@ class Farm extends React.Component {
                 className={poolTab === 'Ethereum Pool' ? 'active' : ''}
                 onClick={() => this.handleChange(null, 'Ethereum Pool')}
                 variant="body2"
-                component="span"
-                color="white">
+                component="span">
                 Ethereum Pool
               </Typography>
               <Typography
                 className={poolTab === 'Boba L2 Pool' ? 'active' : ''}
                 onClick={() => this.handleChange(null, 'Boba L2 Pool')}
                 variant="body2"
-                component="span"
-                color="white">
+                component="span">
                 Boba L2 Pool
               </Typography>
             </S.PageSwitcher>
