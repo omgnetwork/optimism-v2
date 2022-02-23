@@ -21,7 +21,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-        "sync"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -346,39 +346,39 @@ func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil
 	turingCache.lock.Lock()
 
 	if turingCache.entries == nil {
-	     log.Debug("TURING Cache init") // FIXME - move the init code elsewhere
-	     turingCache.entries = make(map[common.Hash]*turingCacheEntry)
+		log.Debug("TURING Cache init") // FIXME - move the init code elsewhere
+		turingCache.entries = make(map[common.Hash]*turingCacheEntry)
 	}
 
 	if ent, hit := turingCache.entries[key]; hit {
-	     if time.Now().Before(ent.expires) {
-	             log.Debug("TURING Cache hit", "key", key, "expires", ent.expires)
-	             ret = ent.value
-	     } else {
-	             log.Debug("TURING Cache expired", "key", key, "expires", ent.expires)
-	             delete(turingCache.entries, key)
-	     }
+		if time.Now().Before(ent.expires) {
+			log.Debug("TURING Cache hit", "key", key, "expires", ent.expires)
+			ret = ent.value
+		} else {
+			log.Debug("TURING Cache expired", "key", key, "expires", ent.expires)
+			delete(turingCache.entries, key)
+		}
 	}
 	turingCache.lock.Unlock()
 
 	if len(ret) != 0 {
-	     return ret, 0
+		return ret, 0
 	}
 
 	if len(ret) == 0 {
-	     log.Debug("TURING Missing cache entry", "mayBlock", mayBlock)
-	     if mayBlock {
-	             // Since no Boba credit is consumed in an estimateGas call, we put a
-	             // "failed" entry into the cache here so that a failed offchain call
-	             // can't be called repeatedly as a DoS attack.
-	             turingCache.lock.Lock()
-	             newEnt := &turingCacheEntry{value: retError, expires: time.Now().Add(2 * time.Second)}
-	             turingCache.entries[key] = newEnt
-	             turingCache.lock.Unlock()
-	     } else {
-	             retError[35] = 20 // Missing cache entry
-	             return retError, 20
-	     }
+		log.Debug("TURING Missing cache entry", "mayBlock", mayBlock)
+		if mayBlock {
+			// Since no Boba credit is consumed in an estimateGas call, we put a
+			// "failed" entry into the cache here so that a failed offchain call
+			// can't be called repeatedly as a DoS attack.
+			turingCache.lock.Lock()
+			newEnt := &turingCacheEntry{value: retError, expires: time.Now().Add(2 * time.Second)}
+			turingCache.entries[key] = newEnt
+			turingCache.lock.Unlock()
+		} else {
+			retError[35] = 20 // Missing cache entry
+			return retError, 20
+		}
 	}
 
 	// A micro-ABI decoder... this works because we know that all these numbers can never exceed 256
@@ -606,8 +606,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				updated_input, turingErr = bobaTuringCall(input, caller.Address(), mayBlock)
 
 				if turingErr == 20 {
-				     log.Debug("TURING returning ErrTuringWouldBlock")
-				     return nil, gas, ErrTuringWouldBlock
+					log.Debug("TURING returning ErrTuringWouldBlock")
+					return nil, gas, ErrTuringWouldBlock
 				}
 			} else if isGetRand2 {
 				updated_input = bobaTuringRandom(input, caller.Address())
