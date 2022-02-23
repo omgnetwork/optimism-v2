@@ -14,8 +14,8 @@ let l2PoolBalance
 let l2BlockNumber
 let l2GasPrice
 const oracleAddresses = []
-const l1Provider = new ethers.providers.JsonRpcProvider(configs.l1Url)
-const l2Provider = new ethers.providers.JsonRpcProvider(configs.l2Url)
+const l1Provider = new ethers.providers.StaticJsonRpcProvider(configs.l1Url)
+const l2Provider = new ethers.providers.StaticJsonRpcProvider(configs.l2Url)
 const addressManager = new ethers.Contract(
   configs.addressManagerAddress,
   addressManagerJSON.abi,
