@@ -108,7 +108,7 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     l1CrossDomainMessengerAddress,
     bobaTuringPrice,
     TuringHelperJson,
-    berlinBlock
+    berlinBlock,
   })
 
   fs.writeFileSync(outfile, JSON.stringify(genesis, null, 4))
