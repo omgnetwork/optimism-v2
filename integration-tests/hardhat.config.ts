@@ -15,6 +15,7 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 50000,
+    grep: '',
   },
   solidity: {
     compilers: [
