@@ -2,6 +2,7 @@
 pragma solidity ^0.5.16;
 
 import "@boba/contracts/contracts/DAO/governance/Timelock.sol";
+import { IMockGovernorBravoDelegate } from "./MockGovernorBravoDelegate.sol";
 
 contract MockTimelock is Timelock {
 
@@ -14,5 +15,15 @@ contract MockTimelock is Timelock {
     function setAdminMock(address newAdmin) external {
         require(msg.sender == owner);
         admin = newAdmin;
+    }
+
+    function setVotingPeriodMock(address governor, uint value) external {
+        require(msg.sender == owner);
+        IMockGovernorBravoDelegate(governor)._setVotingPeriodMock(value);
+    }
+
+    function setVotingDelayMock(address governor, uint value) external {
+        require(msg.sender == owner);
+        IMockGovernorBravoDelegate(governor)._setVotingDelayMock(value);
     }
 }
