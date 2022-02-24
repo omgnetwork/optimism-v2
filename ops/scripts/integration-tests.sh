@@ -32,4 +32,6 @@ curl \
 #cp ./hardhat.config.ts /tmp/
 sed -i -e "s/grep: '',/grep: '$TEST_GREP_FILTER',/g" ./hardhat.config.ts
 cat ./hardhat.config.ts
+echo $TEST_GREP_FILTER
+echo "Now run:"
 npx hardhat test --network optimism --no-compile --config ./hardhat.config.ts
