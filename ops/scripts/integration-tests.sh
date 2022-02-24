@@ -29,4 +29,6 @@ curl \
     --output /dev/null \
     $L2_URL
 
-npx hardhat test --network optimism --no-compile
+cp ./hardhat.config.ts /tmp/
+sed -i -e "s/grep: '',/grep: '$TEST_GREP_FILTER',/g" /tmp/hardhat.config.ts
+npx hardhat test --network optimism --no-compile --config /tmp/hardhat.config.ts
