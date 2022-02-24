@@ -274,14 +274,18 @@ func bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 	return ret
 }
 
+const turingCacheExpire = 2 * time.Second
+const turingCacheClean = 60 * time.Second
+
 type turingCacheEntry struct {
 	expires time.Time
 	value   []byte
 }
 
 var turingCache struct {
-	lock    sync.RWMutex
-	entries map[common.Hash]*turingCacheEntry
+	lock      sync.RWMutex
+	entries   map[common.Hash]*turingCacheEntry
+	nextClean time.Time
 }
 
 // In response to an off-chain Turing request, obtain the requested data and
@@ -348,6 +352,7 @@ func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil
 	if turingCache.entries == nil {
 		log.Debug("TURING Cache init") // FIXME - move the init code elsewhere
 		turingCache.entries = make(map[common.Hash]*turingCacheEntry)
+		turingCache.nextClean = time.Now().Add(turingCacheClean)
 	}
 
 	if ent, hit := turingCache.entries[key]; hit {
@@ -489,9 +494,20 @@ func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil
 		"newValue", hexutil.Bytes(ret))
 
 	turingCache.lock.Lock()
-	newEnt := &turingCacheEntry{value: ret, expires: time.Now().Add(2 * time.Second)}
+	newEnt := &turingCacheEntry{value: ret, expires: time.Now().Add(turingCacheExpire)}
 	turingCache.entries[key] = newEnt
 	log.Debug("TURING Cache insert", "key", key, "expires", newEnt.expires)
+
+	if mayBlock && time.Now().After(turingCache.nextClean) {
+		log.Debug("TURING scanning cache for expired entries")
+
+		for key, element := range turingCache.entries {
+			if time.Now().After(element.expires) {
+				delete(turingCache.entries, key)
+			}
+		}
+		turingCache.nextClean = time.Now().Add(turingCacheClean)
+	}
 	turingCache.lock.Unlock()
 
 	return ret, 0
