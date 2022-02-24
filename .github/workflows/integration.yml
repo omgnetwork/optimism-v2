@@ -44,6 +44,9 @@ jobs:
         image: registry:2
         ports:
           - 5000:5000
+    strategy:
+      matrix:
+        test-grep-filter: [L2 -> L1, boba]
     env:
         DOCKER_BUILDKIT: 1
         COMPOSE_DOCKER_CLI_BUILD: 1
@@ -83,7 +86,7 @@ jobs:
 
       - name: Run the integration tests
         working-directory: ./ops
-        run: docker-compose run integration_tests
+        run: docker-compose run integration_tests -e TEST_GREP_FILTER=${{ matrix.test-grep-filter }}
 
   stop-runner:
     name: Stop self-hosted EC2 runner

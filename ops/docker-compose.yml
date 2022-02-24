@@ -337,7 +337,7 @@ services:
       dockerfile: ./ops/docker/Dockerfile.integration-tests
     entrypoint: ./integration-tests.sh
     environment:
-      TEST_GREP_FILTER: "L2 -> L1"
+      TEST_GREP_FILTER: ""
       VERIFIER_URL: http://verifier:8545
       REPLICA_URL: http://replica:8545
       L1_URL: http://l1_chain:8545
