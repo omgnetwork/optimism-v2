@@ -49,6 +49,42 @@ func BatchElementFromBlock(block *l2types.Block) BatchElement {
 
 	tx := txs[0]
 
+	// The transaction is here, including the L1Turing data and the rawTransaction
+	// We need to (1) add a header to the rawTransaction, and (2) if L1Turing in non-zero, 
+	// we need to graft that on to the rawTransaction
+
+	ret := make([]byte, 1)
+
+	// Turing length cannot exceed 256*256 characters (based on limit in the Geth), so we need two bytes max for the length
+	turingLength := make([]byte, 2) 
+	
+	ret[0] = 1 // set the Turing version (1)
+
+	l1Turing := tx.meta.L1Turing() // function does not exist yet
+	rawTransaction := tx.meta.rawTransaction() // function does not exist yet
+
+	if(len(l1Turing) > 1) {
+		// build the modified rawTransaction
+		binary.BigEndian.PutUint16(turingLength, uint16(len(l1Turing)))
+		// add the Turing payload length
+		ret = append(ret, turingLength...)
+		// add the rawTransaction
+		ret = append(ret, rawTransaction...)
+		// add the Turing data
+		ret = append(ret, l1Turing...)
+		log.Debug("TURING bobaTuringWrite:Modified parameters", "newValue", ret, "length1", turingLength, "length2", uint16(len(meta.l1Turing)))
+		// and now, replace the original rawData
+		tx.meta.setRawTransaction(ret) // this function does not exist yet
+
+	} else {
+		// add the Turing payload length - 0000 in this case
+		ret = append(ret, turingLength...)
+		// add the rawTransaction
+		ret = append(ret, rawTransaction...)
+		log.Debug("TURING bobaTuringWrite:NonTuring parameters", "newValue", ret, "length", turingLength)
+		tx.meta.setRawTransaction(ret) // this function does not exist yet
+	}
+
 	// Extract L2 metadata.
 	l1BlockNumber := tx.L1BlockNumber().Uint64()
 	isSequencerTx := tx.QueueOrigin() == l2types.QueueOriginSequencer
@@ -56,6 +92,7 @@ func BatchElementFromBlock(block *l2types.Block) BatchElement {
 	// Only include sequencer txs in the returned BatchElement.
 	var cachedTx *CachedTx
 	if isSequencerTx {
+		// this RLP compresses the entire TX
 		cachedTx = NewCachedTx(tx)
 	}
 
