@@ -248,8 +248,8 @@ describe('Dao Action Test', async () => {
     )
 
     // mock the voting period and voting delay time
-    await Governor._setVotingDelayMock(5)
-    await Governor._setVotingPeriodMock(5)
+    await Governor._setVotingDelayMock(15)
+    await Governor._setVotingPeriodMock(15)
 
     const L2Balance = await L2Boba.balanceOf(env.l2Wallet.address)
 
