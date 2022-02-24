@@ -86,7 +86,7 @@ jobs:
 
       - name: Run the integration tests
         working-directory: ./ops
-        run: docker-compose run -e TEST_GREP_FILTER=${{ matrix.test-grep-filter }} integration_tests
+        run: docker-compose run -e TEST_GREP_FILTER="${{ matrix.test-grep-filter }}" integration_tests
 
   stop-runner:
     name: Stop self-hosted EC2 runner
