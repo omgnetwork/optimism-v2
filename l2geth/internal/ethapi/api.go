@@ -1045,6 +1045,16 @@ func DoEstimateGas(ctx context.Context, b Backend, args CallArgs, blockNrOrHash 
 		}
 	}
 
+	isGasUpdate := true
+	if blockNr, ok := blockNrOrHash.Number(); ok {
+		fmt.Println("Checking block number is api.go", "blockNr", blockNr.Int64())
+		isGasUpdate = b.ChainConfig().IsGasUpdate(big.NewInt(blockNr.Int64()))
+	}
+
+	if !isGasUpdate {
+		return hexutil.Uint64(hi), nil
+	}
+
 	nonce, _ := b.GetPoolNonce(ctx, *args.From)
 
 	value := new(big.Int)
