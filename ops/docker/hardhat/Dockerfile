@@ -1,11 +1,10 @@
-FROM node:14-alpine
+FROM node:16-alpine
 
 # bring in the config files for installing deps
 COPY [ \
-    "package.json", \
-    "yarn.lock", \
-    "/hardhat/" \
-]
+  "package.json", \
+  "/hardhat/" \
+  ]
 
 # install deps
 WORKDIR /hardhat
