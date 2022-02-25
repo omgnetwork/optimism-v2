@@ -52,8 +52,7 @@ func BatchElementFromBlock(block *l2types.Block) BatchElement {
 
 	tx := txs[0]
 
-	// if L1Turing in non-zero, we need to graft that on to the data AKA rawTransaction AKA payload
-
+	// if L1Turing in non-zero, we need to graft that on to the data
 	// start building the augmented transaction data
 	ret := make([]byte, 1)
 	ret[0] = 1 // set the Turing version (1)
