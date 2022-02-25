@@ -219,6 +219,13 @@ describe("Basic Math", function () {
     const result = parseInt(rawData.slice(-64), 16) / 100 
     expect(result.toFixed(5)).to.equal('33.51000')
   })
+  
+  it("should not re-use cache for a new Tx", async () => {
+    // The nonce is now part of the cache key, so after a completed Tx the
+    // next Tx should not see the previous cache entry.
+    let tr = await hello.multFloatNumbers(urlStr, '2.123', gasOverride)
+    await expect(tr.wait()).to.be.reverted
+  })
 
   it("should revert on a cache miss", async () => {
     let tr = await hello.multFloatNumbers(urlStr, '3.123', gasOverride)

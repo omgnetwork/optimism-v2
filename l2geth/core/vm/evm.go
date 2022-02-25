@@ -206,7 +206,7 @@ func (evm *EVM) Interpreter() Interpreter {
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
-func bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
+func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 
 	var ret hexutil.Bytes
 
@@ -274,7 +274,7 @@ func bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
 	return ret
 }
 
-const turingCacheExpire = 2 * time.Second
+const turingCacheExpire = 5 * time.Second
 const turingCacheClean = 60 * time.Second
 
 type turingCacheEntry struct {
@@ -291,9 +291,9 @@ var turingCache struct {
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
 // caller is the address of the TuringHelper contract
-func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil.Bytes, int) {
+func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil.Bytes, int) {
 
-	log.Debug("TURING bobaTuringCall:Caller", "caller", caller.String())
+	log.Debug("TURING bobaTuringCall:Caller", "caller", caller.String(), "origin", evm.Context.Origin)
 
 	var responseStringEnc string
 	var responseString []byte
@@ -340,9 +340,11 @@ func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil
 
 	// Now check for a cached result
 	ret := []byte{}
-
 	hasher := sha3.NewLegacyKeccak256()
-	hasher.Write(common.LeftPadBytes(caller.Bytes(), 32)) // FIXME - add account nonce, contract ID, etc?
+	hasher.Write(caller.Bytes())
+	hasher.Write(evm.Context.Origin.Bytes())
+	nonce := new(big.Int).SetUint64(evm.StateDB.GetNonce(evm.Context.Origin))
+	hasher.Write(nonce.Bytes())
 	hasher.Write(input)
 	key := common.BytesToHash(hasher.Sum(nil))
 
@@ -377,7 +379,9 @@ func bobaTuringCall(input []byte, caller common.Address, mayBlock bool) (hexutil
 			// "failed" entry into the cache here so that a failed offchain call
 			// can't be called repeatedly as a DoS attack.
 			turingCache.lock.Lock()
-			newEnt := &turingCacheEntry{value: retError, expires: time.Now().Add(2 * time.Second)}
+			errVal := make([]byte, len(retError))
+			copy(errVal, retError)
+			newEnt := &turingCacheEntry{value: errVal, expires: time.Now().Add(2 * time.Second)}
 			turingCache.entries[key] = newEnt
 			turingCache.lock.Unlock()
 		} else {
@@ -589,7 +593,6 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
 	var updated_input hexutil.Bytes
-	var turingErr int
 
 	// Sanity and depth checks
 	if isTuring2 || isGetRand2 {
@@ -618,15 +621,9 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				// As a hack, look for a zero GasPrice to infer that we are in an eth_estimateGas call stack.
 				mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
 				log.Debug("TURING preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
-
-				updated_input, turingErr = bobaTuringCall(input, caller.Address(), mayBlock)
-
-				if turingErr == 20 {
-					log.Debug("TURING returning ErrTuringWouldBlock")
-					return nil, gas, ErrTuringWouldBlock
-				}
+				updated_input, _ = evm.bobaTuringCall(input, caller.Address(), mayBlock)
 			} else if isGetRand2 {
-				updated_input = bobaTuringRandom(input, caller.Address())
+				updated_input = evm.bobaTuringRandom(input, caller.Address())
 			} // there is no other option
 			ret, err = run(evm, contract, updated_input, false)
 			log.Debug("TURING NEW CALL", "updated_input", updated_input)
@@ -650,11 +647,12 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	}
 
 	log.Debug("TURING evm.go run",
+		"depth", evm.depth,
 		"contract", contract.CodeAddr,
 		"ret", hexutil.Bytes(ret),
 		"err", err,
 		"updated_input", updated_input,
-		"evm.Context.Turing", evm.Context.Turing,
+		"evm.Context.Turing", hexutil.Bytes(evm.Context.Turing),
 		"length Turing", len(evm.Context.Turing))
 
 	// When an error was returned by the EVM or when setting the creation code
