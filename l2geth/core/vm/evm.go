@@ -282,11 +282,62 @@ type turingCacheEntry struct {
 	value   []byte
 }
 
-var turingCache struct {
+type turingCache struct {
 	lock      sync.RWMutex
 	entries   map[common.Hash]*turingCacheEntry
 	nextClean time.Time
 }
+
+func (cache *turingCache) Init() {
+	log.Debug("TURING Cache init")
+	cache.entries = make(map[common.Hash]*turingCacheEntry)
+	cache.nextClean = time.Now().Add(turingCacheClean)
+}
+
+func (cache *turingCache) Get(key common.Hash) []byte {
+	ret := []byte{}
+
+	cache.lock.Lock()
+	if tCache.entries == nil {
+		tCache.Init()
+	}
+	if ent, hit := cache.entries[key]; hit {
+		if time.Now().Before(ent.expires) {
+			log.Debug("TURING Cache hit", "key", key, "expires", ent.expires)
+			ret = ent.value
+		} else {
+			log.Debug("TURING Cache expired", "key", key, "expires", ent.expires)
+			delete(cache.entries, key)
+		}
+	}
+	cache.lock.Unlock()
+	return ret
+}
+
+func (cache *turingCache) Put(key common.Hash, value []byte) {
+	cache.lock.Lock()
+	newEnt := &turingCacheEntry{value: value, expires: time.Now().Add(turingCacheExpire)}
+	cache.entries[key] = newEnt
+	log.Debug("TURING Cache insert", "key", key, "expires", newEnt.expires)
+	cache.lock.Unlock()
+}
+
+func (cache *turingCache) Trim() {
+	cache.lock.Lock()
+	if time.Now().After(cache.nextClean) {
+		log.Debug("TURING scanning cache for expired entries")
+
+		for key, element := range cache.entries {
+			if time.Now().After(element.expires) {
+				delete(cache.entries, key)
+			}
+		}
+		cache.nextClean = time.Now().Add(turingCacheClean)
+	}
+	cache.lock.Unlock()
+}
+
+var tCache turingCache
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
@@ -339,7 +390,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	}
 
 	// Now check for a cached result
-	ret := []byte{}
+
 	hasher := sha3.NewLegacyKeccak256()
 	hasher.Write(caller.Bytes())
 	hasher.Write(evm.Context.Origin.Bytes())
@@ -349,24 +400,8 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	key := common.BytesToHash(hasher.Sum(nil))
 
 	log.Debug("TURING Cache key", "key", key, "mayBlock", mayBlock)
-	turingCache.lock.Lock()
 
-	if turingCache.entries == nil {
-		log.Debug("TURING Cache init") // FIXME - move the init code elsewhere
-		turingCache.entries = make(map[common.Hash]*turingCacheEntry)
-		turingCache.nextClean = time.Now().Add(turingCacheClean)
-	}
-
-	if ent, hit := turingCache.entries[key]; hit {
-		if time.Now().Before(ent.expires) {
-			log.Debug("TURING Cache hit", "key", key, "expires", ent.expires)
-			ret = ent.value
-		} else {
-			log.Debug("TURING Cache expired", "key", key, "expires", ent.expires)
-			delete(turingCache.entries, key)
-		}
-	}
-	turingCache.lock.Unlock()
+	ret := tCache.Get(key)
 
 	if len(ret) != 0 {
 		return ret, 0
@@ -378,12 +413,9 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 			// Since no Boba credit is consumed in an estimateGas call, we put a
 			// "failed" entry into the cache here so that a failed offchain call
 			// can't be called repeatedly as a DoS attack.
-			turingCache.lock.Lock()
 			errVal := make([]byte, len(retError))
 			copy(errVal, retError)
-			newEnt := &turingCacheEntry{value: errVal, expires: time.Now().Add(2 * time.Second)}
-			turingCache.entries[key] = newEnt
-			turingCache.lock.Unlock()
+			tCache.Put(key, errVal)
 		} else {
 			retError[35] = 20 // Missing cache entry
 			return retError, 20
@@ -497,22 +529,10 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	log.Debug("TURING bobaTuringCall:Modified parameters",
 		"newValue", hexutil.Bytes(ret))
 
-	turingCache.lock.Lock()
-	newEnt := &turingCacheEntry{value: ret, expires: time.Now().Add(turingCacheExpire)}
-	turingCache.entries[key] = newEnt
-	log.Debug("TURING Cache insert", "key", key, "expires", newEnt.expires)
-
-	if mayBlock && time.Now().After(turingCache.nextClean) {
-		log.Debug("TURING scanning cache for expired entries")
-
-		for key, element := range turingCache.entries {
-			if time.Now().After(element.expires) {
-				delete(turingCache.entries, key)
-			}
-		}
-		turingCache.nextClean = time.Now().Add(turingCacheClean)
+	tCache.Put(key, ret)
+	if mayBlock {
+		tCache.Trim()
 	}
-	turingCache.lock.Unlock()
 
 	return ret, 0
 }
