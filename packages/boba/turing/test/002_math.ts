@@ -27,6 +27,8 @@ let turingCredit: Contract
 let L2BOBAToken: Contract
 let addressesBOBA
 
+let badCallCount = 0
+
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
@@ -63,6 +65,15 @@ describe("Basic Math", function () {
           }
 
           const args = abiDecoder.decodeParameter('string', v1)
+
+          if (parseFloat(args['0']) == 4) {
+                // This tests that failures are cached and not retried
+                badCallCount += 1
+                console.log("      (HTTP) Sending error response, count=", badCallCount)
+                res.writeHead(400, { 'Content-Type': 'text/plain' })
+                res.end('Error: 4 is a bad number')
+                return
+          }
 
           let volume = (4/3) * 3.14159 * Math.pow(parseFloat(args['0']),3)
 
@@ -204,7 +215,6 @@ describe("Basic Math", function () {
         expect(Number(result[1])).to.equal(3351)
       }
     )
-
   })
 
   it("should support floating point volume of sphere", async () => {
@@ -239,6 +249,16 @@ describe("Basic Math", function () {
     } catch (err) {
       expect(err.message).to.contain("Multiply by zero error")
     }
+  })
+
+  it("should not retry a failed off-chain call", async () => {
+    for (let i = 0; i < 10; i++) {
+      try {
+        await hello.estimateGas.multFloatNumbers(urlStr, '4', gasOverride)
+        expect(1).to.equal(0)
+      } catch (err) {}
+    }
+    expect(badCallCount).to.equal(1)
   })
 })
 
