@@ -1,4 +1,11 @@
-import { BigNumber, Contract, ContractFactory, providers, Wallet, utils } from 'ethers'
+import {
+  BigNumber,
+  Contract,
+  ContractFactory,
+  providers,
+  Wallet,
+  utils,
+} from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { ethers } from 'hardhat'
 import chai, { expect } from 'chai'
@@ -7,18 +14,17 @@ chai.use(solidity)
 
 import { Direction } from './shared/watcher-utils'
 
-import hre from 'hardhat'
-const cfg = hre.network.config
+// import hre from 'hardhat'
+// const cfg = hre.network.config
 
-import HelloTuringJson from "@boba/turing-hybrid-compute/artifacts/contracts/HelloTuring.sol/HelloTuring.json"
-import TuringHelperJson from "@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json"
+import HelloTuringJson from '@boba/turing-hybrid-compute/artifacts/contracts/HelloTuring.sol/HelloTuring.json'
+import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 import { OptimismEnv } from './shared/env'
 
-describe("Turing 256 Bit Random Number Test", function () {
-
+describe('Turing 256 Bit Random Number Test', async () => {
   let env: OptimismEnv
   let BobaTuringHelper: Contract
   let BobaTuringCredit: Contract
@@ -37,7 +43,6 @@ describe("Turing 256 Bit Random Number Test", function () {
   let random: Contract
 
   before(async () => {
-    
     env = await OptimismEnv.new()
 
     const BobaTuringCreditAddress = await env.addressManager.getAddress(
@@ -67,7 +72,7 @@ describe("Turing 256 Bit Random Number Test", function () {
       env.l2Wallet
     )
     TuringHelper = await Factory__TuringHelper.deploy()
-    console.log("    Helper contract deployed at", TuringHelper.address)
+    console.log('    Helper contract deployed at', TuringHelper.address)
     await TuringHelper.deployTransaction.wait()
 
     Factory__Random = new ContractFactory(
@@ -76,12 +81,15 @@ describe("Turing 256 Bit Random Number Test", function () {
       env.l2Wallet
     )
     random = await Factory__Random.deploy(TuringHelper.address)
-    console.log("    Test random contract deployed at", random.address)
+    console.log('    Test random contract deployed at', random.address)
     await random.deployTransaction.wait()
 
     const tr1 = await TuringHelper.addPermittedCaller(random.address)
     const res1 = await tr1.wait()
-    console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
+    console.log(
+      '    addingPermittedCaller to TuringHelper',
+      res1.events[0].data
+    )
 
     const L1StandardBridgeAddress = await env.addressManager.getAddress(
       'Proxy__L1StandardBridge'
@@ -91,7 +99,6 @@ describe("Turing 256 Bit Random Number Test", function () {
       'L1StandardBridge',
       env.l1Wallet
     ).attach(L1StandardBridgeAddress)
-
   })
 
   it('Should transfer BOBA to L2', async () => {
@@ -129,26 +136,30 @@ describe("Turing 256 Bit Random Number Test", function () {
     )
   })
 
-  it("contract should be whitelisted", async () => {
+  it('contract should be whitelisted', async () => {
     const tr2 = await TuringHelper.checkPermittedCaller(random.address)
     const res2 = await tr2.wait()
     const rawData = res2.events[0].data
     const result = parseInt(rawData.slice(-64), 16)
     expect(result).to.equal(1)
-    console.log("    Test contract whitelisted in TuringHelper (1 = yes)?", result)
+    console.log(
+      '    Test contract whitelisted in TuringHelper (1 = yes)?',
+      result
+    )
   })
 
   it('Should register and fund your Turing helper contract in turingCredit', async () => {
-
     env = await OptimismEnv.new()
 
     const depositAmount = utils.parseEther('0.1')
 
-    const preBalance = await BobaTuringCredit.prepaidBalance(TuringHelper.address)
-    console.log("    Credit Prebalance", preBalance.toString())
+    const preBalance = await BobaTuringCredit.prepaidBalance(
+      TuringHelper.address
+    )
+    console.log('    Credit Prebalance', preBalance.toString())
 
     const bobaBalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
-    console.log("    BOBA Balance in your account", bobaBalance.toString())
+    console.log('    BOBA Balance in your account', bobaBalance.toString())
 
     const approveTx = await L2BOBAToken.approve(
       BobaTuringCredit.address,
@@ -169,15 +180,13 @@ describe("Turing 256 Bit Random Number Test", function () {
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
-  it("should get a 256 bit random number", async () => {
-    let tr = await random.getRandom()
+  it('should get a 256 bit random number', async () => {
+    const tr = await random.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
     const rawData = res.events[0].data
-    const numberHexString = '0x'+ rawData.slice(-64)
-    let result = BigInt(numberHexString)
-    console.log("    Turing VRF 256 =",result)
+    const numberHexString = '0x' + rawData.slice(-64)
+    const result = BigInt(numberHexString)
+    console.log('    Turing VRF 256 =', result)
   })
-
 })
-
