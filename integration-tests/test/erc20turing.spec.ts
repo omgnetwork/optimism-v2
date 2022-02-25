@@ -7,8 +7,6 @@ chai.use(solidity)
 
 import { Direction } from './shared/watcher-utils'
 
-const abiDecoder = require('web3-eth-abi')
-
 import hre from 'hardhat'
 const cfg = hre.network.config
 
