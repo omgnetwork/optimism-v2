@@ -413,9 +413,9 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 			// Since no Boba credit is consumed in an estimateGas call, we put a
 			// "failed" entry into the cache here so that a failed offchain call
 			// can't be called repeatedly as a DoS attack.
-			errVal := make([]byte, len(retError))
-			copy(errVal, retError)
-			tCache.Put(key, errVal)
+			//errVal := make([]byte, len(retError))
+			//copy(errVal, retError)
+			tCache.Put(key, retError)
 		} else {
 			retError[35] = 20 // Missing cache entry
 			return retError, 20

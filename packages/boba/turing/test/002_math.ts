@@ -56,7 +56,6 @@ describe("Basic Math", function () {
           // in the real world it's less complicated
 
           var jBody = JSON.parse(body)
-
           let v1 = jBody.params[0]
 
           if(v1.length > 194) {
@@ -64,18 +63,32 @@ describe("Basic Math", function () {
             v1 = '0x' + v1.slice(66)
           }
 
-          const args = abiDecoder.decodeParameter('string', v1)
+          const arg = abiDecoder.decodeParameter('string', v1)
 
-          if (parseFloat(args['0']) == 4) {
+          if (arg == 4) {
                 // This tests that failures are cached and not retried
                 badCallCount += 1
-                console.log("      (HTTP) Sending error response, count=", badCallCount)
+                console.log("      (HTTP) Sending 400 error response, count=", badCallCount)
                 res.writeHead(400, { 'Content-Type': 'text/plain' })
                 res.end('Error: 4 is a bad number')
                 return
           }
 
-          let volume = (4/3) * 3.14159 * Math.pow(parseFloat(args['0']),3)
+          if (arg == 5) {
+                // Should get a different error message
+                badCallCount += 1
+                console.log("      (HTTP) Sending bad JSON-RPC response")
+                res.writeHead(200, { 'Content-Type': 'application/json' })
+                const badRpc = {
+                  "jsonrpc": "2.0",
+                  "id": jBody.id,
+                  "result": "Flagrant system error."
+                }
+                res.end(JSON.stringify(badRpc))
+                return
+          }
+
+          let volume = (4/3) * 3.14159 * Math.pow(parseFloat(arg),3)
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
 
@@ -87,7 +100,7 @@ describe("Basic Math", function () {
             await new Promise(resolve => setTimeout(resolve, ms_delay));
           }
 
-          console.log("      (HTTP) SPHERE Returning off-chain response:", args, "->", volume * 100)
+          console.log("      (HTTP) SPHERE Returning off-chain response:", arg, "->", volume * 100)
 
           let result = abiDecoder.encodeParameters(['uint256','uint256'], [32/*start offset of the bytes*/, Math.round(volume*100)])
 
@@ -212,7 +225,7 @@ describe("Basic Math", function () {
       res => res.json()
     ).then(json => {
         const result = abiDecoder.decodeParameters(['uint256','uint256'], json.result)
-        expect(Number(result[1])).to.equal(3351)
+        expect(Number(result[1])).to.equal(4008)
       }
     )
   })
@@ -227,7 +240,7 @@ describe("Basic Math", function () {
     expect(res).to.be.ok
     const rawData = res.events[0].data
     const result = parseInt(rawData.slice(-64), 16) / 100 
-    expect(result.toFixed(5)).to.equal('33.51000')
+    expect(result.toFixed(2)).to.equal('40.08')
   })
   
   it("should not re-use cache for a new Tx", async () => {
@@ -256,9 +269,20 @@ describe("Basic Math", function () {
       try {
         await hello.estimateGas.multFloatNumbers(urlStr, '4', gasOverride)
         expect(1).to.equal(0)
-      } catch (err) {}
+      } catch (err) {
+        expect(err.message).to.contain("TURING: Server error")
+      }
     }
     expect(badCallCount).to.equal(1)
+  })
+  it("should get appropriate error msg for bad JSON-RPC", async () => {
+    try {
+      await hello.estimateGas.multFloatNumbers(urlStr, '5', gasOverride)
+      expect(1).to.equal(0)
+    } catch (err) {
+      expect(err.message).to.contain("TURING: Could not decode server response")
+    }
+    expect(badCallCount).to.equal(2)
   })
 })
 
