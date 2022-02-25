@@ -100,14 +100,7 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           calldata,
           nextTxPointer
         )
-        // need to keep track of the original length so the pointer system for accessing
-        // the individual transactions works correctly
-        const sequencerTransaction_original_length = sequencerTransaction.length
-        // let turing = Buffer.from([]) // initialize to empty buffer, not to .from('0')
-        // ;[sequencerTransaction, turing] = turingParse(
-        //   sequencerTransaction,
-        //   l2ChainId
-        // )
+
         const decoded = decodeSequencerBatchTransaction(
           sequencerTransaction,
           l2ChainId
@@ -123,16 +116,16 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           gasLimit: BigNumber.from(0).toString(),
           target: constants.AddressZero,
           origin: null,
-          data: toHexString(sequencerTransaction), // this is the full tx, which needs to be decoded, and still may contain a Turing payload
+          data: toHexString(sequencerTransaction),
           queueOrigin: 'sequencer',
-          value: decoded.value, // the cleaned up callData
+          value: decoded.value,
           queueIndex: null,
           decoded,
           confirmed: true,
-          turing: decoded.turing, // the cleaned up Turing data
+          turing: decoded.turing,
         })
 
-        nextTxPointer += 3 + sequencerTransaction_original_length
+        nextTxPointer += 3 + sequencerTransaction.length
         transactionIndex++
       }
 

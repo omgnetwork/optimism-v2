@@ -212,8 +212,6 @@ func (tx *Transaction) UnmarshalJSON(input []byte) error {
 		return err
 	}
 
-	log.Debug("turing transaction.go UnmarshalJSON", "input", input, "tx.Data()", tx.Data())
-
 	withSignature := tx.data.V.Sign() != 0 || tx.data.R.Sign() != 0 || tx.data.S.Sign() != 0
 	if withSignature {
 		var V byte

@@ -105,7 +105,6 @@ func BatchElementFromBlock(block *l2types.Block) BatchElement {
 	// Only include sequencer txs in the returned BatchElement.
 	var cachedTx *CachedTx
 	if isSequencerTx {
-		// this RLP compresses the entire TX
 		cachedTx = NewCachedTx(tx)
 	}
 
