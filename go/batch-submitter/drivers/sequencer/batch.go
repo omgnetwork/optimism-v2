@@ -52,113 +52,52 @@ func BatchElementFromBlock(block *l2types.Block) BatchElement {
 
 	tx := txs[0]
 
-	// The transaction is here, including the L1Turing data and the rawTransaction
-	// We need to (1) add a header to the rawTransaction, and (2) if L1Turing in non-zero, 
-	// we need to graft that on to the rawTransaction
+	// if L1Turing in non-zero, we need to graft that on to the data AKA rawTransaction AKA payload
 
-	// start building the augmented rawTransaction
+	// start building the augmented transaction data
 	ret := make([]byte, 1)
+	ret[0] = 1 // set the Turing version (1)
 
 	// Turing length cannot exceed 256*256 bytes (based on limit in the Geth), so we need two bytes max for the length
 	turingLength := make([]byte, 2) 
 	
-	ret[0] = 1 // set the Turing version (1)
-
 	transactionMeta := tx.GetMeta()
+	l1Turing := transactionMeta.L1Turing
+	txData := tx.Data()
 
 	log.Debug("TURING transactionMeta", 
-		"tx", tx, 
-		"transactionMeta", transactionMeta, 
-		"turingLength", turingLength, 
-		"ret", ret)
-
-	l1Turing := transactionMeta.L1Turing
-	rawTransaction := transactionMeta.RawTransaction
-
-	// func (t *Transaction) SetTransactionMeta(meta *TransactionMeta) {
-	// 	if meta == nil {
-	// 		return
-	// 	}
-	// 	t.meta = *meta
-	// }
-
-	// func (t *Transaction) GetMeta() *TransactionMeta {
-	// 	if &t.meta == nil {
-	// 		return nil
-	// 	}
-	// 	return &t.meta
-	// }
+		"turing", l1Turing,
+		"txData", txData)
 
 	if(len(l1Turing) > 1) {
-		// build the modified rawTransaction
+		// build the modified txData
 		binary.BigEndian.PutUint16(turingLength, uint16(len(l1Turing)))
 		// add the Turing payload length
 		ret = append(ret, turingLength...)
-		// add the rawTransaction
-		ret = append(ret, rawTransaction...)
+		// add the txData
+		ret = append(ret, txData...)
 		// add the Turing data
 		ret = append(ret, l1Turing...)
 		log.Debug("TURING bobaTuringWrite:Modified parameters", 
-			"newValue", ret, "length1", 
-			turingLength, "length2", uint16(len(l1Turing)))
-		// and now, replace the original rawData
-		transactionMeta.RawTransaction = common.CopyBytes(ret)
-		tx.SetTransactionMeta(transactionMeta) // is this doing what we want?
-
+			"newValue", ret, 
+			"turingLength", turingLength)
+		// and now, replace the original txData
+		tx.SetData(common.CopyBytes(ret))
 	} else {
 		// add the Turing payload length - 0000 in this case
 		ret = append(ret, turingLength...)
-		// add the rawTransaction
-		ret = append(ret, rawTransaction...)
+		// add the txData
+		ret = append(ret, txData...)
 		log.Debug("TURING bobaTuringWrite:NonTuring parameters", 
 			"newValue", ret, 
-			"length", turingLength)
-		// and now, replace the original rawData
-		transactionMeta.RawTransaction = common.CopyBytes(ret)
-		tx.SetTransactionMeta(transactionMeta)
+			"turingLength", turingLength)
+		// and now, replace the original txData
+		tx.SetData(common.CopyBytes(ret))
 	}
 
-	// the metadata should be updated at this point??
-	log.Debug("TURING REVISED", "tx", tx)
+	// the data should be updated at this point
+	log.Debug("TURING REVISED", "tx", tx, "tx.data", tx.Data())
 
-/*
-	This seems to be doing precisely what we want it to:
-	batch_submitter_1            | {"lvl":"dbug","msg":
-	"TURING transactionMeta","ret":"[1]","t":"2022-02-24T18:45:15.550260444Z",
-	"transactionMeta":"\u0026{L1BlockNumber:+279 L1Timestamp:1645728314 
-	L1Turing:[73 61 87 214 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 12 210 215 239 5 236 227 223 66 244 170 73 27 166 147 68 20 113 18 22 165 123 17 73 184 92 27 79 208 207 74 252] 
-	L1MessageSender:\u003cnil\u003e QueueOrigin:sequencer Index:0xc000143170 QueueIndex:\u003cnil\u003e 
-	RawTransaction:[248 171 124 132 59 154 202 0 131 1 67 145 148 255 167 202 26 238 235 188 48 200 116 211 44 126 34 240 82 187 234 4 41 128 184 68 64 193 15 25 0 0 0 0 0 0 0 0 0 0 0 0 243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 42 130 244 247 160 118 145 54 6 217 53 23 212 40 66 129 129 62 116 87 234 250 12 97 253 80 93 153 75 188 196 8 223 187 222 9 119 160 109 128 209 244 223 69 179 220 241 220 94 241 180 25 135 107 58 191 127 2 75 218 72 60 241 11 201 24 179 5 29 184]}",
-	"turingLength":"[0 0]","tx":"\u0026{data:{AccountNonce:124 Price:0xc0003ee7a0 GasLimit:82833 Recipient:0xc0003bc420 Amount:0xc0003ee7c0 
-	Payload:[64 193 15 25 0 0 0 0 0 0 0 0 0 0 0 0 243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 42] V:0xc0003ee7e0 R:0xc0003ee800 S:0xc0003ee820 Hash:0xc00025c660} 
-	meta:{L1BlockNumber:0xc0003ee860 L1Timestamp:1645728314 
-	L1Turing:[73 61 87 214 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 12 210 215 239 5 236 227 223 66 244 170 73 27 166 147 68 20 113 18 22 165 123 17 73 184 92 27 79 208 207 74 252] 
-	L1MessageSender:\u003cnil\u003e QueueOrigin:0 Index:0xc000143170 QueueIndex:\u003cnil\u003e 
-	RawTransaction:[248 171 124 132 59 154 202 0 131 1 67 145 148 255 167 202 26 238 235 188 48 200 116 211 44 126 34 240 82 187 234 4 41 128 184 68 64 193 15 25 0 0 0 0 0 0 0 0 0 0 0 0 243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 42 130 244 247 160 118 145 54 6 217 53 23 212 40 66 129 129 62 116 87 234 250 12 97 253 80 93 153 75 188 196 8 223 187 222 9 119 160 109 128 209 244 223 69 179 220 241 220 94 241 180 25 135 107 58 191 127 2 75 218 72 60 241 11 201 24 179 5 29 184]} 
-	hash:{v:\u003cnil\u003e} size:{v:\u003cnil\u003e} from:{v:{signer:0xc0003d6a80 from:[243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102]}}}"}
-	batch_submitter_1            | {"length1":"[0 68]","length2":68,"lvl":"dbug","msg":"TURING bobaTuringWrite:Modified parameters",
-	"newValue":"[1 0 68 248 171 124 132 59 154 202 0 131 1 67 145 148 255 167 202 26 238 235 188 48 200 116 211 44 126 34 240 82 187 234 4 41 128 184 68 64 193 15 25 0 0 0 0 0 0 0 0 0 0 0 0 243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 42 130 244 247 160 118 145 54 6 217 53 23 212 40 66 129 129 62 116 87 234 250 12 97 253 80 93 153 75 188 196 8 223 187 222 9 119 160 109 128 209 244 223 69 179 220 241 220 94 241 180 25 135 107 58 191 127 2 75 218 72 60 241 11 201 24 179 5 29 184 73 61 87 214 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 12 210 215 239 5 236 227 223 66 244 170 73 27 166 147 68 20 113 18 22 165 123 17 73 184 92 27 79 208 207 74 252]",
-	"t":"2022-02-24T18:45:15.550337495Z"}
-	batch_submitter_1            | {"lvl":"dbug","msg":"TURING REVISED","t":"2022-02-24T18:45:15.550357189Z","tx":"\u0026{data:{AccountNonce:124 Price:0xc0003ee7a0 GasLimit:82833 Recipient:0xc0003bc420 Amount:0xc0003ee7c0 
-	Payload:[64 193 15 25 0 0 0 0 0 0 0 0 0 0 0 0 243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 42] 
-	V:0xc0003ee7e0 R:0xc0003ee800 S:0xc0003ee820 Hash:0xc00025c660} 
-	meta:{L1BlockNumber:0xc0003ee860 L1Timestamp:1645728314 
-	L1Turing:[73 61 87 214 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 12 210 215 239 5 236 227 223 66 244 170 73 27 166 147 68 20 113 18 22 165 123 17 73 184 92 27 79 208 207 74 252] 
-	L1MessageSender:\u003cnil\u003e QueueOrigin:0 Index:0xc000143170 QueueIndex:\u003cnil\u003e 
-	RawTransaction:[1 0 68 248 171 124 132 59 154 202 0 131 1 67 145 148 255 167 202 26 238 235 188 48 200 116 211 44 126 34 240 82 187 234 4 41 128 184 68 64 193 15 25 0 0 0 0 0 0 0 0 0 0 0 0 243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 42 130 244 247 160 118 145 54 6 217 53 23 212 40 66 129 129 62 116 87 234 250 12 97 253 80 93 153 75 188 196 8 223 187 222 9 119 160 109 128 209 244 223 69 179 220 241 220 94 241 180 25 135 107 58 191 127 2 75 218 72 60 241 11 201 24 179 5 29 184 73 61 87 214 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 12 210 215 239 5 236 227 223 66 244 170 73 27 166 147 68 20 113 18 22 165 123 17 73 184 92 27 79 208 207 74 252]} 
-	hash:{v:\u003cnil\u003e} size:{v:\u003cnil\u003e} from:{v:{signer:0xc0003d6a80 from:[243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102]}}}"}
-	batch_submitter_1            | {"length":23551,"lvl":"info","msg":"Sequencer batch constructed","num_txs":16,"t":"2022-02-24T18:45:15.550416748Z"}
-
-
-Original rawTransaction: RawTransaction:[248 171 124 132 59 154 202 0 131 1 67 145 148 255 167 202 26 238 235 188 48 200 116 211 44 126 34 240 82 187 234 4 41 128 184 68 64 193 15 25 0 0 0 0 0 0 0 0 0 0 0 0 243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 42 130 244 247 160 118 145 54 6 217 53 23 212 40 66 129 129 62 116 87 234 250 12 97 253 80 93 153 75 188 196 8 223 187 222 9 119 160 109 128 209 244 223 69 179 220 241 220 94 241 180 25 135 107 58 191 127 2 75 218 72 60 241 11 201 24 179 5 29 184]}
-L1Turing               : L1Turing:[73 61 87 214 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 12 210 215 239 5 236 227 223 66 244 170 73 27 166 147 68 20 113 18 22 165 123 17 73 184 92 27 79 208 207 74 252]
-modified rawTransaction: [
-turing version: 1 
-turing length: 0 68 
-rawTransaction: 248 171 124 132 59 154 202 0 131 1 67 145 148 255 167 202 26 238 235 188 48 200 116 211 44 126 34 240 82 187 234 4 41 128 184 68 64 193 15 25 0 0 0 0 0 0 0 0 0 0 0 0 243 159 214 229 26 173 136 246 244 206 106 184 130 114 121 207 255 185 34 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 42 130 244 247 160 118 145 54 6 217 53 23 212 40 66 129 129 62 116 87 234 250 12 97 253 80 93 153 75 188 196 8 223 187 222 9 119 160 109 128 209 244 223 69 179 220 241 220 94 241 180 25 135 107 58 191 127 2 75 218 72 60 241 11 201 24 179 5 29 184 
-turing data appended: 73 61 87 214 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 12 210 215 239 5 236 227 223 66 244 170 73 27 166 147 68 20 113 18 22 165 123 17 73 184 92 27 79 208 207 74 252]}
-
-*/
 	// Extract L2 metadata.
 	l1BlockNumber := tx.L1BlockNumber().Uint64()
 	isSequencerTx := tx.QueueOrigin() == l2types.QueueOriginSequencer

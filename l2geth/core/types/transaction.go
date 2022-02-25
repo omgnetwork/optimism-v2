@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
 	"github.com/ethereum-optimism/optimism/l2geth/crypto"
+	"github.com/ethereum-optimism/optimism/l2geth/log"
 	"github.com/ethereum-optimism/optimism/l2geth/rlp"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 )
@@ -157,6 +158,13 @@ func (t *Transaction) SetL1Turing(turing []byte) {
 	t.meta.L1Turing = common.CopyBytes(turing)
 }
 
+func (t *Transaction) SetData(data []byte) {
+	if &t.data == nil {
+		return
+	}
+	t.data.Payload = common.CopyBytes(data)
+}
+
 // ChainId returns which chain id this transaction was signed for (if at all)
 func (tx *Transaction) ChainId() *big.Int {
 	return deriveChainId(tx.data.V)
@@ -203,6 +211,8 @@ func (tx *Transaction) UnmarshalJSON(input []byte) error {
 	if err != nil {
 		return err
 	}
+
+	log.Debug("turing transaction.go UnmarshalJSON", "input", input, "tx.Data()", tx.Data())
 
 	withSignature := tx.data.V.Sign() != 0 || tx.data.R.Sign() != 0 || tx.data.S.Sign() != 0
 	if withSignature {
@@ -286,7 +296,7 @@ func (tx *Transaction) Hash() common.Hash {
 }
 
 // Size returns the true RLP encoded storage size of the transaction, either by
-// encoding and returning it, or returning a previsouly cached value.
+// encoding and returning it, or returning a previously cached value.
 func (tx *Transaction) Size() common.StorageSize {
 	if size := tx.size.Load(); size != nil {
 		return size.(common.StorageSize)
@@ -500,7 +510,7 @@ type Message struct {
 
 	l1Timestamp   uint64
 	l1BlockNumber *big.Int
-	// l1Turing is needed for data flow into the EWVM: transaction.meta->msg->evm.context
+	// l1Turing is needed for data flow into the EVM: transaction.meta->msg->evm.context
 	l1Turing    []byte
 	queueOrigin QueueOrigin
 }
