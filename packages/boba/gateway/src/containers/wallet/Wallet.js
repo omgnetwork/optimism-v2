@@ -9,7 +9,6 @@ import { selectAccountEnabled, selectLayer } from "selectors/setupSelector"
 import Token from "./token/Token"
 import * as S from './wallet.styles'
 
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import WalletPicker from 'components/walletpicker/WalletPicker'
 import PageTitle from 'components/pageTitle/PageTitle'
 import AlertIcon from 'components/icons/AlertIcon'

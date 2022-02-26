@@ -1,7 +1,5 @@
-import { Box, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Typography, useTheme } from '@mui/material'
 import { fetchLookUpPrice } from 'actions/networkAction'
-import AlertIcon from 'components/icons/AlertIcon'
-import WalletPicker from 'components/walletpicker/WalletPicker'
 import { isEqual } from 'lodash'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -22,7 +20,6 @@ function TokenPage({
 
   const dispatch = useDispatch()
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const accountEnabled = useSelector(selectAccountEnabled())
   const tokenList = useSelector(selectTokens)
