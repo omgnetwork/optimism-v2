@@ -100,7 +100,7 @@ function History() {
               variant="body2"
               component="p"
             >
-              To see your history, connect to MetaMask
+              Connect to MetaMask to see your history
             </S.AlertText>
           </S.AlertInfo>
           <WalletPicker />

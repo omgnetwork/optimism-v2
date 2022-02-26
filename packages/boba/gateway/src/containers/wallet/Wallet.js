@@ -56,51 +56,51 @@ function Wallet() {
                 variant="body2"
                 component="p"
               >
-                Connect your wallet to see your balances, transfer, and bridge
+                Connect to MetaMask to see your balances, transfer, and bridge
               </S.AlertText>
             </S.AlertInfo>
             <WalletPicker />
           </S.LayerAlert>
         }
 
-      <S.PageSwitcher>
-        <Typography
-          className={chain === 'Ethereum Wallet' ? 'active' : ''}
-          onClick={() => {
-            if (!!accountEnabled) {
-              dispatch(switchChain('L1'))
-            }
-          }}
-          variant="body2"
-          component="span">
-          Ethereum Wallet
-        </Typography>
-        <Typography
-          className={chain === 'Boba Wallet' ? 'active' : ''}
-          onClick={() => {
-            if (!!accountEnabled) {
-              dispatch(switchChain('L2'))
-            }
-          }}
-          variant="body2"
-          component="span">
-          Boba Wallet
-        </Typography>
-      </S.PageSwitcher>
-      {
-        !accountEnabled ?
-          <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
-          : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
-      }
-      <Box sx={{ mt: 2 }}>
-        <Tabs
-          activeTab={page}
-          onClick={(t) => handleSwitch(t)}
-          aria-label="Page Tab"
-          tabs={[ "Token", "NFT" ]}
-        />
-      </Box>
-      {page === 'Token' ? <Token /> : <Nft />}
+        <S.PageSwitcher>
+          <Typography
+            className={chain === 'Ethereum Wallet' ? 'active' : ''}
+            onClick={() => {
+              if (!!accountEnabled) {
+                dispatch(switchChain('L1'))
+              }
+            }}
+            variant="body2"
+            component="span">
+            Ethereum Wallet
+          </Typography>
+          <Typography
+            className={chain === 'Boba Wallet' ? 'active' : ''}
+            onClick={() => {
+              if (!!accountEnabled) {
+                dispatch(switchChain('L2'))
+              }
+            }}
+            variant="body2"
+            component="span">
+            Boba Wallet
+          </Typography>
+        </S.PageSwitcher>
+        {
+          !accountEnabled ?
+            <Typography variant="body2" sx={{ color: '#FF6A55' }}><Circle sx={{ height: "10px", width: "10px" }} /> Disconnected</Typography>
+            : <Typography variant="body2" sx={{ color: '#BAE21A' }}><Circle sx={{ height: "10px", width: "10px" }} /> Connected</Typography>
+        }
+        <Box sx={{ mt: 2 }}>
+          <Tabs
+            activeTab={page}
+            onClick={(t) => handleSwitch(t)}
+            aria-label="Page Tab"
+            tabs={[ "Token", "NFT" ]}
+          />
+        </Box>
+        {page === 'Token' ? <Token /> : <Nft />}
     </S.PageContainer>
   )
 }

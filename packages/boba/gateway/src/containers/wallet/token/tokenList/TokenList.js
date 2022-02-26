@@ -10,20 +10,35 @@ import { amountToUsd, logAmount } from 'util/amountConvert';
 import { getCoinImage } from 'util/coinImage';
 import * as S from './TokenList.styles';
 
-const marks = [
-  {
-    value: 30,
-    label: '500M',
-  },
-  {
-    value: 50,
-    label: '650M',
-  },
-  {
-    value: 70,
-    label: '800M',
-  },
-];
+  const marks_v0 = [
+    {
+      value: 30,
+      label: '500M',
+    },
+    {
+      value: 50,
+      label: '650M',
+    },
+    {
+      value: 70,
+      label: '800M',
+    },
+  ]
+
+  const marks_v1 = [
+    {
+      value: 30,
+      label: '162M',
+    },
+    {
+      value: 50,
+      label: '222M',
+    },
+    {
+      value: 70,
+      label: '283M',
+    },
+  ];
 
 
 function TokenList({
@@ -33,9 +48,9 @@ function TokenList({
   disabled,
   loading
 }) {
-  const [ dropDownBox, setDropDownBox ] = useState(false);
-  const [ sliderValue, setSliderValue ] = useState(55);
-
+  const [ dropDownBox, setDropDownBox ] = useState(false)
+  const [ sliderValue_v0, setSliderValue_v0 ] = useState(55)
+  const [ sliderValue_v1, setSliderValue_v1 ] = useState(55)
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -48,21 +63,30 @@ function TokenList({
     Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
     Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
+  const WAGMI_v0 = 1 + (sliderValue_v0 / 100)
+  const TVL_v0 = Number(300 + (sliderValue_v0 / 100) * 700)
 
-  const WAGMI_v0 = 1 + (sliderValue / 100)
-  const TVL = Number(300 + (sliderValue / 100) * 700)
-
+  const WAGMI_v1 = 1 + (sliderValue_v1 / 10)
+  const TVL_v1 = Number(70 + (sliderValue_v1 / 100) * 305)
 
   const handleModalClick = (modalName, token, fast) => {
     dispatch(openModal(modalName, token, fast))
   }
 
-  const handleSliderChange = (e) => {
-    setSliderValue(e.target.value)
+  const handleSliderChange_v0 = (e) => {
+    setSliderValue_v0(e.target.value)
   }
 
-  const settleV0 = () => {
+  const handleSliderChange_v1 = (e) => {
+    setSliderValue_v1(e.target.value)
+  }
+
+  const settle_v0 = () => {
     dispatch(settle_v0())
+  }
+
+  const settle_v1 = () => {
+    dispatch(settle_v1())
   }
 
   if (isMobile) {
@@ -140,7 +164,7 @@ function TokenList({
                 </>
               }
 
-              {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'WAGMIv0' &&
+              {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
                 <>
                   <Button
                     onClick={() => { this.handleModalClick('exitModal', token, false) }}
@@ -206,22 +230,54 @@ function TokenList({
                   gap: '10px',
                 }}>
                   <Typography variant="body3" component="p" >
-                    At a TVL of {TVL}M each WAGMI will settle for {WAGMI_v0} BOBA
+                    At a TVL of {TVL_v0}M each WAGMIv0 will settle for {WAGMI_v0} BOBA
                   </Typography>
                   <Slider
                     min={0}
                     max={100}
-                    value={sliderValue}
-                    onChange={handleSliderChange}
+                    value={sliderValue_v0}
+                    onChange={handleSliderChange_v0}
                     aria-label="WAGMIv0"
                     step={10}
-                    marks={marks}
+                    marks={marks_v0}
                   />
                   <Button
-                    onClick={() => { settleV0() }}
+                    onClick={() => { settle_v0() }}
                     variant="contained"
                     disabled={true}
                     tooltip="Settle your WAGMv0 long options."
+                    fullWidth
+                  >
+                    Settle
+                  </Button>
+                </div>
+              }
+
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv1' &&
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-end',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  <Typography variant="body3" component="p" >
+                    At a TVL of {TVL_v1}M each WAGMIv1 will settle for {WAGMI_v1} BOBA
+                  </Typography>
+                  <Slider
+                    min={0}
+                    max={100}
+                    value={sliderValue_v1}
+                    onChange={handleSliderChange_v1}
+                    aria-label="WAGMIv1"
+                    step={10}
+                    marks={marks_v1}
+                  />
+                  <Button
+                    onClick={() => { settle_v1() }}
+                    variant="contained"
+                    disabled={true}
+                    tooltip="Settle your WAGMv1 long options."
                     fullWidth
                   >
                     Settle
@@ -293,7 +349,7 @@ function TokenList({
               </Button>
             </>
           }
-          {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'WAGMIv0' &&
+          {enabled && chain === 'L2' && token.symbol !== 'OLO' && token.symbol !== 'WAGMIv0' && token.symbol !== 'WAGMIv1' &&
             <>
               <Button
                 onClick={() => { handleModalClick('exitModal', token, false) }}
@@ -332,22 +388,53 @@ function TokenList({
               gap: '10px',
             }}>
               <Typography variant="body3" component="p" >
-                At a TVL of {TVL}M each WAGMI will settle for {WAGMI_v0} BOBA
+                At a TVL of {TVL_v0}M each WAGMI will settle for {WAGMI_v0} BOBA
               </Typography>
               <Slider
                 min={0}
                 max={100}
-                value={sliderValue}
-                onChange={handleSliderChange}
+                value={sliderValue_v0}
+                onChange={handleSliderChange_v0}
                 aria-label="WAGMIv0"
                 step={10}
-                marks={marks}
+                marks={marks_v0}
               />
               <Button
-                onClick={() => { settleV0() }}
+                onClick={() => { settle_v0() }}
                 variant="contained"
                 disabled={true}
-                tooltip="Settle your WAGMv0 long options."
+                tooltip="Settle your WAGMv0 long options"
+                fullWidth
+              >
+                Settle
+              </Button>
+            </div>
+          }
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv1' &&
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              flexDirection: 'column',
+              gap: '10px',
+            }}>
+              <Typography variant="body3" component="p" >
+                At a TVL of {TVL_v1}M each WAGMI will settle for {WAGMI_v1} BOBA
+              </Typography>
+              <Slider
+                min={0}
+                max={100}
+                value={sliderValue_v1}
+                onChange={handleSliderChange_v1}
+                aria-label="WAGMIv1"
+                step={10}
+                marks={marks_v1}
+              />
+              <Button
+                onClick={() => { settle_v1() }}
+                variant="contained"
+                disabled={true}
+                tooltip="Settle your WAGMv1 long options"
                 fullWidth
               >
                 Settle
