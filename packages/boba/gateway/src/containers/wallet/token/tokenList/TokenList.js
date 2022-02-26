@@ -1,14 +1,14 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Fade, Link, Slider, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { settle_v0 } from 'actions/networkAction';
-import { openModal } from 'actions/uiAction';
-import Button from 'components/button/Button';
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectLookupPrice } from 'selectors/lookupSelector';
-import { amountToUsd, logAmount } from 'util/amountConvert';
-import { getCoinImage } from 'util/coinImage';
-import * as S from './TokenList.styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { Box, Fade, Link, Slider, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { settle_v0, settle_v1 } from 'actions/networkAction'
+import { openModal } from 'actions/uiAction'
+import Button from 'components/button/Button'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectLookupPrice } from 'selectors/lookupSelector'
+import { amountToUsd, logAmount } from 'util/amountConvert'
+import { getCoinImage } from 'util/coinImage'
+import * as S from './TokenList.styles'
 
   const marks_v0 = [
     {
@@ -447,4 +447,4 @@ function TokenList({
   )
 }
 
-export default React.memo(TokenList);
+export default React.memo(TokenList)
