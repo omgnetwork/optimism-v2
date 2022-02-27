@@ -14,9 +14,7 @@ import TokenList from './tokenList/TokenList'
 import lightLoader from 'images/boba2/loading_light.gif'
 import darkLoader from 'images/boba2/loading_dark.gif'
 
-function TokenPage({
-  isEmpty = false
-}) {
+function TokenPage({}) {
 
   const dispatch = useDispatch()
   const theme = useTheme()
@@ -55,7 +53,7 @@ function TokenPage({
     getLookupPrice()
   }, [ getLookupPrice, accountEnabled ])
 
-  if (isEmpty) {
+  if (!accountEnabled) {
 
     return (
       <S.TokenPageContainer>
