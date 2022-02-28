@@ -418,7 +418,7 @@ func TestApplyBatchedTransaction(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Create a transactoin with the index of 0
+	// Create a transaction with the index of 0
 	tx0 := setMockTxIndex(mockTx(), 0)
 
 	// Ingest through applyBatchedTransaction which should set the latest
@@ -739,6 +739,76 @@ func TestFeeGasPriceOracleOwnerTransactions(t *testing.T) {
 	} else {
 		t.Fatal("err is nil")
 	}
+}
+
+// run this test via command line like this:
+// go test -v -run TestSyncServiceTuringVerify ./...
+
+func TestSyncServiceTuringVerify(t *testing.T) {
+
+	service, txCh, sub, err := newTestSyncService(true, nil) // Pass true to set as a verifier
+	defer sub.Unsubscribe()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("TestSyncServiceTuringVerify")
+	// this is a mock turing transaction coming from the L1
+	timestamp := uint64(24)
+	target := common.HexToAddress("0x04668ec2f57cc15c381b461b9fedab5d451c8f7f")
+	l1TxOrigin := common.HexToAddress("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8")
+	gasLimit := uint64(66)
+	l1BlockNumber := big.NewInt(100)
+	queueIndex := uint64(0)
+	index := uint64(0)
+
+	//data := []byte{0x02, 0x92}
+	data := []byte{73, 61, 87, 214, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+	turingRev := []byte{73, 61, 87, 214, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 
+	232, 160, 159, 36, 55, 255, 93, 65, 116, 7, 15, 208, 83, 95, 62, 82, 110, 40, 48, 107, 66, 79, 197, 103, 3, 176, 117, 62, 134, 195, 24, 99}
+
+	tx := types.NewTransaction(0, target, big.NewInt(0), gasLimit, big.NewInt(0), data)
+
+	txMeta := types.NewTransactionMeta(
+		l1BlockNumber,
+		timestamp,
+		turingRev, // set to mock turing payload rather than []byte{0}
+		&l1TxOrigin,
+		types.QueueOriginL1ToL2,
+		&index,
+		&queueIndex,
+		nil,
+	)
+	tx.SetTransactionMeta(txMeta)
+
+	fmt.Printf("Generated mock Turing Transaction from L1 %+v\n", tx)
+
+	go func() {
+		err = service.applyTransactionToTip(tx)
+	}()
+	event := <-txCh
+	if err != nil {
+		t.Fatal("Apply transaction failed", err)
+	}
+
+	conf := event.Txs[0]
+	fmt.Printf("Generated Turing event %+v\n", conf)
+
+	// The index should be set to the next
+	if conf.GetMeta().Index == nil {
+		t.Fatal("Index is nil")
+	}
+	// The index that the sync service is tracking should be updated
+	if *conf.GetMeta().Index != *service.GetLatestIndex() {
+		t.Fatal("index on the service was not updated")
+	}
+	// The tx timestamp should be setting the services timestamp
+	if conf.L1Timestamp() != service.GetLatestL1Timestamp() {
+		t.Fatal("Mismatched timestamp")
+	}
+
 }
 
 // Pass true to set as a verifier
@@ -1117,7 +1187,7 @@ func mockTx() *types.Transaction {
 	meta := types.NewTransactionMeta(
 		l1BlockNumber,
 		timestamp,
-		[]byte{0},
+		[]byte{0}, // Turing set to zero here
 		&l1TxOrigin,
 		types.QueueOriginSequencer,
 		nil,
