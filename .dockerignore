@@ -1,5 +1,6 @@
 .git
 .github
+.env
 
 node_modules
 

@@ -148,12 +148,17 @@ class BlockMonitorService extends OptimismEnv {
 
       const receipts = {}
       for (const receipt of receiptsData) {
-        receipts[receipt.transactionHash] = receipt
+        if (receipt && receipt.transactionHash) {
+          receipts[receipt.transactionHash] = receipt
+        }
       }
 
       // write the block data into MySQL
       this.logger.info('Writing the block data...')
       for (const blockData of blocksData) {
+        if (!blockData) {
+          continue
+        }
         await this.databaseService.insertBlockData(blockData)
         // write the transaction data into MySQL
         if (blockData.transactions.length) {
@@ -236,7 +241,7 @@ class BlockMonitorService extends OptimismEnv {
         }
       }
       promiseCount = 0
-    // } else {
+      // } else {
       // this.logger.info('No waiting cross domain message found.')
     }
 
@@ -263,7 +268,7 @@ class BlockMonitorService extends OptimismEnv {
     }
     const blocksData = await Promise.all(promisesBlock)
     for (const blockData of blocksData) {
-      if (blockData.transactions.length) {
+      if (blockData && blockData.transactions.length) {
         blockData.transactions.forEach((i) => {
           promisesReceipt.push(this.L2Provider.getTransactionReceipt(i.hash))
         })
