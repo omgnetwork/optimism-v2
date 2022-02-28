@@ -38,7 +38,7 @@ const PageHeader = () => {
         isMobile ? (
           <Container>
             <S.HeaderWrapper>
-              <BobaLogo style={{ maxWidth: '160px' }} />
+              <BobaLogo style={{ maxWidth: '100px' }} />
               <S.HeaderActionButton>
                 <Box onClick={() => setWalletOpen(!walletOpen)} sx={{ cursor: 'pointer' }}>
                   <WalletIcon />
@@ -77,7 +77,7 @@ const PageHeader = () => {
             </S.HeaderWrapper>
           </Container>
         ) : (<S.HeaderWrapper>
-          <BobaLogo style={{ maxWidth: '140px' }} />
+          <BobaLogo style={{ maxWidth: '140px', paddingTop: '20px' }} />
           <MenuItems setOpen={setOpen} />
           <LayerSwitcher />
           {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}
