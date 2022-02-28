@@ -41,6 +41,22 @@ const PageFooter = () => {
               dispatch(setPage('BobaScope'))
             }}
           >System Analytics</S.FooterLink>
+          <S.FooterLink
+            onClick={() => {
+              console.log('link to explorer')
+            }}
+          >Explorer</S.FooterLink>
+          <S.FooterLink
+            onClick={() => {
+              console.log('link to explorer')
+            }}
+          >Test (Rinkeby)</S.FooterLink>
+          <S.FooterLink
+            href="https://docs.boba.network"
+            component="a"
+            target="_blank"
+            sx={{ whiteSpace: 'nowrap'}}
+          >Boba Docs</S.FooterLink>
         </S.LinkWrapper>
         <S.FooterDivierMobile />
         <S.SocialWrapper>
@@ -53,6 +69,12 @@ const PageFooter = () => {
           <IconButton href="https://boba.eco/telegram" target='_blank' aria-label="telegram">
             <Telegram sx={{opacity: 0.65}} />
           </IconButton>
+          <S.FooterLink
+            href="https://boba.network"
+            component="a"
+            target="_blank"
+            sx={{ whiteSpace: 'nowrap'}}
+          >Boba Websites</S.FooterLink>
         </S.SocialWrapper>
       </S.FooterLinkWrapper>
     </S.Wrapper>

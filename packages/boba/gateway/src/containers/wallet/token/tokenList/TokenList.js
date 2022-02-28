@@ -154,7 +154,7 @@ function TokenList({
 
                   <Button
                     onClick={() => { this.handleModalClick('exitModal', token, true) }}
-                    variant="contained"
+                    variant="outlined"
                     disabled={disabled}
                     tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
                     fullWidth
@@ -165,6 +165,7 @@ function TokenList({
                   <Button
                     onClick={() => { this.handleModalClick('transferModal', token, false) }}
                     variant="contained"
+                    color="primary"
                     disabled={disabled}
                     tooltip="Transfer funds from one L2 account to another L2 account."
                     fullWidth
@@ -188,6 +189,7 @@ function TokenList({
                   <Button
                     onClick={() => { this.handleModalClick('transferModal', token, false) }}
                     variant="contained"
+                    color="primary"
                     disabled={disabled}
                     tooltip="Transfer funds from one L2 account to another L2 account."
                     fullWidth
@@ -220,6 +222,7 @@ function TokenList({
                   <Button
                     onClick={() => { settleV0() }}
                     variant="contained"
+                    color="primary"
                     disabled={true}
                     tooltip="Settle your WAGMv0 long options."
                     fullWidth
@@ -316,7 +319,8 @@ function TokenList({
               </Button>
               <Button
                 onClick={() => { handleModalClick('transferModal', token, false) }}
-                variant="outlined"
+                variant="contained"
+                color="primary"
                 disabled={disabled}
                 tooltip="Transfer funds from one L2 account to another L2 account."
                 fullWidth
@@ -346,6 +350,7 @@ function TokenList({
               <Button
                 onClick={() => { settleV0() }}
                 variant="contained"
+                color="primary"
                 disabled={true}
                 tooltip="Settle your WAGMv0 long options."
                 fullWidth

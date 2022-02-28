@@ -15,11 +15,11 @@ export const NFTPageContainer = styled(Box)(({ theme }) => ({
   //   width: '90%',
   //   padding: '0px',
   // },
-  // [theme.breakpoints.down('sm')]: {
-  //   width: '100%',
-  //   padding: '0px',
-  //   flexDirection: 'column',
-  // },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: '0px',
+    flexDirection: 'column',
+  },
 }));
 
 export const NFTActionContent = styled(Box)(({ theme }) => ({

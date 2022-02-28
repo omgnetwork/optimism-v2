@@ -191,14 +191,20 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
   return (
     <S.LayerSwitcherWrapper>
       <IconButton
-        sx={{ gap: '5px' }}
+        sx={{ 
+          gap: '5px',
+          opacity: !layer || layer === 'L2' ? '0.5' :'1'
+      }}
         onClick={() => { dispatchSwitchLayer('L1') }}
         aria-label="eth"
       >
         <EthereumIcon />
       </IconButton>
       <IconButton
-        sx={{ gap: '5px' }}
+        sx={{ 
+          gap: '5px',
+          opacity: !layer || layer === 'L1' ? '0.5' :'1'
+      }}
         onClick={() => { dispatchSwitchLayer('L2') }}
         aria-label="boba"
       >
