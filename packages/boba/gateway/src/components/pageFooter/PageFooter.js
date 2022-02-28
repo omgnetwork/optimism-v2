@@ -42,15 +42,11 @@ const PageFooter = () => {
             }}
           >System Analytics</S.FooterLink>
           <S.FooterLink
-            onClick={() => {
-              console.log('link to explorer')
-            }}
-          >Explorer</S.FooterLink>
-          <S.FooterLink
-            onClick={() => {
-              console.log('link to explorer')
-            }}
-          >Test (Rinkeby)</S.FooterLink>
+            href="https://blockexplorer.boba.network"
+            component="a"
+            target="_blank"
+            sx={{ whiteSpace: 'nowrap'}}
+          >Blockexplorer</S.FooterLink>
           <S.FooterLink
             href="https://docs.boba.network"
             component="a"
