@@ -299,7 +299,17 @@ const turingParse = (decodedTxData: string): [string, string] => {
     dataLength: dataHexString.length,
   })
 
-  if (
+  if ( dataHexString.slice(0, 4) === '0000' ) {
+    // turing legacy format - 0000f8 for example
+    // The .slice(4) chops off the v0 turing length header field
+    dataHexString = dataHexString.slice(4)
+    console.log('Found a legacy non-Turing TX:', {
+      turingLength,
+      turing: '0x', // this will be '0x'
+      restoredData: dataHexString,
+    })
+    return [add0x(dataHexString), '0x']
+  } else if (
     turingVersion === 1 &&
     turingLength > 0 && // yes we have a Turing payload
     turingLength < dataHexString.length // and the length is not corrupted and will not overrun the string length
