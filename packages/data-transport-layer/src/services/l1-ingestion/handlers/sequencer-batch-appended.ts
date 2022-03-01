@@ -260,7 +260,7 @@ const decodeSequencerBatchTransaction = (
   let restoredData = ''
   let turing = ''
 
-  ;[restoredData, turing] = turingParse(decodedTx.data, blockNumber)
+  ;[restoredData, turing] = turingParse(decodedTx.data, blockNumber, l2ChainId)
   console.log('Decoded TX', { restoredData, turing })
 
   return {
@@ -281,7 +281,8 @@ const decodeSequencerBatchTransaction = (
 
 const turingParse = (
   decodedTxData: string,
-  L1blockNumber: number
+  L1blockNumber: number,
+  l2ChainId: number
 ): [string, string] => {
   // This MIGHT have a Turing payload inside of it...
   let dataHexString = remove0x(decodedTxData)
@@ -289,17 +290,18 @@ const turingParse = (
   let turingHexString = ''
   console.log('TuringParse: Decoded TX', { dataHexString, L1blockNumber })
 
-  // Rinkeby
-  //const format0 = 10048692 // L1 block
-  //const format1 = 10249940 // ????????? just a placeholder
-
-  // Mainnet
-  //const format0 = ???????? // L1 block
-  //const format1 = ???????? // ????????? just a placeholder
-
   // Local
-  const format0 = 0
-  const format1 = 0
+  let format0 = 0
+  let format1 = 0
+
+  if (l2ChainId === 28) {
+    // Rinkeby
+    format0 = 10048692 // L1 block
+    format1 = 10249940 // ????????? just a placeholder
+  } else if (l2ChainId === 288) {
+    format0 = 14298926 // L1 block - ????????? just a placeholder - wild guess
+    format1 = format0
+  }
 
   // ****************************************
   // pre turing era
