@@ -103,7 +103,8 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
 
         const decoded = decodeSequencerBatchTransaction(
           sequencerTransaction,
-          l2ChainId
+          l2ChainId,
+          context.blockNumber
         )
 
         transactionEntries.push({
@@ -250,7 +251,8 @@ const parseSequencerBatchTransaction = (
 
 const decodeSequencerBatchTransaction = (
   transaction: Buffer,
-  l2ChainId: number
+  l2ChainId: number,
+  blockNumber: number,
 ): DecodedSequencerBatchTransaction => {
   const decodedTx = ethers.utils.parseTransaction(transaction)
   console.log('Decoding TX', { transaction, decodedTx })
@@ -258,7 +260,7 @@ const decodeSequencerBatchTransaction = (
   let restoredData = ''
   let turing = ''
 
-  ;[restoredData, turing] = turingParse(decodedTx.data)
+  ;[restoredData, turing] = turingParse(decodedTx.data, blockNumber)
   console.log('Decoded TX', { restoredData, turing })
 
   return {
@@ -277,55 +279,86 @@ const decodeSequencerBatchTransaction = (
   }
 }
 
-const turingParse = (decodedTxData: string): [string, string] => {
+const turingParse = (decodedTxData: string, L1blockNumber: number): [string, string] => {
+
   // This MIGHT have a Turing payload inside of it...
   let dataHexString = remove0x(decodedTxData)
 
   let turingHexString = ''
-  console.log('TuringParse: Decoded TX', { dataHexString })
+  console.log('TuringParse: Decoded TX', { dataHexString, L1blockNumber })
 
-  // First, parse the version and length field...
-  // TuringVersion not used right now; for future use and for supporting legacy packets
-  const turingVersion = parseInt(dataHexString.slice(0, 2), 16)
+  // Rinkeby
+  //const format0 = 10048692 // L1 block
+  //const format1 = 10249940 // ????????? just a placeholder
 
-  const turingLength = parseInt(dataHexString.slice(2, 6), 16) * 2 // * 2 because we are operating on the hex string
+  // Mainnet
+  //const format0 = ???????? // L1 block
+  //const format1 = ???????? // ????????? just a placeholder
 
-  // methodID for GetResponse is 7d93616c -> [125 147 97 108]
-  // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
+  // Local
+  const format0 = 0
+  const format1 = 0
 
-  console.log('Turing:', {
-    turingVersion,
-    turingLength,
-    dataLength: dataHexString.length,
-  })
-
-  if ( dataHexString.slice(0, 4) === '0000' ) {
-    // turing legacy format - 0000f8 for example
-    // The .slice(4) chops off the v0 turing length header field
-    dataHexString = dataHexString.slice(4)
-    console.log('Found a legacy non-Turing TX:', {
-      turingLength,
-      turing: '0x', // this will be '0x'
+  // ****************************************
+  // pre turing era
+  // do nothing
+  if( L1blockNumber < format0 ) {
+    console.log('Found a LEGACY TX:', {
+      turing: '0x',
       restoredData: dataHexString,
     })
     return [add0x(dataHexString), '0x']
-  } else if (
-    turingVersion === 1 &&
-    turingLength > 0 && // yes we have a Turing payload
-    turingLength < dataHexString.length // and the length is not corrupted and will not overrun the string length
-  ) {
+  }
+
+  let turingLength = 0
+  let headerLength = 0
+  let turingVersion = 0
+
+  if ( L1blockNumber >= format0 && L1blockNumber < format1 ) {
+    // ****************************************
+    // v0 header
+    // first-generation turing format - for example, 0x0000f8
+    turingVersion = 0
+    turingLength = parseInt(dataHexString.slice(0, 4), 16) * 2
+    headerLength = 4
+  } else if ( L1blockNumber >= format1 ) {
+    // ****************************************
+    // v1 header
+    // Second-generation turing format - for example, 0x010000f8
+    // First, parse the version and length field...
+    // TuringVersion not used right now; for future use and for supporting legacy packets
+    turingVersion = parseInt(dataHexString.slice(0, 2), 16)
+    turingLength = parseInt(dataHexString.slice(2, 6), 16) * 2 // * 2 because we are operating on the hex string
+    headerLength = 6
+  }
+
+  if(turingLength === 0) {
+    // The .slice(headerLength) chops off the turing header
+    dataHexString = dataHexString.slice(headerLength)
+    console.log('Found a non-Turing TX:', {
+      turingVersion,
+      turingLength,
+      turing: '0x',
+      restoredData: dataHexString,
+    })
+    return [add0x(dataHexString), '0x']
+  } 
+  else if (turingLength > 0 && turingLength < dataHexString.length) {
     const turingCandidate = dataHexString.slice(-turingLength)
     console.log('turingCandidate', { turingCandidate })
 
     const turingCall = turingCandidate.slice(0, 8).toLowerCase()
     console.log('turingCall', { turingCall })
 
+    // methodID for GetResponse is 7d93616c -> [125 147 97 108]
+    // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
     if (turingCall === '7d93616c' || turingCall === '493d57d6') {
       // we are all set! we have a Turing v1 payload
       turingHexString = dataHexString.slice(-turingLength)
-      dataHexString = dataHexString.slice(6, -turingLength)
-      // The `3` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
+      dataHexString = dataHexString.slice(headerLength, -turingLength)
+      // The `headerLength` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
       console.log('Found a Turing TX:', {
+        turingVersion,
         turingLength,
         turing: turingHexString,
         restoredData: dataHexString,
@@ -334,7 +367,7 @@ const turingParse = (decodedTxData: string): [string, string] => {
     } else {
       // don't do anything
       // unknown/corrupted/legacy format
-      // In this case, will add '0x', the default, by doing nothing
+      // In this case, will add '0x', the default, and do nothing
       console.log('ERROR TURING TX - UNKNOWN OR CORRUPTED FORMAT', {
         turingLength,
         turing: '0x',
@@ -342,21 +375,17 @@ const turingParse = (decodedTxData: string): [string, string] => {
       })
       return [add0x(dataHexString), '0x']
     }
-  } else if (turingVersion === 1 && turingLength === 0) {
-    // The `3` chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
-    dataHexString = dataHexString.slice(6)
-    console.log('Found a non-Turing TX:', {
-      turingLength,
-      turing: '0x', // this will be '0x'
-      restoredData: dataHexString,
-    })
-    return [add0x(dataHexString), '0x']
-  } else {
-    console.log('Found a LEGACY TX:', {
+  }
+  else {
+    // don't do anything
+    // unknown/corrupted/legacy format
+    // In this case, will add '0x', the default, and do nothing
+    console.log('ERROR TURING TX - UNKNOWN OR CORRUPTED FORMAT', {
       turingLength,
       turing: '0x',
       restoredData: dataHexString,
     })
     return [add0x(dataHexString), '0x']
   }
+  
 }
