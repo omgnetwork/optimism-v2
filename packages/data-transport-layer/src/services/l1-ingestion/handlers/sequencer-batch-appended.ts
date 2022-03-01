@@ -252,7 +252,7 @@ const parseSequencerBatchTransaction = (
 const decodeSequencerBatchTransaction = (
   transaction: Buffer,
   l2ChainId: number,
-  blockNumber: number,
+  blockNumber: number
 ): DecodedSequencerBatchTransaction => {
   const decodedTx = ethers.utils.parseTransaction(transaction)
   console.log('Decoding TX', { transaction, decodedTx })
@@ -279,8 +279,10 @@ const decodeSequencerBatchTransaction = (
   }
 }
 
-const turingParse = (decodedTxData: string, L1blockNumber: number): [string, string] => {
-
+const turingParse = (
+  decodedTxData: string,
+  L1blockNumber: number
+): [string, string] => {
   // This MIGHT have a Turing payload inside of it...
   let dataHexString = remove0x(decodedTxData)
 
@@ -302,7 +304,7 @@ const turingParse = (decodedTxData: string, L1blockNumber: number): [string, str
   // ****************************************
   // pre turing era
   // do nothing
-  if( L1blockNumber < format0 ) {
+  if (L1blockNumber < format0) {
     console.log('Found a LEGACY TX:', {
       turing: '0x',
       restoredData: dataHexString,
@@ -314,14 +316,14 @@ const turingParse = (decodedTxData: string, L1blockNumber: number): [string, str
   let headerLength = 0
   let turingVersion = 0
 
-  if ( L1blockNumber >= format0 && L1blockNumber < format1 ) {
+  if (L1blockNumber >= format0 && L1blockNumber < format1) {
     // ****************************************
     // v0 header
     // first-generation turing format - for example, 0x0000f8
     turingVersion = 0
     turingLength = parseInt(dataHexString.slice(0, 4), 16) * 2
     headerLength = 4
-  } else if ( L1blockNumber >= format1 ) {
+  } else if (L1blockNumber >= format1) {
     // ****************************************
     // v1 header
     // Second-generation turing format - for example, 0x010000f8
@@ -332,7 +334,7 @@ const turingParse = (decodedTxData: string, L1blockNumber: number): [string, str
     headerLength = 6
   }
 
-  if(turingLength === 0) {
+  if (turingLength === 0) {
     // The .slice(headerLength) chops off the turing header
     dataHexString = dataHexString.slice(headerLength)
     console.log('Found a non-Turing TX:', {
@@ -342,8 +344,7 @@ const turingParse = (decodedTxData: string, L1blockNumber: number): [string, str
       restoredData: dataHexString,
     })
     return [add0x(dataHexString), '0x']
-  } 
-  else if (turingLength > 0 && turingLength < dataHexString.length) {
+  } else if (turingLength > 0 && turingLength < dataHexString.length) {
     const turingCandidate = dataHexString.slice(-turingLength)
     console.log('turingCandidate', { turingCandidate })
 
@@ -375,8 +376,7 @@ const turingParse = (decodedTxData: string, L1blockNumber: number): [string, str
       })
       return [add0x(dataHexString), '0x']
     }
-  }
-  else {
+  } else {
     // don't do anything
     // unknown/corrupted/legacy format
     // In this case, will add '0x', the default, and do nothing
@@ -387,5 +387,4 @@ const turingParse = (decodedTxData: string, L1blockNumber: number): [string, str
     })
     return [add0x(dataHexString), '0x']
   }
-  
 }
