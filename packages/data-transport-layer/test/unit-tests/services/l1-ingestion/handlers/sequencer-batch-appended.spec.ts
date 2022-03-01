@@ -28,7 +28,13 @@ describe('Event Handlers: CanonicalTransactionChain.SequencerBatchAppended', () 
     }
 
     it('should error on malformed transaction data', async () => {
-      const input1: [any, SequencerBatchAppendedExtraData, number, number, number] = [
+      const input1: [
+        any,
+        SequencerBatchAppendedExtraData,
+        number,
+        number,
+        number
+      ] = [
         {
           args: {
             _startingQueueIndex: ethers.constants.Zero,

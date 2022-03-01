@@ -270,7 +270,6 @@ const decodeSequencerBatchTransaction = (
   turing_v0_height: number,
   turing_v1_height: number
 ): DecodedSequencerBatchTransaction => {
-
   //console.log('transaction', {transaction: toHexString(transaction), blockNumber})
 
   if (blockNumber < turing_v0_height) {
@@ -295,25 +294,28 @@ const decodeSequencerBatchTransaction = (
     blockNumber >= turing_v0_height &&
     blockNumber < turing_v1_height
   ) {
-      console.log('Turing v0 TX', {transaction: toHexString(transaction), blockNumber})
-      let turingBuffer = Buffer.from([]) // initialize to empty buffer, not to .from('0')
-      ;[transaction, turingBuffer] = turingParse_v2(transaction, turingBuffer)
-      const decodedTx = ethers.utils.parseTransaction(transaction)
-      console.log('Decoded v0 TX', { transaction, decodedTx })
-      return {
-        nonce: BigNumber.from(decodedTx.nonce).toString(),
-        gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
-        gasLimit: BigNumber.from(decodedTx.gasLimit).toString(),
-        value: toRpcHexString(decodedTx.value),
-        target: decodedTx.to ? toHexString(decodedTx.to) : null,
-        data: toHexString(decodedTx.data),
-        sig: {
-          v: parseSignatureVParam(decodedTx.v, l2ChainId),
-          r: toHexString(decodedTx.r),
-          s: toHexString(decodedTx.s),
-        },
-        turing: toHexString(turingBuffer),
-      }
+    console.log('Turing v0 TX', {
+      transaction: toHexString(transaction),
+      blockNumber,
+    })
+    let turingBuffer = Buffer.from([]) // initialize to empty buffer, not to .from('0')
+    ;[transaction, turingBuffer] = turingParse_v2(transaction, turingBuffer)
+    const decodedTx = ethers.utils.parseTransaction(transaction)
+    console.log('Decoded v0 TX', { transaction, decodedTx })
+    return {
+      nonce: BigNumber.from(decodedTx.nonce).toString(),
+      gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
+      gasLimit: BigNumber.from(decodedTx.gasLimit).toString(),
+      value: toRpcHexString(decodedTx.value),
+      target: decodedTx.to ? toHexString(decodedTx.to) : null,
+      data: toHexString(decodedTx.data),
+      sig: {
+        v: parseSignatureVParam(decodedTx.v, l2ChainId),
+        r: toHexString(decodedTx.r),
+        s: toHexString(decodedTx.s),
+      },
+      turing: toHexString(turingBuffer),
+    }
     // let turingBuffer = Buffer.from([]) // initialize to empty buffer, not to .from('0')
     // ;[transaction, turingBuffer] = turingParse_v0(transaction, turingBuffer)
     // const decodedTx = ethers.utils.parseTransaction(transaction)
@@ -335,7 +337,10 @@ const decodeSequencerBatchTransaction = (
   } else if (blockNumber >= turing_v1_height) {
     let restoredData = ''
     let turing = ''
-    console.log('Turing v1 TX', {transaction: toHexString(transaction), blockNumber})
+    console.log('Turing v1 TX', {
+      transaction: toHexString(transaction),
+      blockNumber,
+    })
     const decodedTx = ethers.utils.parseTransaction(transaction)
     console.log('Decoded v1 TX', { transaction, decodedTx })
     ;[restoredData, turing] = turingParse_v1(
@@ -384,8 +389,7 @@ const turingParse_v2 = (
       turing: '0x',
       restoredSequencerTransaction: toHexString(sequencerTransaction),
     })
-  }
-  else if (turingLength > 0 && turingLength < sequencerTransaction.length) {
+  } else if (turingLength > 0 && turingLength < sequencerTransaction.length) {
     const turingCandidate = remove0x(
       toHexString(sequencerTransaction.slice(-turingLength))
     )
