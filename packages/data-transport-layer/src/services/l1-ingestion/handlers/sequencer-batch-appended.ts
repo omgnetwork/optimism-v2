@@ -347,6 +347,8 @@ const turingParse_v0 = (
 
   console.log('Turing:', {
     turingLength,
+    sTxHexString,
+    lengthField: remove0x(sTxHexString).slice(0, 4)
   })
 
   if (turingLength > 0 && turingLength < sequencerTransaction.length) {
