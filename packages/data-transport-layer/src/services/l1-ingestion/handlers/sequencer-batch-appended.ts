@@ -75,7 +75,13 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
       batchExtraData: batchSubmissionEvent.args._extraData,
     }
   },
-  parseEvent: (event, extraData, l2ChainId) => {
+  parseEvent: (
+    event,
+    extraData,
+    l2ChainId,
+    turing_v0_height,
+    turing_v1_height
+  ) => {
     const transactionEntries: TransactionEntry[] = []
 
     // It's easier to deal with this data if it's a Buffer.
@@ -87,6 +93,12 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
           `converted buffer length is < 12.`
       )
     }
+
+    console.log('turing_heights', {
+      turing_v0_height,
+      turing_v1_height,
+    })
+
     const numContexts = BigNumber.from(calldata.slice(12, 15)).toNumber()
     let transactionIndex = 0
     let enqueuedCount = 0
@@ -104,7 +116,9 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         const decoded = decodeSequencerBatchTransaction(
           sequencerTransaction,
           l2ChainId,
-          context.blockNumber
+          context.blockNumber,
+          turing_v0_height,
+          turing_v1_height
         )
 
         transactionEntries.push({
@@ -252,7 +266,9 @@ const parseSequencerBatchTransaction = (
 const decodeSequencerBatchTransaction = (
   transaction: Buffer,
   l2ChainId: number,
-  blockNumber: number
+  blockNumber: number,
+  turing_v0_height: number,
+  turing_v1_height: number
 ): DecodedSequencerBatchTransaction => {
   const decodedTx = ethers.utils.parseTransaction(transaction)
   console.log('Decoding TX', { transaction, decodedTx })
@@ -260,7 +276,13 @@ const decodeSequencerBatchTransaction = (
   let restoredData = ''
   let turing = ''
 
-  ;[restoredData, turing] = turingParse(decodedTx.data, blockNumber, l2ChainId)
+  ;[restoredData, turing] = turingParse(
+    decodedTx.data,
+    blockNumber,
+    l2ChainId,
+    turing_v0_height,
+    turing_v1_height
+  )
   console.log('Decoded TX', { restoredData, turing })
 
   return {
@@ -282,26 +304,33 @@ const decodeSequencerBatchTransaction = (
 const turingParse = (
   decodedTxData: string,
   L1blockNumber: number,
-  l2ChainId: number
+  l2ChainId: number,
+  turing_v0_height: number,
+  turing_v1_height: number
 ): [string, string] => {
   // This MIGHT have a Turing payload inside of it...
   let dataHexString = remove0x(decodedTxData)
 
   let turingHexString = ''
-  console.log('TuringParse: Decoded TX', { dataHexString, L1blockNumber })
 
-  // Local
-  let format0 = 0
-  let format1 = 0
+  const format0 = turing_v0_height
+  const format1 = turing_v1_height
 
-  if (l2ChainId === 28) {
-    // Rinkeby
-    format0 = 10048692 // L1 block
-    format1 = 10249940 // ????????? just a placeholder
-  } else if (l2ChainId === 288) {
-    format0 = 14298926 // L1 block - ????????? just a placeholder - wild guess
-    format1 = format0
-  }
+  console.log('TuringParse: Decoded TX', {
+    dataHexString,
+    L1blockNumber,
+    format0,
+    format1,
+  })
+
+  // if (l2ChainId === 28) {
+  //   // Rinkeby
+  //   format0 = 10048692 // L1 block
+  //   format1 = 10249940 // ????????? just a placeholder
+  // } else if (l2ChainId === 288) {
+  //   format0 = 14298926 // L1 block - ????????? just a placeholder - wild guess
+  //   format1 = format0
+  // }
 
   // ****************************************
   // pre turing era
