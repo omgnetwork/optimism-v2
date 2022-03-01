@@ -256,7 +256,7 @@ describe('Basic RPC tests', () => {
     it('{tag:rpc} includes L1 gas price and L1 gas used', async () => {
       const tx = await env.l2Wallet.populateTransaction({
         to: env.l2Wallet.address,
-        gasPrice: isLiveNetwork() ? 10000 : 1,
+        gasPrice: await gasPriceForL2(),
       })
 
       const raw = serialize({
@@ -279,7 +279,9 @@ describe('Basic RPC tests', () => {
       const res = await env.l2Wallet.sendTransaction(tx)
       await res.wait()
 
-      const json = await provider.send('eth_getTransactionReceipt', [res.hash])
+      const json = await env.l2Provider.send('eth_getTransactionReceipt', [
+        res.hash,
+      ])
 
       expect(l1GasUsed).to.deep.equal(BigNumber.from(json.l1GasUsed))
       expect(l1GasPrice).to.deep.equal(BigNumber.from(json.l1GasPrice))

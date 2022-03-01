@@ -1890,6 +1890,7 @@ describe('Liquidity Pool Test', async () => {
     })
 
     it('{tag:mrf} should deposit ERC20', async () => {
+
       const depositAmount = utils.parseEther('10')
 
       const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
@@ -1928,7 +1929,7 @@ describe('Liquidity Pool Test', async () => {
       expect(postL2ERC20Balance).to.deep.eq(
         preL2ERC20Balance.add(depositAmount.mul(remainingPercent).div(1000))
       )
-    })
+    }).timeout(50000 * 2)
 
     it('{tag:mrf} should not deposit ERC20 for an unregistered token', async () => {
       const depositAmount = utils.parseEther('10')
