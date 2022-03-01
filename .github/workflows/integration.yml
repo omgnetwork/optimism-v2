@@ -92,11 +92,11 @@ jobs:
   build:
     needs: start-runner
     runs-on: ${{ needs.start-runner.outputs.label }}
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
+    # services:
+    #   registry:
+    #     image: registry:2
+    #     ports:
+    #       - 5000:5000
     env:
         DOCKER_BUILDKIT: 1
         COMPOSE_DOCKER_CLI_BUILD: 1
@@ -143,11 +143,11 @@ jobs:
       - build
       - start-executioner
     runs-on: [self-hosted]
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
+    #services:
+      # registry:
+      #   image: registry:2
+      #   ports:
+      #     - 5000:5000
     strategy:
       max-parallel: 6
       fail-fast: false

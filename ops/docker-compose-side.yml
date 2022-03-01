@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  monitor:
+    depends_on:
+     - l1_chain
+     - l2geth
+    image: bobanetwork/monitor:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.monitor
+    deploy:
+      replicas: 0
