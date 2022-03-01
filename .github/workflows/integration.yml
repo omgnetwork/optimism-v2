@@ -229,6 +229,17 @@ jobs:
       - integration # required to wait when the main job is done
     runs-on: ubuntu-latest
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    strategy:
+      max-parallel: 6
+      fail-fast: false
+      matrix:
+        include:
+        - id: 1
+        - id: 2
+        - id: 3
+        - id: 4
+        - id: 5
+        - id: 6
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -256,5 +267,5 @@ jobs:
         with:
           mode: stop
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          label: ${{ needs.runner_info.outputs.label }}
-          ec2-instance-id: ${{ needs.runner_info.outputs.ec2-instance-id }}
+          label: ${{ steps.runner_info.outputs.label }}
+          ec2-instance-id: ${{ steps.runner_info.outputs.ec2-instance-id }}
