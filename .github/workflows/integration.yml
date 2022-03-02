@@ -141,6 +141,9 @@ jobs:
       - build
       - start-executioner
     runs-on: [self-hosted]
+    env:
+      DOCKER_CLIENT_TIMEOUT: 120
+      COMPOSE_HTTP_TIMEOUT: 120
     #services:
       # registry:
       #   image: registry:2
