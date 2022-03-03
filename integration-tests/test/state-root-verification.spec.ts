@@ -58,14 +58,6 @@ describe('Verify State Roots', async () => {
           'eth_getBlockByNumber',
           [utils.hexValue(l2BlockNumber), true]
         )
-        // const l2VerifierBlockReceipt = await env.verifierProvider.send(
-        //   'eth_getBlockByNumber',
-        //   [utils.hexValue(l2BlockNumber), true]
-        // )
-        // const l2ReplicaBlockReceipt = await env.replicaProvider.send(
-        //   'eth_getBlockByNumber',
-        //   [utils.hexValue(l2BlockNumber), true]
-        // )
         const [l2VerifierBlockReceipt, l2ReplicaBlockReceipt] =
           await pullForBlock(env, l2BlockNumber)
         const l2StateRoot = l2BlockReceipt.stateRoot
@@ -93,8 +85,6 @@ export const pullForBlock = async (env, l2BlockNumber) => {
       'eth_getBlockByNumber',
       [utils.hexValue(l2BlockNumber), true]
     )
-    console.log(l2VerifierBlockReceipt)
-    console.log(l2ReplicaBlockReceipt)
     if (
       l2VerifierBlockReceipt.stateRoot !== null &&
       l2ReplicaBlockReceipt.stateRoot !== null
