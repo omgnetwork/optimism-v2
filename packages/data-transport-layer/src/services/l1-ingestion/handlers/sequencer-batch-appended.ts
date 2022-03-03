@@ -94,11 +94,6 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
       )
     }
 
-    // console.log('turing_heights', {
-    //   turing_v0_height,
-    //   turing_v1_height,
-    // })
-
     const numContexts = BigNumber.from(calldata.slice(12, 15)).toNumber()
     let transactionIndex = 0
     let enqueuedCount = 0
@@ -349,12 +344,6 @@ const turingParse_v0 = (
   const turingVersion = parseInt(remove0x(sTxHexString).slice(0, 2), 16)
   const turingLength = parseInt(remove0x(sTxHexString).slice(2, 6), 16)
 
-  // console.log('Turing v0:', {
-  //   sTxHexString,
-  //   lengthField: remove0x(sTxHexString).slice(2, 6),
-  //   turingLength,
-  // })
-
   if (turingLength === 0) {
     // The 'slice' chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
     // the '3' is correct because we are operating on the buffer, not the string
@@ -412,16 +401,11 @@ const turingParse_v1 = (
   // This MIGHT have a Turing payload inside of it...
   let dataHexString = remove0x(decodedTxData)
 
-  // console.log('TuringParse: Decoded TX', {
-  //   dataHexString,
-  //   L1blockNumber,
-  // })
-
-  // Second-generation Turing format - data are added INSIDE the RLP payload
   // First, parse the version and length field...
   // TuringVersion not used right now; for future use and for supporting legacy packets
   const turingVersion = parseInt(dataHexString.slice(0, 2), 16)
   const turingLength = parseInt(dataHexString.slice(2, 6), 16) * 2 // * 2 because we are operating on the hex string
+  const headerLength = 6
 
   if (turingLength === 0) {
     // The .slice(headerLength) chops off the Turing header
