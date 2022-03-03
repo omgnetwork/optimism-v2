@@ -96,8 +96,8 @@ export const pullForBlock = async (env, l2BlockNumber) => {
     console.log(l2VerifierBlockReceipt)
     console.log(l2ReplicaBlockReceipt)
     if (
-      l2VerifierBlockReceipt !== undefined &&
-      l2ReplicaBlockReceipt !== undefined
+      l2VerifierBlockReceipt.stateRoot !== null &&
+      l2ReplicaBlockReceipt.stateRoot !== null
     ) {
       return [l2VerifierBlockReceipt, l2ReplicaBlockReceipt]
     }
