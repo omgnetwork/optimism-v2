@@ -94,10 +94,10 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
       )
     }
 
-    console.log('turing_heights', {
-      turing_v0_height,
-      turing_v1_height,
-    })
+    // console.log('turing_heights', {
+    //   turing_v0_height,
+    //   turing_v1_height,
+    // })
 
     const numContexts = BigNumber.from(calldata.slice(12, 15)).toNumber()
     let transactionIndex = 0
@@ -270,13 +270,9 @@ const decodeSequencerBatchTransaction = (
   turing_v0_height: number,
   turing_v1_height: number
 ): DecodedSequencerBatchTransaction => {
-  //console.log('transaction', {transaction: toHexString(transaction), blockNumber})
-
   if (blockNumber < turing_v0_height) {
-    //console.log('Found a LEGACY TX - do nothing')
     const decodedTx = ethers.utils.parseTransaction(transaction)
-    //console.log('Decoded TX', { transaction, decodedTx })
-    return {
+    const ret = {
       nonce: BigNumber.from(decodedTx.nonce).toString(),
       gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
       gasLimit: BigNumber.from(decodedTx.gasLimit).toString(),
@@ -290,19 +286,16 @@ const decodeSequencerBatchTransaction = (
       },
       turing: '0x',
     }
+    console.log('Decoded legacy TX', { transaction, ret })
+    return ret
   } else if (
     blockNumber >= turing_v0_height &&
     blockNumber < turing_v1_height
   ) {
-    console.log('Turing v0 TX', {
-      transaction: toHexString(transaction),
-      blockNumber,
-    })
     let turingBuffer = Buffer.from([]) // initialize to empty buffer, not to .from('0')
-    ;[transaction, turingBuffer] = turingParse_v2(transaction, turingBuffer)
+    ;[transaction, turingBuffer] = turingParse_v0(transaction, turingBuffer)
     const decodedTx = ethers.utils.parseTransaction(transaction)
-    console.log('Decoded v0 TX', { transaction, decodedTx })
-    return {
+    const ret = {
       nonce: BigNumber.from(decodedTx.nonce).toString(),
       gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
       gasLimit: BigNumber.from(decodedTx.gasLimit).toString(),
@@ -316,39 +309,18 @@ const decodeSequencerBatchTransaction = (
       },
       turing: toHexString(turingBuffer),
     }
-    // let turingBuffer = Buffer.from([]) // initialize to empty buffer, not to .from('0')
-    // ;[transaction, turingBuffer] = turingParse_v0(transaction, turingBuffer)
-    // const decodedTx = ethers.utils.parseTransaction(transaction)
-    // console.log('Decoded v0 TX', { transaction, decodedTx })
-    // return {
-    //   nonce: BigNumber.from(decodedTx.nonce).toString(),
-    //   gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
-    //   gasLimit: BigNumber.from(decodedTx.gasLimit).toString(),
-    //   value: toRpcHexString(decodedTx.value),
-    //   target: decodedTx.to ? toHexString(decodedTx.to) : null,
-    //   data: toHexString(decodedTx.data),
-    //   sig: {
-    //     v: parseSignatureVParam(decodedTx.v, l2ChainId),
-    //     r: toHexString(decodedTx.r),
-    //     s: toHexString(decodedTx.s),
-    //   },
-    //   turing: toHexString(turingBuffer),
-    // }
+    console.log('Decoded v0 TX', { transaction, ret })
+    return ret
   } else if (blockNumber >= turing_v1_height) {
     let restoredData = ''
     let turing = ''
-    console.log('Turing v1 TX', {
-      transaction: toHexString(transaction),
-      blockNumber,
-    })
     const decodedTx = ethers.utils.parseTransaction(transaction)
-    console.log('Decoded v1 TX', { transaction, decodedTx })
     ;[restoredData, turing] = turingParse_v1(
       decodedTx.data,
       blockNumber,
       l2ChainId
     )
-    return {
+    const ret = {
       nonce: BigNumber.from(decodedTx.nonce).toString(),
       gasPrice: BigNumber.from(decodedTx.gasPrice).toString(),
       gasLimit: BigNumber.from(decodedTx.gasLimit).toString(),
@@ -362,10 +334,12 @@ const decodeSequencerBatchTransaction = (
       },
       turing,
     }
+    console.log('Decoded v1 TX', { transaction, ret })
+    return ret
   }
 }
 
-const turingParse_v2 = (
+const turingParse_v0 = (
   sequencerTransaction: Buffer,
   turing: Buffer
 ): [Buffer, Buffer] => {
@@ -383,8 +357,9 @@ const turingParse_v2 = (
 
   if (turingLength === 0) {
     // The 'slice' chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
+    // the '3' is correct because we are operating on the buffer, not the string
     sequencerTransaction = sequencerTransaction.slice(3)
-    console.log('Found a normal TX:', {
+    console.log('Found a v0 non-turing TX:', {
       turingLength,
       turing: '0x',
       restoredSequencerTransaction: toHexString(sequencerTransaction),
@@ -394,7 +369,7 @@ const turingParse_v2 = (
       toHexString(sequencerTransaction.slice(-turingLength))
     )
     const turingCall = turingCandidate.slice(0, 8).toLowerCase()
-    // console.log('turingCall', { turingCall })
+    // the (0, 8) here is correct because were operating on the hex string
     // methodID for GetResponse is 7d93616c -> [125 147 97 108]
     // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
     if (turingCall === '7d93616c' || turingCall === '493d57d6') {
@@ -402,6 +377,7 @@ const turingParse_v2 = (
       turing = sequencerTransaction.slice(-turingLength)
       sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
       // The 'slice' chops off the header field and the `-turingLength` chops off the Turing data
+      // the '3' is correct because we are operating on the buffer, not the string
       console.log('Found a v0 Turing TX:', {
         turingLength,
         turing: toHexString(turing),
@@ -410,16 +386,16 @@ const turingParse_v2 = (
     } else {
       // unknown/corrupted/legacy format
       // In this case, will add '0x', the default, by doing nothing
+      console.log('CORRUPTED/UNKNOWN V0 FORMAT:', {
+        turingLength,
+        turing: '0x',
+        restoredSequencerTransaction: toHexString(sequencerTransaction),
+      })
     }
-  } else if (turingLength === 0) {
-    sequencerTransaction = sequencerTransaction.slice(3)
-    console.log('Found a v0 normal TX:', {
-      turingLength,
-      turing: '0x',
-      restoredSequencerTransaction: toHexString(sequencerTransaction),
-    })
   } else {
-    console.log('Found a v0 LEGACY TX :', {
+    // unknown/corrupted/legacy format
+    // In this case, will add '0x', the default, by doing nothing
+    console.log('CORRUPTED/UNKNOWN V0 FORMAT:', {
       turingLength,
       turing: '0x',
       restoredSequencerTransaction: toHexString(sequencerTransaction),
@@ -427,62 +403,6 @@ const turingParse_v2 = (
   }
   return [sequencerTransaction, turing]
 }
-
-// const turingParse_v0 = (
-//   sequencerTransaction: Buffer,
-//   turing: Buffer
-// ): [Buffer, Buffer] => {
-//   // This MIGHT have a Turing payload inside of it...
-//   // First, parse the new version and length field...
-//   const sTxHexString = toHexString(sequencerTransaction)
-//   const turingLength = parseInt(remove0x(sTxHexString).slice(0, 4), 16)
-
-//   console.log('Turing:', {
-//     turingLength,
-//     sTxHexString,
-//     lengthField: remove0x(sTxHexString).slice(0, 4)
-//   })
-
-//   if (turingLength > 0 && turingLength < sequencerTransaction.length) {
-//     const turingCandidate = remove0x(
-//       toHexString(sequencerTransaction.slice(-turingLength))
-//     )
-//     const turingCall = turingCandidate.slice(0, 8).toLowerCase()
-//     console.log('turingCall', { turingCall })
-//     // methodID for GetResponse is 7d93616c -> [125 147 97 108]
-//     // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
-//     if (turingCall === '7d93616c' || turingCall === '493d57d6') {
-//       // we are all set!
-//       // we have a Turing v0 payload
-//       turing = sequencerTransaction.slice(-turingLength)
-//       sequencerTransaction = sequencerTransaction.slice(2, -turingLength)
-//       // The `3` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
-//       console.log('Found a Turing payload:', {
-//         turingLength,
-//         turing: toHexString(turing),
-//         restoredSequencerTransaction: toHexString(sequencerTransaction),
-//       })
-//     } else {
-//       // unknown/corrupted/legacy format
-//       // In this case, will add '0x', the default, by doing nothing
-//     }
-//   } else if (turingLength === 0) {
-//     // The `3` chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
-//     sequencerTransaction = sequencerTransaction.slice(2)
-//     console.log('Found a normal TX:', {
-//       turingLength,
-//       turing: '0x',
-//       restoredSequencerTransaction: toHexString(sequencerTransaction),
-//     })
-//   } else {
-//     console.log('Found a v0 LEGACY TX :', {
-//       turingLength,
-//       turing: '0x',
-//       restoredSequencerTransaction: toHexString(sequencerTransaction),
-//     })
-//   }
-//   return [sequencerTransaction, turing]
-// }
 
 const turingParse_v1 = (
   decodedTxData: string,
@@ -497,18 +417,17 @@ const turingParse_v1 = (
     L1blockNumber,
   })
 
-  // Second-generation Turing format - for example, 0x010000f8
+  // Second-generation Turing format - data are added INSIDE the RLP payload
   // First, parse the version and length field...
   // TuringVersion not used right now; for future use and for supporting legacy packets
   const turingVersion = parseInt(dataHexString.slice(0, 2), 16)
   const turingLength = parseInt(dataHexString.slice(2, 6), 16) * 2 // * 2 because we are operating on the hex string
-  const headerLength = 6
 
   if (turingLength === 0) {
-    // The .slice(headerLength) chops off the turing header
-    dataHexString = dataHexString.slice(headerLength)
-    console.log('Found a v1 normal TX:', {
-      turingVersion,
+    // The .slice(headerLength) chops off the Turing header
+    // '6' is correct here because we are operating on the string
+    dataHexString = dataHexString.slice(6)
+    console.log('Found a v1 non-turing TX::', {
       turingLength,
       turing: '0x',
       restoredData: dataHexString,
@@ -526,20 +445,19 @@ const turingParse_v1 = (
     if (turingCall === '7d93616c' || turingCall === '493d57d6') {
       // we are all set! we have a Turing v1 payload
       const turingHexString = dataHexString.slice(-turingLength)
-      dataHexString = dataHexString.slice(headerLength, -turingLength)
+      dataHexString = dataHexString.slice(6, -turingLength)
       // The `headerLength` chops off the Turing length header field, and the `-turingLength` chops off the Turing bytes
+      // '6' is correct here because we are operating on the string
       console.log('Found a v1 Turing TX:', {
-        turingVersion,
         turingLength,
         turing: turingHexString,
         restoredData: dataHexString,
       })
       return [add0x(dataHexString), add0x(turingHexString)]
     } else {
-      // don't do anything
       // unknown/corrupted/legacy format
       // In this case, will add '0x', the default, and do nothing
-      console.log('ERROR TURING TX - UNKNOWN OR CORRUPTED FORMAT', {
+      console.log('CORRUPTED/UNKNOWN V1 FORMAT', {
         turingLength,
         turing: '0x',
         restoredData: dataHexString,
@@ -547,10 +465,9 @@ const turingParse_v1 = (
       return [add0x(dataHexString), '0x']
     }
   } else {
-    // don't do anything
     // unknown/corrupted/legacy format
     // In this case, will add '0x', the default, and do nothing
-    console.log('ERROR TURING TX - UNKNOWN OR CORRUPTED FORMAT', {
+    console.log('CORRUPTED/UNKNOWN V1 FORMAT', {
       turingLength,
       turing: '0x',
       restoredData: dataHexString,
