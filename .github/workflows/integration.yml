@@ -41,7 +41,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 6
+      max-parallel: 4
       fail-fast: false
       matrix:
         include:
@@ -53,8 +53,6 @@ jobs:
           test-grep-filter: 'tag:mrf'
         - id: 4
           test-grep-filter: 'tag:other'
-        - id: 5
-          test-grep-filter: '^((?!tag:).)*$'
     outputs:
       label: ${{ steps.executioner.outputs.label }}
       ec2-instance-id: ${{ steps.executioner.outputs.ec2-instance-id }}
@@ -150,7 +148,7 @@ jobs:
       #   ports:
       #     - 5000:5000
     strategy:
-      max-parallel: 6
+      max-parallel: 4
       fail-fast: false
       matrix:
         include:
@@ -162,8 +160,6 @@ jobs:
           test-grep-filter: 'tag:mrf'
         - id: 4
           test-grep-filter: 'tag:other'
-        - id: 5
-          test-grep-filter: '^((?!tag:).)*$'
     steps:
       - uses: actions/download-artifact@v2
         id: download
@@ -229,7 +225,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     strategy:
-      max-parallel: 6
+      max-parallel: 4
       fail-fast: false
       matrix:
         include:
@@ -237,7 +233,6 @@ jobs:
         - id: 2
         - id: 3
         - id: 4
-        - id: 5
     steps:
       - uses: actions/download-artifact@v2
         with:
