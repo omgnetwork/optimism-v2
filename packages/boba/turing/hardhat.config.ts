@@ -14,7 +14,11 @@ const config: HardhatUserConfig = {
     },
     boba_rinkeby: {
       url: 'https://rinkeby.boba.network',
-      accounts: ['0x0000000000000000000000000000000000000000000000000000000000000000']
+      accounts: ['0x__your_pk_here___']
+    },
+    boba_mainnet: {
+      url: 'http://3.238.204.142:8545',
+      accounts: ['0x__your_pk_here___']
     },
   },
   solidity: {

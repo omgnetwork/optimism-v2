@@ -286,7 +286,7 @@ const decodeSequencerBatchTransaction = (
       },
       turing: '0x',
     }
-    console.log('Decoded legacy TX', { transaction, ret })
+    console.log('Final Decoded legacy TX', { transaction, ret })
     return ret
   } else if (
     blockNumber >= turing_v0_height &&
@@ -309,7 +309,7 @@ const decodeSequencerBatchTransaction = (
       },
       turing: toHexString(turingBuffer),
     }
-    console.log('Decoded v0 TX', { transaction, ret })
+    console.log('Final Decoded v0 TX', { transaction, ret })
     return ret
   } else if (blockNumber >= turing_v1_height) {
     let restoredData = ''
@@ -334,7 +334,7 @@ const decodeSequencerBatchTransaction = (
       },
       turing,
     }
-    console.log('Decoded v1 TX', { transaction, ret })
+    console.log('Final Decoded v1 TX', { transaction, ret })
     return ret
   }
 }
@@ -349,11 +349,11 @@ const turingParse_v0 = (
   const turingVersion = parseInt(remove0x(sTxHexString).slice(0, 2), 16)
   const turingLength = parseInt(remove0x(sTxHexString).slice(2, 6), 16)
 
-  console.log('Turing v0:', {
-    sTxHexString,
-    lengthField: remove0x(sTxHexString).slice(2, 6),
-    turingLength,
-  })
+  // console.log('Turing v0:', {
+  //   sTxHexString,
+  //   lengthField: remove0x(sTxHexString).slice(2, 6),
+  //   turingLength,
+  // })
 
   if (turingLength === 0) {
     // The 'slice' chops off the Turing version and length header field, which is in this case (0: 01 1: 00 2: 00)
@@ -412,10 +412,10 @@ const turingParse_v1 = (
   // This MIGHT have a Turing payload inside of it...
   let dataHexString = remove0x(decodedTxData)
 
-  console.log('TuringParse: Decoded TX', {
-    dataHexString,
-    L1blockNumber,
-  })
+  // console.log('TuringParse: Decoded TX', {
+  //   dataHexString,
+  //   L1blockNumber,
+  // })
 
   // Second-generation Turing format - data are added INSIDE the RLP payload
   // First, parse the version and length field...
@@ -427,7 +427,7 @@ const turingParse_v1 = (
     // The .slice(headerLength) chops off the Turing header
     // '6' is correct here because we are operating on the string
     dataHexString = dataHexString.slice(6)
-    console.log('Found a v1 non-turing TX::', {
+    console.log('Found a v1 non-turing TX:', {
       turingLength,
       turing: '0x',
       restoredData: dataHexString,
