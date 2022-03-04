@@ -147,6 +147,8 @@ jobs:
         DOCKER_BUILDKIT: 1
         COMPOSE_DOCKER_CLI_BUILD: 1
     steps:
+      #https://github.com/actions/checkout/issues/590
+      - run: git checkout -f $(git -c user.name=x -c user.email=x@x commit-tree $(git hash-object -t tree /dev/null) < /dev/null) || true
       - uses: actions/checkout@v3
 
       - name: Get yarn cache directory path
@@ -238,6 +240,8 @@ jobs:
           done
           wait < <(jobs -p)
 
+      #https://github.com/actions/checkout/issues/590
+      - run: git checkout -f $(git -c user.name=x -c user.email=x@x commit-tree $(git hash-object -t tree /dev/null) < /dev/null) || true
       - uses: actions/checkout@v3
 
       - name: Bring the stack up
