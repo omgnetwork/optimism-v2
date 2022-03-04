@@ -80,9 +80,6 @@ jobs:
           test-grep-filter: 'tag:mrf'
         - id: 4
           test-grep-filter: 'tag:other'
-    # outputs:
-    #   label: ${{ steps.executioner.outputs.label }}
-    #   ec2-instance-id: ${{ steps.executioner.outputs.ec2-instance-id }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

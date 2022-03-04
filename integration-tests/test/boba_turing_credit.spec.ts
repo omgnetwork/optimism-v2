@@ -81,7 +81,7 @@ describe('Boba Turing Credit Test', async () => {
   })
 
   after(async () => {
-    await verifyStateRoots()
+    expect(await verifyStateRoots()).to.equal(true)
     console.log('Verified state roots.')
   })
 

@@ -103,7 +103,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
   })
 
   after(async () => {
-    await verifyStateRoots()
+    expect(await verifyStateRoots()).to.equal(true)
     console.log('Verified state roots.')
   })
 
