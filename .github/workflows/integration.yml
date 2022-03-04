@@ -30,8 +30,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Start EC2 runner
-        id: start-ec2-runner
+        id: start-ec2-runner-1
         uses: machulav/ec2-github-runner@v2
+        continue-on-error: true
         with:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
@@ -40,8 +41,8 @@ jobs:
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
       - name: Start EC2 runner retry
-        if: steps.start-ec2-runner.outcome=='failure'
-        id: start-ec2-runner-retry
+        if: steps.start-ec2-runner-1.outcome == 'failure'
+        id: start-ec2-runner-2
         uses: machulav/ec2-github-runner@v2
         with:
           mode: start
@@ -50,6 +51,17 @@ jobs:
           ec2-instance-type: m4.4xlarge
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
+      - name: See if any of 2 tries succeeded
+        id: start-ec2-runner
+        run: |
+          if [ "${{ steps.start-ec2-runner-1.outcome }}" = "success" ]; then
+            echo "::set-output name=label::${{ steps.start-ec2-runner-1.outputs.label }}"
+            echo "::set-output name=ec2-instance-id::${{ steps.start-ec2-runner-1.outputs.ec2-instance-id }}"
+          fi
+          if [ "${{ steps.start-ec2-runner-2.outcome }}" = "success" ]; then
+            echo "::set-output name=label::${{ steps.start-ec2-runner-2.outputs.label }}"
+            echo "::set-output name=ec2-instance-id::${{ steps.start-ec2-runner-2.outputs.ec2-instance-id }}"
+          fi
 
   start-executioner:
     name: Start self-hosted EC2 executioner
@@ -81,6 +93,7 @@ jobs:
       - name: Start EC2 executioner
         id: start-ec2-executioner-1
         uses: machulav/ec2-github-runner@v2
+        continue-on-error: true
         with:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
@@ -88,13 +101,35 @@ jobs:
           ec2-instance-type: t2.2xlarge
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
+      - name: Start EC2 executioner
+        id: start-ec2-executioner-2
+        if: steps.start-ec2-executioner-1.outcome == 'failure'
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          ec2-image-id: ami-00b46fa1102c70ff2
+          ec2-instance-type: t2.2xlarge
+          subnet-id: subnet-905870ae
+          security-group-id: sg-0855631d714870b32
+      - name: See if any of 2 tries succeeded
+        id: start-ec2-executioner
+        run: |
+          if [ "${{ steps.start-ec2-executioner-1.outcome }}" = "success" ]; then
+            echo "::set-output name=label::${{ steps.start-ec2-executioner-1.outputs.label }}"
+            echo "::set-output name=ec2-instance-id::${{ steps.start-ec2-executioner-1.outputs.ec2-instance-id }}"
+          fi
+          if [ "${{ steps.start-ec2-executioner-2.outcome }}" = "success" ]; then
+            echo "::set-output name=label::${{ steps.start-ec2-executioner-2.outputs.label }}"
+            echo "::set-output name=ec2-instance-id::${{ steps.start-ec2-executioner-2.outputs.ec2-instance-id }}"
+          fi
       - name: Output the runner meta
         run: |
           mkdir /tmp/runner/
           mkdir /tmp/runner/${{ matrix.id }}
           echo '${{ matrix.test-grep-filter }}' > /tmp/runner/${{ matrix.id }}/filter
-          echo ${{ steps.start-ec2-executioner-1.outputs.label }} > //tmp/runner/${{ matrix.id }}/label
-          echo ${{ steps.start-ec2-executioner-1.outputs.ec2-instance-id }} > /tmp/runner/${{ matrix.id }}/instance
+          echo ${{ steps.start-ec2-executioner.outputs.label }} > //tmp/runner/${{ matrix.id }}/label
+          echo ${{ steps.start-ec2-executioner.outputs.ec2-instance-id }} > /tmp/runner/${{ matrix.id }}/instance
       - uses: actions/upload-artifact@v2
         with:
           name: runner_info
