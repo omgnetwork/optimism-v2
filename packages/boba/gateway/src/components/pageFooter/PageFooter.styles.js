@@ -22,7 +22,6 @@ export const Wrapper = styled(Box)(({ theme }) => ({
   },
 }))
 
-
 export const ContentWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
@@ -50,6 +49,7 @@ export const FooterLink = styled(Box)(({ theme }) => ({
   fontSize: '14px',
   textDecoration: 'none',
   cursor: 'pointer',
+  color: 'unset',
   '&:hover': {
     color: theme.palette.secondary.main,
   },

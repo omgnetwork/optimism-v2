@@ -5,6 +5,7 @@ import { Contract, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 
 import { OptimismEnv } from './shared/env'
+import { sleep } from './shared/utils'
 
 describe('Verify State Roots', async () => {
   let StateCommitmentChain: Contract
@@ -24,7 +25,7 @@ describe('Verify State Roots', async () => {
     ).attach(StateCommitmentChainAddress)
   })
 
-  it('State roots should match', async () => {
+  it('{tag:other} State roots should match', async () => {
     // get latest state root from SCC contract
     const blockInterval = 5000
     const l1BlockNumber = await env.l1Provider.getBlockNumber()
@@ -57,14 +58,8 @@ describe('Verify State Roots', async () => {
           'eth_getBlockByNumber',
           [utils.hexValue(l2BlockNumber), true]
         )
-        const l2VerifierBlockReceipt = await env.verifierProvider.send(
-          'eth_getBlockByNumber',
-          [utils.hexValue(l2BlockNumber), true]
-        )
-        const l2ReplicaBlockReceipt = await env.replicaProvider.send(
-          'eth_getBlockByNumber',
-          [utils.hexValue(l2BlockNumber), true]
-        )
+        const [l2VerifierBlockReceipt, l2ReplicaBlockReceipt] =
+          await pullForBlock(env, l2BlockNumber)
         const l2StateRoot = l2BlockReceipt.stateRoot
         const l2VerifierStateRoot = l2VerifierBlockReceipt.stateRoot
         const l2ReplicaStateRoot = l2ReplicaBlockReceipt.stateRoot
@@ -79,3 +74,23 @@ describe('Verify State Roots', async () => {
     }
   })
 })
+
+export const pullForBlock = async (env, l2BlockNumber) => {
+  while (true) {
+    const l2VerifierBlockReceipt = await env.verifierProvider.send(
+      'eth_getBlockByNumber',
+      [utils.hexValue(l2BlockNumber), true]
+    )
+    const l2ReplicaBlockReceipt = await env.replicaProvider.send(
+      'eth_getBlockByNumber',
+      [utils.hexValue(l2BlockNumber), true]
+    )
+    if (
+      l2VerifierBlockReceipt.stateRoot !== null &&
+      l2ReplicaBlockReceipt.stateRoot !== null
+    ) {
+      return [l2VerifierBlockReceipt, l2ReplicaBlockReceipt]
+    }
+    await sleep(2000)
+  }
+}
