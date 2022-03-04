@@ -40,8 +40,6 @@ function Wallet() {
     }
   }
 
-  console.log([ 'page', page ])
-  console.log([ 'chain', chain ])
 
   return (
     <S.PageContainer>
