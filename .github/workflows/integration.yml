@@ -39,6 +39,17 @@ jobs:
           ec2-instance-type: m4.4xlarge
           subnet-id: subnet-905870ae
           security-group-id: sg-0855631d714870b32
+      - name: Start EC2 runner retry
+        if: steps.start-ec2-runner.outcome=='failure'
+        id: start-ec2-runner-retry
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          ec2-image-id: ami-00b46fa1102c70ff2
+          ec2-instance-type: m4.4xlarge
+          subnet-id: subnet-905870ae
+          security-group-id: sg-0855631d714870b32
 
   start-executioner:
     name: Start self-hosted EC2 executioner
@@ -166,7 +177,17 @@ jobs:
           test-grep-filter: 'tag:other'
     steps:
       - uses: actions/download-artifact@v2
+        continue-on-error: true
         id: download
+        with:
+          name: boba_images
+          path: /tmp/bobanetwork/
+      #resolving transient error:
+      #An error occurred while attempting to decompress the response stream
+      - name: retry artifact download on failure
+        id: download_2
+        if: steps.download.outcome=='failure'
+        uses: actions/download-artifact@v2
         with:
           name: boba_images
           path: /tmp/bobanetwork/

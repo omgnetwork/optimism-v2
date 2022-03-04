@@ -82,6 +82,7 @@ describe('Boba Turing Credit Test', async () => {
 
   after(async () => {
     await verifyStateRoots()
+    console.log('Verified state roots.')
   })
 
   it('{tag:boba} Should transfer BOBA to L2', async () => {
