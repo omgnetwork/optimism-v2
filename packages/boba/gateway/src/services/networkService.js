@@ -834,11 +834,13 @@ async initializeBase( networkGateway ) {
 
   }
 
-  async switchChain( layer ) {
-    this.correctChain( layer )
-  }
+  async switchChain( targetLayer ) {
+  //  this.correctChain( layer )
+  //}
 
-  async correctChain( targetLayer ) {
+  //async correctChain( targetLayer ) {
+
+    // this needds to trigger justSwitchedChain
 
     const nw = getNetwork()
     const network = store.getState().setup.network
