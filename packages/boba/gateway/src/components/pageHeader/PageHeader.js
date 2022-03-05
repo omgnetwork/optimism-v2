@@ -39,6 +39,8 @@ const PageHeader = ({ maintenance }) => {
 
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
 
+  console.log("orderedTransactions:", orderedTransactions)
+
   const pendingL1 = orderedTransactions.filter((i) => {
     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
       i.crossDomainMessage &&
@@ -68,6 +70,8 @@ const PageHeader = ({ maintenance }) => {
     ...pendingL2
   ]
 
+  console.log("pending:", pending)
+
   if (maintenance) {
     return (
       <S.HeaderWrapper>
@@ -83,7 +87,7 @@ const PageHeader = ({ maintenance }) => {
         isMobile ? (
           <Container>
             <S.HeaderWrapper>
-              <BobaLogo style={{ maxWidth: '100px' }} />
+              <BobaLogo style={{ maxWidth: '100px', paddingLeft: '20px' }} />
               <S.HeaderActionButton>
                 <Box onClick={() => setWalletOpen(!walletOpen)} sx={{ cursor: 'pointer' }}>
                   <WalletIcon />
@@ -122,7 +126,7 @@ const PageHeader = ({ maintenance }) => {
             </S.HeaderWrapper>
           </Container>
         ) : (<S.HeaderWrapper>
-          <BobaLogo style={{ maxWidth: '140px', paddingTop: '20px', width: '140px' }} />
+          <BobaLogo style={{ width: '140px', paddingTop: '15px', paddingLeft: '15px'}} />
           <MenuItems setOpen={setOpen} />
           <LayerSwitcher />
           {!!accountEnabled && pending.length > 0 ?

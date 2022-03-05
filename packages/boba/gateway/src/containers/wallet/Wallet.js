@@ -40,7 +40,6 @@ function Wallet() {
     }
   }
 
-
   return (
     <S.PageContainer>
       <PageTitle title="Wallet"/>
