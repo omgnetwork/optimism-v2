@@ -908,7 +908,7 @@ async initializeBase( networkGateway ) {
       }
     }
 
-    console.log("responseL1",txL1)
+    //console.log("responseL1",txL1)
 
     const responseL2 = await omgxWatcherAxiosInstance(
       this.networkGateway
@@ -918,7 +918,7 @@ async initializeBase( networkGateway ) {
       toRange: 1000,
     })
 
-    console.log("responseL2",responseL2)
+    //console.log("responseL2",responseL2)
 
     if (responseL2.status === 201) {
       //add the chain: 'L2' field
@@ -933,7 +933,7 @@ async initializeBase( networkGateway ) {
       toRange: 1000,
     })
 
-    console.log("responseL1pending",responseL1pending)
+    //console.log("responseL1pending",responseL1pending)
 
     if (responseL1pending.status === 201) {
       //add the chain: 'L1pending' field

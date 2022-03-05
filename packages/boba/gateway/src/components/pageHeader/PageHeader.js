@@ -39,7 +39,7 @@ const PageHeader = ({ maintenance }) => {
 
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
 
-  console.log("orderedTransactions:", orderedTransactions)
+  //console.log("orderedTransactions:", orderedTransactions)
 
   const pendingL1 = orderedTransactions.filter((i) => {
     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
@@ -69,8 +69,6 @@ const PageHeader = ({ maintenance }) => {
     ...pendingL1,
     ...pendingL2
   ]
-
-  console.log("pending:", pending)
 
   if (maintenance) {
     return (
