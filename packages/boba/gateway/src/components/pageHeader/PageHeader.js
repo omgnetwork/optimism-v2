@@ -41,12 +41,15 @@ const PageHeader = ({ maintenance }) => {
 
   //console.log("orderedTransactions:", orderedTransactions)
 
+  const now = Math.floor(Date.now() / 1000)
+
   const pendingL1 = orderedTransactions.filter((i) => {
     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
       i.crossDomainMessage &&
       i.crossDomainMessage.crossDomainMessage === 1 &&
       i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-      i.action.status === "pending"
+      i.action.status === "pending" &&
+      (now - i.timeStamp) < 500 
     ) {
       return true
     }
@@ -58,7 +61,8 @@ const PageHeader = ({ maintenance }) => {
       i.crossDomainMessage &&
       i.crossDomainMessage.crossDomainMessage === 1 &&
       i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-      i.action.status === "pending"
+      i.action.status === "pending" &&
+      (now - i.timeStamp) < 500 
     ) {
       return true
     }
@@ -69,6 +73,9 @@ const PageHeader = ({ maintenance }) => {
     ...pendingL1,
     ...pendingL2
   ]
+
+  console.log("pending",pending)
+  console.log("pending",pending.length)
 
   if (maintenance) {
     return (
