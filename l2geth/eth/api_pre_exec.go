@@ -10,10 +10,8 @@ import (
   "github.com/ethereum-optimism/optimism/l2geth/core/state"
   "github.com/ethereum-optimism/optimism/l2geth/core/types"
   "github.com/ethereum-optimism/optimism/l2geth/core/vm"
+  txtrace "github.com/ethereum-optimism/optimism/l2geth/core/vm/oetracer"
   "github.com/ethereum-optimism/optimism/l2geth/rpc"
-  ec "github.com/ethereum/go-ethereum/common"
-
-  "github.com/DeBankDeFi/eth/txtrace"
 )
 
 type PreExecAPI struct {
@@ -127,15 +125,14 @@ func (api *PreExecAPI) TraceTransaction(ctx context.Context, origin *PreExecTx) 
   }
   vmctx := core.NewEVMContext(d.msg, d.header, bc, nil)
 
-  to := ec.BytesToAddress(d.msg.To().Bytes())
   // Fill essential info into logger
-  tracer.SetFrom(ec.BytesToAddress(d.msg.From().Bytes()))
-  tracer.SetTo(&to)
+  tracer.SetFrom(d.msg.From())
+  tracer.SetTo(d.msg.To())
   tracer.SetValue(*d.msg.Value())
   tracer.SetGasUsed(d.msg.Gas())
-  tracer.SetBlockHash(ec.BytesToHash(d.block.Hash().Bytes()))
+  tracer.SetBlockHash(d.block.Hash())
   tracer.SetBlockNumber(vmctx.BlockNumber)
-  tracer.SetTx(ec.BytesToHash(d.tx.Hash().Bytes()))
+  tracer.SetTx(d.tx.Hash())
   tracer.SetTxIndex(uint(0))
   // Run the transaction with tracing enabled.
   vmenv := vm.NewEVM(vmctx, d.stateDb, bc.Config(), vm.Config{Debug: true, Tracer: tracer})
