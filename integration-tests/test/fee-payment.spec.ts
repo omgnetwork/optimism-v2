@@ -32,7 +32,7 @@ describe('Fee Payment Integration Tests', async () => {
     env = await OptimismEnv.new()
   })
 
-  it(`should return eth_gasPrice equal to OVM_GasPriceOracle.gasPrice`, async () => {
+  it('{tag:other} should return eth_gasPrice equal to OVM_GasPriceOracle.gasPrice', async () => {
     const assertGasPrice = async () => {
       const gasPrice = await env.l2Wallet.getGasPrice()
       const oracleGasPrice = await env.gasPriceOracle.gasPrice()
@@ -47,7 +47,7 @@ describe('Fee Payment Integration Tests', async () => {
     assertGasPrice()
   })
 
-  it('Paying a nonzero but acceptable gasPrice fee', async () => {
+  it('{tag:other} Paying a nonzero but acceptable gasPrice fee', async () => {
     await setPrices(env, 1000)
 
     const amount = utils.parseEther('0.0000001')
@@ -72,8 +72,6 @@ describe('Fee Payment Integration Tests', async () => {
       data: unsigned.data,
     })
 
-    const l1Fee = await env.gasPriceOracle.getL1Fee(raw)
-
     const tx = await env.l2Wallet.sendTransaction(unsigned)
     const receipt = await tx.wait()
     expect(receipt.status).to.eq(1)
@@ -83,23 +81,17 @@ describe('Fee Payment Integration Tests', async () => {
       env.sequencerFeeVault.address
     )
 
-    const l2Fee = receipt.gasUsed.mul(tx.gasPrice)
+    const txFee = receipt.gasUsed.mul(tx.gasPrice)
 
-    const expectedFeePaid = l1Fee.add(l2Fee)
-
-    expect(balanceBefore.sub(balanceAfter)).to.deep.equal(
-      expectedFeePaid.add(amount)
-    )
+    expect(balanceBefore.sub(balanceAfter)).to.deep.equal(amount.add(txFee))
 
     // Make sure the fee was transferred to the vault.
-    expect(feeVaultBalanceAfter.sub(feeVaultBalanceBefore)).to.deep.equal(
-      expectedFeePaid
-    )
+    expect(feeVaultBalanceAfter.sub(feeVaultBalanceBefore)).to.deep.equal(txFee)
 
     await setPrices(env, 1)
   })
 
-  it('should compute correct fee', async () => {
+  it('{tag:other} should compute correct fee', async () => {
     await setPrices(env, 1000)
 
     const preBalance = await env.l2Wallet.getBalance()
@@ -130,14 +122,11 @@ describe('Fee Payment Integration Tests', async () => {
       data: unsigned.data,
     })
 
-    const l1Fee = await OVM_GasPriceOracle.getL1Fee(raw)
-
     const tx = await env.l2Wallet.sendTransaction(unsigned)
     const receipt = await tx.wait()
-    const l2Fee = receipt.gasUsed.mul(tx.gasPrice)
+    const fee = receipt.gasUsed.mul(tx.gasPrice)
     const postBalance = await env.l2Wallet.getBalance()
     const feeVaultAfter = await WETH.balanceOf(predeploys.OVM_SequencerFeeVault)
-    const fee = l1Fee.add(l2Fee)
     const balanceDiff = preBalance.sub(postBalance)
     const feeReceived = feeVaultAfter.sub(feeVaultBefore)
     expect(balanceDiff).to.deep.equal(fee)
@@ -147,11 +136,11 @@ describe('Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('should not be able to withdraw fees before the minimum is met', async () => {
+  it('{tag:other} should not be able to withdraw fees before the minimum is met', async () => {
     await expect(env.sequencerFeeVault.withdraw()).to.be.rejected
   })
 
-  it('should be able to withdraw fees back to L1 once the minimum is met', async function () {
+  it('{tag:other} should be able to withdraw fees back to L1 once the minimum is met', async function () {
     const l1FeeWallet = await env.sequencerFeeVault.l1FeeWallet()
     const balanceBefore = await env.l1Wallet.provider.getBalance(l1FeeWallet)
     const withdrawalAmount = await env.sequencerFeeVault.MIN_WITHDRAWAL_AMOUNT()

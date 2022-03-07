@@ -25,13 +25,14 @@ let Timelock: Contract
 let Proxy__L2LiquidityPool: Contract
 
 const getTimestamp = async (hre) => {
-  const blockNumber = await (hre as any).deployConfig.l2Provider.getBlockNumber()
+  const blockNumber = await (
+    hre as any
+  ).deployConfig.l2Provider.getBlockNumber()
   const block = await (hre as any).deployConfig.l2Provider.getBlock(blockNumber)
   return block.timestamp
 }
 
 const deployFn: DeployFunction = async (hre) => {
-
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
@@ -52,7 +53,7 @@ const deployFn: DeployFunction = async (hre) => {
   } else {
     // set config for local/rinkeby
     delay_before_execute_s = 0
-    eta_delay_s = 0
+    eta_delay_s = 5
     governor_voting_period = 259200 // 3 days in seconds
     governor_voting_delay = 172800 // 2 days in seconds
     governor_proposal_threshold = utils.parseEther('50000')
@@ -61,7 +62,9 @@ const deployFn: DeployFunction = async (hre) => {
   // get deployed BOBA L2
 
   const BobaL2 = await hre.deployments.getOrNull('TK_L2BOBA')
+  const xBobaL2 = await hre.deployments.getOrNull('TK_L2xBOBA')
   console.log(`L2_BOBA is located at: ${BobaL2.address}`)
+  console.log(`L2_xBOBA is located at: ${xBobaL2.address}`)
 
   Factory__Timelock = new ContractFactory(
     TimelockJson.abi,
@@ -84,7 +87,7 @@ const deployFn: DeployFunction = async (hre) => {
   }
 
   await hre.deployments.save('Timelock', TimelockDeploymentSubmission)
-  await registerBobaAddress( addressManager, 'Timelock', Timelock.address )
+  await registerBobaAddress(addressManager, 'Timelock', Timelock.address)
 
   // deploy governorDelegate
   Factory__GovernorBravoDelegate = new ContractFactory(
@@ -95,7 +98,9 @@ const deployFn: DeployFunction = async (hre) => {
 
   GovernorBravoDelegate = await Factory__GovernorBravoDelegate.deploy()
   await GovernorBravoDelegate.deployTransaction.wait()
-  console.log(`GovernorBravoDelegate deployed to: ${GovernorBravoDelegate.address}`)
+  console.log(
+    `GovernorBravoDelegate deployed to: ${GovernorBravoDelegate.address}`
+  )
 
   const GovernorBravoDelegateDeploymentSubmission: DeploymentSubmission = {
     ...GovernorBravoDelegate,
@@ -104,8 +109,15 @@ const deployFn: DeployFunction = async (hre) => {
     abi: GovernorBravoDelegate.abi,
   }
 
-  await hre.deployments.save('GovernorBravoDelegate', GovernorBravoDelegateDeploymentSubmission)
-  await registerBobaAddress( addressManager, 'GovernorBravoDelegate', GovernorBravoDelegate.address )
+  await hre.deployments.save(
+    'GovernorBravoDelegate',
+    GovernorBravoDelegateDeploymentSubmission
+  )
+  await registerBobaAddress(
+    addressManager,
+    'GovernorBravoDelegate',
+    GovernorBravoDelegate.address
+  )
 
   // deploy GovernorBravoDelegator
   Factory__GovernorBravoDelegator = new ContractFactory(
@@ -117,6 +129,7 @@ const deployFn: DeployFunction = async (hre) => {
   GovernorBravoDelegator = await Factory__GovernorBravoDelegator.deploy(
     Timelock.address,
     BobaL2.address,
+    xBobaL2.address,
     Timelock.address,
     GovernorBravoDelegate.address,
     governor_voting_period, // VOTING PERIOD - duration of the voting period in seconds
@@ -124,7 +137,9 @@ const deployFn: DeployFunction = async (hre) => {
     governor_proposal_threshold // the votes necessary to propose
   )
   await GovernorBravoDelegator.deployTransaction.wait()
-  console.log(`GovernorBravoDelegator deployed to: ${ GovernorBravoDelegator.address}`)
+  console.log(
+    `GovernorBravoDelegator deployed to: ${GovernorBravoDelegator.address}`
+  )
 
   const GovernorBravoDelegatorDeploymentSubmission: DeploymentSubmission = {
     ...GovernorBravoDelegator,
@@ -133,22 +148,29 @@ const deployFn: DeployFunction = async (hre) => {
     abi: GovernorBravoDelegator.abi,
   }
 
-  await hre.deployments.save('GovernorBravoDelegator', GovernorBravoDelegatorDeploymentSubmission)
-  await registerBobaAddress( addressManager, 'GovernorBravoDelegator', GovernorBravoDelegator.address )
+  await hre.deployments.save(
+    'GovernorBravoDelegator',
+    GovernorBravoDelegatorDeploymentSubmission
+  )
+  await registerBobaAddress(
+    addressManager,
+    'GovernorBravoDelegator',
+    GovernorBravoDelegator.address
+  )
 
   // set Dao in L2LP
-  const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull(
-    'Proxy__L2LiquidityPool'
-  )
+  // const Proxy__L2LiquidityPoolDeployment = await hre.deployments.getOrNull(
+  //   'Proxy__L2LiquidityPool'
+  // )
 
-  Proxy__L2LiquidityPool = new Contract(
-    Proxy__L2LiquidityPoolDeployment.address,
-    L2LiquidityPoolJson.abi,
-    (hre as any).deployConfig.deployer_l2
-  )
+  // Proxy__L2LiquidityPool = new Contract(
+  //   Proxy__L2LiquidityPoolDeployment.address,
+  //   L2LiquidityPoolJson.abi,
+  //   (hre as any).deployConfig.deployer_l2
+  // )
 
-  await Proxy__L2LiquidityPool.transferDAORole(Timelock.address)
-  console.log(`LP Dao role transferred to Timelock`)
+  // await Proxy__L2LiquidityPool.transferDAORole(Timelock.address)
+  // console.log(`LP Dao role transferred to Timelock`)
 
   // set admin Timelock
   console.log('Queue setPendingAdmin...')
@@ -156,7 +178,8 @@ const deployFn: DeployFunction = async (hre) => {
   // set eta to be the current timestamp for local and rinkeby
   const eta1 = (await getTimestamp(hre)) + eta_delay_s
 
-  const setPendingAdminData = utils.defaultAbiCoder.encode( // the parameters for the setPendingAdmin function
+  const setPendingAdminData = utils.defaultAbiCoder.encode(
+    // the parameters for the setPendingAdmin function
     ['address'],
     [GovernorBravoDelegator.address]
   )
@@ -174,7 +197,6 @@ const deployFn: DeployFunction = async (hre) => {
   console.log('Queued setPendingAdmin!')
   console.log(`Time transaction was made: ${await getTimestamp(hre)}`)
   console.log(`Time at which transaction may be executed: ${eta1}`)
-
 
   console.log('Queue Initiate...')
   // call initiate() to complete setAdmin
@@ -205,6 +227,13 @@ const deployFn: DeployFunction = async (hre) => {
   if (process.env.NETWORK !== 'mainnet') {
     console.log('Execute setPendingAdmin...')
     // Execute the transaction that will set the admin of Timelock to the GovernorBravoDelegator contract
+    await new Promise((r) => setTimeout(r, 5000))
+    // since this is local submit random tx - (can be made better)
+    await (hre as any).deployConfig.deployer_l2.sendTransaction({
+      to: (hre as any).deployConfig.deployer_l2.address,
+      value: utils.parseEther('0.01'),
+    })
+
     await Timelock.executeTransaction(
       Timelock.address,
       0,
@@ -222,25 +251,29 @@ const deployFn: DeployFunction = async (hre) => {
       '_initiate()',
       initiateData,
       eta2
-  )
-  console.log('Executed initiate, acceptAdmin() completed');
+    )
+    console.log('Executed initiate, acceptAdmin() completed')
   } else {
     // TODO - replace with a script that can be called on ETA instead
-    console.log('\nPlease copy these values and call executeTransaction() on Timelock twice')
-    console.log('from the deployer account in the following sequence with the below parameters')
+    console.log(
+      '\nPlease copy these values and call executeTransaction() on Timelock twice'
+    )
+    console.log(
+      'from the deployer account in the following sequence with the below parameters'
+    )
     console.log('when the ETA is reached')
     console.log('---------------------------')
     console.log('target :', Timelock.address)
     console.log('value :', 0)
     console.log('signature : setPendingAdmin(address)')
-    console.log('data :',setPendingAdminData)
-    console.log('eta :',eta1)
+    console.log('data :', setPendingAdminData)
+    console.log('eta :', eta1)
     console.log('---------------------------')
     console.log('target :', GovernorBravoDelegator.address)
     console.log('value :', 0)
     console.log('signature : _initiate()')
-    console.log('data :',initiateData)
-    console.log('eta :',eta2)
+    console.log('data :', initiateData)
+    console.log('eta :', eta2)
   }
 }
 

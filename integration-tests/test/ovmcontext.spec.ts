@@ -2,15 +2,14 @@ import { expect } from 'chai'
 
 /* Imports: External */
 import { ethers } from 'hardhat'
-import { injectL2Context } from '@eth-optimism/core-utils'
+import { injectL2Context, expectApprox } from '@eth-optimism/core-utils'
 import { predeploys } from '@eth-optimism/contracts'
 import { Contract, BigNumber } from 'ethers'
 
 /* Imports: Internal */
-import { l2Provider, l1Provider, IS_LIVE_NETWORK } from './shared/utils'
+import { l2Provider, l1Provider, DEFAULT_TEST_GAS_L1 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { Direction } from './shared/watcher-utils'
-
 /**
  * These tests cover the OVM execution contexts. In the OVM execution
  * of a L1 to L2 transaction, both `block.number` and `block.timestamp`
@@ -41,20 +40,19 @@ describe('OVM Context: Layer 2 EVM Context', () => {
     await OVMMulticall.deployTransaction.wait()
   })
 
-  let numTxs = 5
-  if (IS_LIVE_NETWORK) {
-    // Tests take way too long if we don't reduce the number of txs here.
-    numTxs = 1
-  }
+  const numTxs = 5
 
-  it('enqueue: L1 contextual values are correctly set in L2', async () => {
+  it('{tag:other} enqueue: L1 contextual values are correctly set in L2', async () => {
     for (let i = 0; i < numTxs; i++) {
       // Send a transaction from L1 to L2. This will automatically update the L1 contextual
       // information like the L1 block number and L1 timestamp.
       const tx = await env.l1Messenger.sendMessage(
         OVMContextStorage.address,
         '0x',
-        2_000_000
+        2_000_000,
+        {
+          gasLimit: DEFAULT_TEST_GAS_L1,
+        }
       )
 
       // Wait for the transaction to be sent over to L2.
@@ -74,9 +72,11 @@ describe('OVM Context: Layer 2 EVM Context', () => {
       const l1BlockNumber = await OVMContextStorage.l1BlockNumbers(i)
       expect(l1BlockNumber.toNumber()).to.deep.equal(l1Block.number)
 
-      // L1 and L2 blocks will have the same timestamp.
+      // L1 and L2 blocks will have approximately the same timestamp.
       const timestamp = await OVMContextStorage.timestamps(i)
-      expect(timestamp.toNumber()).to.deep.equal(l1Block.timestamp)
+      expectApprox(timestamp.toNumber(), l1Block.timestamp, {
+        percentUpperDeviation: 5,
+      })
       expect(timestamp.toNumber()).to.deep.equal(l2Block.timestamp)
 
       // Difficulty should always be zero.
@@ -89,7 +89,7 @@ describe('OVM Context: Layer 2 EVM Context', () => {
     }
   }).timeout(150000) // this specific test takes a while because it involves L1 to L2 txs
 
-  it('should set correct OVM Context for `eth_call`', async () => {
+  it('{tag:other} should set correct OVM Context for `eth_call`', async () => {
     for (let i = 0; i < numTxs; i++) {
       // Make an empty transaction to bump the latest block number.
       const dummyTx = await env.l2Wallet.sendTransaction({
@@ -138,7 +138,7 @@ describe('OVM Context: Layer 2 EVM Context', () => {
    * OVM context.
    */
 
-  it('should return same timestamp and blocknumbers between `eth_call` and `rollup_getInfo`', async () => {
+  it('{tag:other} should return same timestamp and blocknumbers between `eth_call` and `rollup_getInfo`', async () => {
     // As atomically as possible, call `rollup_getInfo` and OVMMulticall for the
     // blocknumber and timestamp. If this is not atomic, then the sequencer can
     // happend to update the timestamp between the `eth_call` and the `rollup_getInfo`

@@ -23,10 +23,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/rlp"
-	whisper "github.com/ethereum/go-ethereum/whisper/whisperv6"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/rlp"
+	whisper "github.com/ethereum-optimism/optimism/l2geth/whisper/whisperv6"
 )
 
 // A Nonce is a 64-bit hash which proves (combined with the mix-hash) that
@@ -195,6 +195,12 @@ func (b *Block) GetTransaction(hash *Hash) *Transaction {
 // Transaction represents a single Ethereum transaction.
 type Transaction struct {
 	tx *types.Transaction
+}
+
+// NewContractCreation creates a new transaction for deploying a new contract with
+// the given properties.
+func NewContractCreation(nonce int64, amount *BigInt, gasLimit int64, gasPrice *BigInt, data []byte) *Transaction {
+	return &Transaction{types.NewContractCreation(uint64(nonce), amount.bigint, uint64(gasLimit), gasPrice.bigint, common.CopyBytes(data))}
 }
 
 // NewTransaction creates a new transaction with the given properties. Contracts

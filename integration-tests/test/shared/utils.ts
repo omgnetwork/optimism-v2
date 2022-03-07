@@ -17,7 +17,7 @@ import {
   predeploys,
 } from '@eth-optimism/contracts'
 import { injectL2Context, remove0x, Watcher } from '@eth-optimism/core-utils'
-import { cleanEnv, str, num, bool } from 'envalid'
+import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
 import { expectEvent } from '@openzeppelin/test-helpers'
 /* Imports: Internal */
@@ -29,7 +29,23 @@ if (process.env.IS_LIVE_NETWORK === 'true') {
   dotenv.config()
 }
 
+export const HARDHAT_CHAIN_ID = 31337
+export const DEFAULT_TEST_GAS_L1 = 330_000
+export const DEFAULT_TEST_GAS_L2 = 1_300_000
+export const ON_CHAIN_GAS_PRICE = 'onchain'
+
+const gasPriceValidator = makeValidator((gasPrice) => {
+  if (gasPrice === 'onchain') {
+    return gasPrice
+  }
+
+  return num()._parse(gasPrice).toString()
+})
+
 const env = cleanEnv(process.env, {
+  L1_GAS_PRICE: gasPriceValidator({
+    default: '0',
+  }),
   L1_URL: str({ default: 'http://localhost:9545' }),
   L2_URL: str({ default: 'http://localhost:8545' }),
   VERIFIER_URL: str({ default: 'http://localhost:8547' }),
@@ -50,12 +66,24 @@ const env = cleanEnv(process.env, {
     default:
       '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e',
   }),
+  PRIVATE_KEY_4: str({
+    default:
+      '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e',
+  }),
   ADDRESS_MANAGER: str({
     default: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   }),
   L2_CHAINID: num({ default: 31338 }),
   IS_LIVE_NETWORK: bool({ default: false }),
+  MOCHA_TIMEOUT: num({
+    default: 120_000,
+  }),
+  RUN_STRESS_TESTS: bool({
+    default: true,
+  }),
 })
+
+export const envConfig = env
 
 // The hardhat instance
 export const l1Provider = new providers.JsonRpcProvider(env.L1_URL)
@@ -74,12 +102,14 @@ replicaProvider.pollingInterval = env.REPLICA_POLLING_INTERVAL
 export const l1Wallet = new Wallet(env.PRIVATE_KEY, l1Provider)
 export const l1Wallet_2 = new Wallet(env.PRIVATE_KEY_2, l1Provider)
 export const l1Wallet_3 = new Wallet(env.PRIVATE_KEY_3, l1Provider)
+export const l1Wallet_4 = new Wallet(env.PRIVATE_KEY_4, l1Provider)
 
 // A random private key which should always be funded with deposits from L1 -> L2
 // if it's using non-0 gas price
 export const l2Wallet = l1Wallet.connect(l2Provider)
 export const l2Wallet_2 = l1Wallet_2.connect(l2Provider)
 export const l2Wallet_3 = l1Wallet_3.connect(l2Provider)
+export const l2Wallet_4 = l1Wallet_4.connect(l2Provider)
 
 // Predeploys
 export const PROXY_SEQUENCER_ENTRYPOINT_ADDRESS =
@@ -98,14 +128,14 @@ export const getAddressManager = (provider: any) => {
 if (!process.env.BOBA_URL) {
   console.log(`!!You did not set process.env.BOBA_URL!!`)
   console.log(
-    `Setting to default value of http://127.0.0.1:8078/addresses.json`
+    `Setting to default value of http://127.0.0.1:8080/boba-addr.json`
   )
 } else {
   console.log(`process.env.BOBA_URL set to:`, process.env.BOBA_URL)
 }
 
 export const BOBA_URL =
-  process.env.BOBA_URL || 'http://127.0.0.1:8078/addresses.json'
+  process.env.BOBA_URL || 'http://127.0.0.1:8080/boba-addr.json'
 
 // Gets the bridge contract
 export const getL1Bridge = async (wallet: Wallet, AddressManager: Contract) => {
@@ -171,12 +201,31 @@ export const encodeSolidityRevertMessage = (_reason: string): string => {
   return '0x08c379a0' + remove0x(abiCoder.encode(['string'], [_reason]))
 }
 
-export const DEFAULT_TRANSACTION = {
-  to: '0x' + '1234'.repeat(10),
-  gasLimit: 8_000_000,
-  gasPrice: 0,
-  data: '0x',
-  value: 0,
+export const defaultTransactionFactory = () => {
+  return {
+    to: '0x' + '1234'.repeat(10),
+    gasLimit: 8_000_000,
+    gasPrice: BigNumber.from(0),
+    data: '0x',
+    value: 0,
+  }
+}
+
+export const isLiveNetwork = () => {
+  return process.env.IS_LIVE_NETWORK === 'true'
+}
+
+// eslint-disable-next-line @typescript-eslint/no-shadow
+export const gasPriceForL2 = async () => {
+  if (await isMainnet()) {
+    return l2Wallet.getGasPrice()
+  }
+
+  if (isLiveNetwork()) {
+    return Promise.resolve(BigNumber.from(10000))
+  }
+
+  return Promise.resolve(BigNumber.from(0))
 }
 
 export const waitForL2Geth = async (
@@ -239,4 +288,23 @@ export const expectLogs = async (
     .map((decoded) => ({ event: eventName, args: decoded }))
 
   return expectEvent.inLogs(filteredLogs, eventName, eventArgs)
+}
+
+// eslint-disable-next-line @typescript-eslint/no-shadow
+export const isMainnet = async () => {
+  const chainId = await l1Wallet.getChainId()
+  return chainId === 1
+}
+
+export const gasPriceForL1 = async () => {
+  if (env.L1_GAS_PRICE === ON_CHAIN_GAS_PRICE) {
+    return l1Wallet.getGasPrice()
+  }
+
+  return utils.parseUnits(env.L1_GAS_PRICE, 'wei')
+}
+
+export const isHardhat = async () => {
+  const chainId = await l1Wallet.getChainId()
+  return chainId === HARDHAT_CHAIN_ID
 }

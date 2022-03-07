@@ -63,11 +63,6 @@
 x-deployer_pk: &deployer_pk
   DEPLOYER_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
-# Account #19
-# Same as the deployer - allows the deployer to bypass the fee enforcement
-x-gas-price-oracle_pk: &gas-price-oracle_pk
-  GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
-
 # Account #1
 x-sequencer_pk: &sequencer_pk
   SEQUENCER_PRIVATE_KEY: '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
@@ -75,6 +70,13 @@ x-sequencer_pk: &sequencer_pk
 # Account #2
 x-proposer_pk: &proposer_pk
   PROPOSER_PRIVATE_KEY: '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
+
+x-sequencer_bs_pk: &sequencer_bs_pk
+  BATCH_SUBMITTER_SEQUENCER_PRIVATE_KEY: '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d'
+
+# Account #2
+x-proposer_bs_pk: &proposer_bs_pk
+  BATCH_SUBMITTER_PROPOSER_PRIVATE_KEY: '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a'
 
 # Account #8
 x-relayer_pk: &relayer_pk
@@ -129,7 +131,7 @@ services:
       context: ./docker/hardhat
       dockerfile: Dockerfile
     ports:
-        # expose the service to the host for integration testing
+      # expose the service to the host for integration testing
       - ${L1CHAIN_HTTP_PORT:-9545}:8545
 
   deployer:
@@ -142,30 +144,33 @@ services:
       dockerfile: ./ops/docker/Dockerfile.deployer
     entrypoint: ./deployer.sh
     environment:
-        FRAUD_PROOF_WINDOW_SECONDS: 0
-        L1_NODE_WEB3_URL: http://l1_chain:8545
-        # these keys are hardhat's first 2 accounts, DO NOT use in production
-        << : *deployer_pk
-        << : *sequencer_pk
-        << : *proposer_pk
-        << : *relayer_pk
-        # setting the whitelist owner to address(0) disables the whitelist
-        WHITELIST_OWNER: "0x0000000000000000000000000000000000000000"
-        L1_FEE_WALLET_ADDRESS: "0x391716d440c151c42cdf1c95c1d83a5427bca52c"
-        L2_CHAIN_ID: 31338
-        L2_BLOCK_GAS_LIMIT: 11000000
-        BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-        GAS_PRICE_ORACLE_OWNER: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
-        GAS_PRICE_ORACLE_OVERHEAD: "2750"
-        GAS_PRICE_ORACLE_SCALAR: "1500000"
-        GAS_PRICE_ORACLE_L1_BASE_FEE: "1"
-        GAS_PRICE_ORACLE_GAS_PRICE: "1"
-        GAS_PRICE_ORACLE_DECIMALS: "1"
-        # skip compilation when run in docker-compose, since the contracts
-        # were already compiled in the builder step
-        NO_COMPILE: 1
-        DTL_REGISTRY_URL: http://dtl:8081/addresses.json
-        DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
+      FRAUD_PROOF_WINDOW_SECONDS: 0
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      # these keys are hardhat's first 2 accounts, DO NOT use in production
+      << : *deployer_pk
+      << : *sequencer_pk
+      << : *proposer_pk
+      << : *relayer_pk
+      # setting the whitelist owner to address(0) disables the whitelist
+      WHITELIST_OWNER: "0x0000000000000000000000000000000000000000"
+      L1_FEE_WALLET_ADDRESS: "0x391716d440c151c42cdf1c95c1d83a5427bca52c"
+      L2_CHAIN_ID: 31338
+      L2_BLOCK_GAS_LIMIT: 11000000
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      GAS_PRICE_ORACLE_OWNER: "0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199"
+      GAS_PRICE_ORACLE_OVERHEAD: "2750"
+      GAS_PRICE_ORACLE_SCALAR: "1500000"
+      GAS_PRICE_ORACLE_L1_BASE_FEE: "1"
+      GAS_PRICE_ORACLE_GAS_PRICE: "1000000000"
+      GAS_PRICE_ORACLE_DECIMALS: "6"
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
+      DTL_REGISTRY_URL: http://dtl:8081/addresses.json
+      DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
+    ports:
+        # expose the service to the host for getting the contract addrs
+      - ${DEPLOYER_PORT:-8077}:8082
 
   # deploys boba contracts and serves contract addresses
   boba_deployer:
@@ -186,13 +191,17 @@ services:
       << : *deployer_pk
       << : *relayer_pk
       << : *fast-relayer_pk
-      RETRIES: 100
+      RETRIES: 200
       DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
 
   dtl:
     depends_on:
       - l1_chain
     image: bobanetwork/data-transport-layer:latest
+    entrypoint: ./dtl.sh
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.data-transport-layer
@@ -202,11 +211,18 @@ services:
     # set the rest of the env vars for the network whcih do not
     # depend on the docker-compose setup
     environment:
-        # connect to the 2 layers
-        DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: http://l1_chain:8545
-        DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: http://l2geth:8545
-        DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
-        DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 31338
+      URL: http://deployer:8082/addresses.json
+      # connect to the 2 layers
+      DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: http://l1_chain:8545
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: http://l2geth:8545
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
+      DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 31338
+      DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 0
+      DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 0
+      RETRIES: 200
+      # if no need to support Turing v0 set height of v0 = v1
+      DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 0
+      DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081
@@ -223,17 +239,20 @@ services:
     entrypoint: sh ./geth.sh
     env_file:
       - ./envs/geth.env
+    restart: always
     environment:
-        ETH1_HTTP: http://l1_chain:8545
-        ROLLUP_TIMESTAMP_REFRESH: 5s
-        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-        # connecting to the DTL
-        ROLLUP_CLIENT_HTTP: http://dtl:7878
-        ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-        RETRIES: 100
-        # no need to keep this secret, only used internally to sign blocks
-        BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
-        BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      ETH1_HTTP: http://l1_chain:8545
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      # connecting to the DTL
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+      RETRIES: 200
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+      EMERGENCY_FORK_NUMBER: 0
     ports:
       - ${L2GETH_HTTP_PORT:-8545}:8545
       - ${L2GETH_WS_PORT:-8546}:8546
@@ -254,22 +273,24 @@ services:
       URL: http://dtl:8081/addresses.json
       # a funded hardhat account
       << : *relayer_pk
-      RETRIES: 100
-      POLLING_INTERVAL: 500
+      RETRIES: 200
+      POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
+      # Integration tests require 0 confirmations. Suggested to use 5 for production.
+      NUM_EVENT_CONFIRMATIONS: 0
 
   # a second relay system for messages that need to get to L1 quickly
-  # NOTE - all withdrawal messenges use the standard relayer with its 7 day window
+  # NOTE - all withdrawal messages use the standard relayer with its 7 day window
   boba_message-relayer-fast:
     depends_on:
       - l1_chain
       - dtl
       - l2geth
-    image: bobanetwork/boba_message-relayer-fast
+    image: bobanetwork/boba_message-relayer-fast:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.boba_message-relayer-fast
@@ -280,40 +301,65 @@ services:
       BOBA_URL: http://dtl:8081/boba-addr.json
       # This is who pays for the fast message relayer
       << : *fast-relayer_pk
-      RETRIES: 100
-      POLLING_INTERVAL: 1500
+      RETRIES: 200
+      POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
       FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
+      # Integration tests require 0 confirmations. Suggested to use 5 for production.
+      NUM_EVENT_CONFIRMATIONS: 0
 
   batch_submitter:
     depends_on:
       - l1_chain
       - dtl
       - l2geth
-    image: bobanetwork/batch-submitter:latest
+    image: bobanetwork/go-batch-submitter:latest
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.batch-submitter
-    entrypoint: ./batches.sh
+    entrypoint: ./batch-submitter.sh
     env_file:
-      - ./envs/batches.env
+      - ./envs/batch-submitter.env
     environment:
-        L1_NODE_WEB3_URL: http://l1_chain:8545
-        L2_NODE_WEB3_URL: http://l2geth:8545
-        URL: http://dtl:8081/addresses.json
-        << : *sequencer_pk
-        << : *proposer_pk
+      L1_ETH_RPC: http://l1_chain:8545
+      L2_ETH_RPC: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      << : *sequencer_bs_pk
+      << : *proposer_bs_pk
+      RETRIES: 200
 
-  verifier:
+  integration_tests:
+    image: bobanetwork/integration-tests:latest
+    deploy:
+       replicas: 0
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.integration-tests
+    entrypoint: ./integration-tests.sh
+    environment:
+      VERIFIER_URL: http://verifier:8545
+      REPLICA_URL: http://replica:8545
+      L1_URL: http://l1_chain:8545
+      L2_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      ENABLE_GAS_REPORT: 1
+      NO_NETWORK: 1
+      L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
+      << : *integration_pk
+      << : *integration_2_pk
+      << : *integration_3_pk
+
+  replica:
     depends_on:
-      - l1_chain
       - dtl
+      - l2geth
     image: bobanetwork/l2geth:latest
     deploy:
-      replicas: 0
+      replicas: 1
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.geth
@@ -321,20 +367,26 @@ services:
     env_file:
       - ./envs/geth.env
     environment:
-        ETH1_HTTP: http://l1_chain:8545
-        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-        ROLLUP_CLIENT_HTTP: http://dtl:7878
-        ROLLUP_BACKEND: 'l1'
-        ROLLUP_VERIFIER_ENABLE: 'true'
-        ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-        RETRIES: 100
+      ETH1_HTTP: http://l1_chain:8545
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l2'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      RETRIES: 60
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+      SEQUENCER_CLIENT_HTTP: http://l2geth:8545
+      EMERGENCY_FORK_NUMBER: 0
     ports:
-      - ${VERIFIER_HTTP_PORT:-8547}:8545
-      - ${VERIFIER_WS_PORT:-8548}:8546
+      - ${L2GETH_HTTP_PORT:-8549}:8545
+      - ${L2GETH_WS_PORT:-8550}:8546
 
-  replica:
+  verifier:
     depends_on:
-      - l1_chain
       - dtl
     image: bobanetwork/l2geth:latest
     deploy:
@@ -347,58 +399,40 @@ services:
       - ./envs/geth.env
     environment:
         ETH1_HTTP: http://l1_chain:8545
+        ROLLUP_TIMESTAMP_REFRESH: 5s
         ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
         ROLLUP_CLIENT_HTTP: http://dtl:7878
-        ROLLUP_BACKEND: 'l2'
+        ROLLUP_BACKEND: 'l1'
         ROLLUP_VERIFIER_ENABLE: 'true'
-        ETH1_CTC_DEPLOYMENT_HEIGHT: 8
-        RETRIES: 100
+        RETRIES: 60
         # no need to keep this secret, only used internally to sign blocks
         BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
         BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+        ROLLUP_POLL_INTERVAL_FLAG: "10s"
+        TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+        EMERGENCY_FORK_NUMBER: 0
     ports:
-      - ${L2GETH_HTTP_PORT:-8549}:8545
-      - ${L2GETH_WS_PORT:-8550}:8546
+      - ${VERIFIER_HTTP_PORT:-8547}:8545
+      - ${VERIFIER_WS_PORT:-8548}:8546
 
-  integration_tests:
-    image: bobanetwork/integration-tests:latest
-    deploy:
-       replicas: 0
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.integration-tests
-    entrypoint: ./integration-tests.sh
-    environment:
-      L1_URL: http://l1_chain:8545
-      L2_URL: http://l2geth:8545
-      URL: http://dtl:8081/addresses.json
-      BOBA_URL: http://dtl:8081/boba-addr.json
-      ENABLE_GAS_REPORT: 1
-      NO_NETWORK: 1
-      L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
-      << : *integration_pk
-      << : *integration_2_pk
-      << : *integration_3_pk
-
-  gas_oracle:
+  fraud-detector:
     depends_on:
-      - l1_chain
-      - l2geth
-    image: bobanetwork/boba_gas-price-oracle
+     - verifier
+     - dtl
+    image: bobanetwork/fraud-detector:latest
+    deploy:
+      replicas: 1
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.boba_gas-price-oracle
+      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
+      L1_CONFIRMATIONS: 8
       L2_NODE_WEB3_URL: http://l2geth:8545
-      GAS_PRICE_ORACLE_ADDRESS: "0x420000000000000000000000000000000000000F"
-      << : *gas-price-oracle_pk #same as the deployer
-      << : *sequencer_pk
-      << : *proposer_pk
-      << : *relayer_pk
-      << : *fast-relayer_pk
-      GAS_PRICE_ORACLE_FLOOR_PRICE:
-      GAS_PRICE_ORACLE_ROOF_PRICE:
-      GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
-      POLLING_INTERVAL:
-      RETRIES: 100
+      L2_CHECK_INTERVAL: 10
+      VERIFIER_WEB3_URL: http://verifier:8545
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      L1_DEPLOYMENT_BLOCK: 8
+      L2_START_BLOCK: 1
+    ports:
+      - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555

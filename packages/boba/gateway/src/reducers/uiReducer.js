@@ -23,8 +23,9 @@ if (activePage) {
 
 const initialState = {
   theme: 'dark',
-  page: activePage ? activePage : 'AccountNow',
+  page: activePage ? activePage : 'Wallet',
   depositModal: false,
+  depositBatchModal: false,
   transferModal: false,
   exitModal: false,
   mergeModal: false,
@@ -36,6 +37,7 @@ const initialState = {
   farmWithdrawModal: false,
   transferDaoModal: false,
   delegateDaoModal: false,
+  delegateDaoXModal: false,
   newProposalModal: false,
   ledger: false,
   alert: null,
@@ -51,8 +53,8 @@ function uiReducer (state = initialState, action) {
     case 'UI/PAGE/UPDATE':
       //save currently active page
       localStorage.setItem("activePage", JSON.stringify(action.payload))
-      return { 
-        ...state, 
+      return {
+        ...state,
         page: action.payload
       }
     case 'UI/MODAL/OPEN':

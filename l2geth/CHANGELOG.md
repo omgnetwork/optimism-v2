@@ -1,5 +1,112 @@
 # Changelog
 
+## 0.5.11
+
+### Patch Changes
+
+- 9ef215b8: Various small changes to reduce our upstream Geth diff
+
+## 0.5.10
+
+### Patch Changes
+
+- 2e7f6a55: Fixes incorrect timestamp handling for L1 syncing verifiers
+- 81d90563: Bring back RPC methods that were previously blocked
+
+## 0.5.9
+
+### Patch Changes
+
+- e631c39c: Implement berlin hardfork
+
+## 0.5.8
+
+### Patch Changes
+
+- 949916f8: Add a better error message for when the sequencer url is not configured when proxying user requests to the sequencer for `eth_sendRawTransaction` when running as a verifier/replica
+- 300f79bf: Fix nonce issue
+- ae96d784: Add reinitialize-by-url command, add dump chain state command
+- c7569a16: Fix blocknumber monotonicity logging bug
+
+## 0.5.7
+
+### Patch Changes
+
+- d4bf299f: Add support to fully unmarshal Receipts with Optimism fields
+- 8be69ca7: Add changeset for https://github.com/ethereum-optimism/optimism/pull/2011 - replicas forward write requests to the sequencer via a configured parameter `--sequencer.clienthttp` or `SEQUENCER_CLIENT_HTTP`
+- c9fd6ec2: Correctly parse fee enforcement via config to allow turning off L2 fees for development
+
+## 0.5.6
+
+### Patch Changes
+
+- 3a77bbcc: Implement updated timestamp logic
+- 3e3c07a3: changed the default address to be address(0) in `call`
+
+## 0.5.5
+
+### Patch Changes
+
+- 2924845d: expose ErrNonceTooHigh from miner
+
+## 0.5.4
+
+### Patch Changes
+
+- d205c1d6: surface sequencer low-level sequencer execution errors
+
+## 0.5.3
+
+### Patch Changes
+
+- 5febe10f: fixes empty block detection and removes empty worker tasks
+- 272d20d6: renames l2geth package name to github.com/ethereum-optimism/optimism/l2geth
+
+## 0.5.2
+
+### Patch Changes
+
+- d141095c: Allow for unprotected transactions
+
+## 0.5.1
+
+### Patch Changes
+
+- 7f2898ba: Fixes deadlock
+
+## 0.5.0
+
+### Minor Changes
+
+- e03dcead: Start refactor to new version of the OVM
+- e4a1129c: Adds aliasing to msg.sender and tx.origin to avoid xdomain attacks
+- 299a459e: Introduces a new opcode L1BLOCKNUMBER to replace old functionality where blocknumber would return the L1 block number and the L2 block number was inaccessible.
+- 872f5976: Removes various unused OVM contracts
+- 65289e63: Add optimistic ethereum specific fields to the receipt. These fields are related to the L1 portion of the fee. Note that this is a consensus change as it will impact the blockhash through the receipts root
+- 92c9692d: Opcode tweaks. Coinbase returns SequencerFeeVault address. Difficulty returns zero.
+- 1e63ffa0: Refactors and simplifies OVM_ETH usage
+- d3cb1b86: Reintroduces the whitelist into the v2 system
+- 81ccd6e4: `regenesis/0.5.0` release
+- f38b8000: Removes ERC20 and WETH9 features from OVM_ETH
+- 3605b963: Adds refactored support for the L1MESSAGESENDER opcode
+- 3f28385a: Removes all custom genesis initialization
+
+### Patch Changes
+
+- 8988a460: Cleanup `time.Ticker`s
+- fbdd06f5: Set the latest queue index and index after the tx has been applied to the chain
+- 5c0e90aa: Handle policy/consensus race condition for balance check
+- 8c8807c0: Refactor to simplify the process of generating the genesis json file
+- 95a0d803: Remove calls to `syncBatchesToTip` in the main `sequence()` loop
+- da99cc43: Remove dead `debug_ingestTransactions` endpoint and `txType` from RPC transactions
+- 6bb040b7: Remove complex mutex logic in favor of simple mutex logic in the `SyncService`
+- 7bd88e81: Use `OVM_GasPriceOracle` based L1 base fee instead of fetching it from remote
+- b70ee70c: upgraded to solidity 0.8.9
+- 3c56126c: Handle race condition in L2 geth for fee logic
+- c39165f8: Remove dead L1 gas price fetching code
+- 95c0463c: Fix various geth tests
+- e11c3ea2: Use minimal EIP-2929 for state accessing opcodes
+
 ## 0.4.15
 
 ### Patch Changes

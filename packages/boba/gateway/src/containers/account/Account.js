@@ -14,59 +14,66 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React,{useState,useEffect,useCallback} from 'react'
-import { useSelector, useDispatch, batch } from 'react-redux'
-
-import { isEqual, orderBy } from 'lodash'
+import { useSelector, useDispatch } from 'react-redux'
+import { isEqual } from 'lodash'
 
 //Selectors
+import { selectAccountEnabled, selectBaseEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectlayer2Balance, selectlayer1Balance } from 'selectors/balanceSelector'
-import { selectTransactions } from 'selectors/transactionSelector'
-
-import ListAccount from 'components/listAccount/listAccount'
-
-import networkService from 'services/networkService'
-
-import * as S from './Account.styles'
-
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
-import PageHeader from 'components/pageHeader/PageHeader'
-import { Box, Grid, Tab, Tabs, Typography, useMediaQuery } from '@material-ui/core'
-import { fetchLookUpPrice, fetchTransactions } from 'actions/networkAction'
+import ListAccount from 'components/listAccount/listAccount'
+import ListAccountBatch from 'components/listAccount/listAccountBatch'
+
+import * as S from './Account.styles'
+
+import { Box, Grid, Tab, Tabs, Typography, useMediaQuery } from '@mui/material'
+
+import { fetchLookUpPrice, fetchTransactions, fetchBalances } from 'actions/networkAction'
 import { selectNetwork } from 'selectors/setupSelector'
 import { useTheme } from '@emotion/react'
 import { tableHeadList } from './tableHeadList'
+
 import TabPanel from 'components/tabs/TabPanel'
-import Drink from '../../images/backgrounds/drink.png'
+
 import NetworkSwitcherIcon from 'components/icons/NetworkSwitcherIcon'
 
-import PendingTransaction from './PendingTransaction'
 import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
 
-function Account () {
+import AlertIcon from 'components/icons/AlertIcon'
+import WalletPicker from 'components/walletpicker/WalletPicker'
 
-  const networkLayer = networkService.L1orL2 === 'L1' ? 'L1' : 'L2'
-  
+function Account ({ enabled }) {
+
   const dispatch = useDispatch()
+
+  const accountEnabled = useSelector(selectAccountEnabled())
+  const baseEnabled = useSelector(selectBaseEnabled())
+  const networkLayer = useSelector(selectLayer())
+  const network = useSelector(selectNetwork())
   
-  const [activeTab, setActiveTab] = useState(networkLayer === 'L1' ? 0 : 1)
+  console.log("Account - network:", network)
+  console.log("Account - layer:", networkLayer)
+  console.log("Account - baseEnabled:", baseEnabled)
+  console.log("Account - accountEnabled:", accountEnabled)
+
+  const [ activeTab, setActiveTab ] = useState(networkLayer === 'L1' ? 0 : 1)
 
   const childBalance = useSelector(selectlayer2Balance, isEqual)
   const rootBalance = useSelector(selectlayer1Balance, isEqual)
 
   const tokenList = useSelector(selectTokens)
 
-  const network = useSelector(selectNetwork())
-
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
-  const exitLoading    = useSelector(selectLoading(['EXIT/CREATE']))
+  const exitLoading = useSelector(selectLoading(['EXIT/CREATE']))
 
   const disabled = depositLoading || exitLoading
 
   const getLookupPrice = useCallback(()=>{
+    if (!accountEnabled) return
     const symbolList = Object.values(tokenList).map((i)=> {
       if(i.symbolL1 === 'ETH') {
         return 'ethereum'
@@ -77,49 +84,68 @@ function Account () {
       }
     })
     dispatch(fetchLookUpPrice(symbolList))
-  },[tokenList, dispatch])
+  },[ tokenList, dispatch, accountEnabled ])
 
-  const unorderedTransactions = useSelector(selectTransactions, isEqual)
+  // const unorderedTransactions = useSelector(selectTransactions, isEqual)
 
-  const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+  // const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
 
-  const pendingL1 = orderedTransactions.filter((i) => {
-      if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
-          i.crossDomainMessage &&
-          i.crossDomainMessage.crossDomainMessage === 1 &&
-          i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-          i.action.status === "pending"
-      ) {
-          return true
-      }
-      return false
-  })
+  // const pendingL1 = orderedTransactions.filter((i) => {
+  //     if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
+  //         i.crossDomainMessage &&
+  //         i.crossDomainMessage.crossDomainMessage === 1 &&
+  //         i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+  //         i.action.status === "pending"
+  //     ) {
+  //         return true
+  //     }
+  //     return false
+  // })
 
-  const pendingL2 = orderedTransactions.filter((i) => {
-      if (i.chain === 'L2' &&
-          i.crossDomainMessage &&
-          i.crossDomainMessage.crossDomainMessage === 1 &&
-          i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-          i.action.status === "pending"
-      ) {
-          return true
-      }
-      return false
-  })
+  // const pendingL2 = orderedTransactions.filter((i) => {
+  //     if (i.chain === 'L2' &&
+  //         i.crossDomainMessage &&
+  //         i.crossDomainMessage.crossDomainMessage === 1 &&
+  //         i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
+  //         i.action.status === "pending"
+  //     ) {
+  //         return true
+  //     }
+  //     return false
+  // })
 
-  const pending = [
-    ...pendingL1,
-    ...pendingL2
-  ]
+  // const pending = [
+  //   ...pendingL1,
+  //   ...pendingL2
+  // ]
+
+      // {pending.length > 0 &&
+      //   <Grid sx={{margin: '10px 0px'}}>
+      //     <Grid item xs={12}>
+      //       <PendingTransaction />
+      //     </Grid>
+      //   </Grid>
+      // }
 
   useEffect(()=>{
+    if (!accountEnabled) return
     getLookupPrice()
-  },[childBalance, rootBalance, getLookupPrice])
+  },[ childBalance, rootBalance, getLookupPrice, accountEnabled ])
+
+  useEffect(()=>{
+    if (accountEnabled) {
+      console.log("Account - initial check balances")
+      dispatch(fetchTransactions())
+      dispatch(fetchBalances())
+    }
+  },[ dispatch, accountEnabled ])
 
   useInterval(() => {
-    batch(() => {
+    if (accountEnabled) {
+      console.log("Account - checking balances")
       dispatch(fetchTransactions())
-    })
+      dispatch(fetchBalances())
+    }
   }, POLL_INTERVAL)
 
   const theme = useTheme()
@@ -135,11 +161,11 @@ function Account () {
     </Box>
   )
 
-  let label_L1 = 'Your Balance on Ethereum Mainnet'
-  if(network === 'rinkeby') label_L1 = 'Rinkeby L1'
+  let label_L1 = 'Your Balance on Ethereum'
+  if (network === 'rinkeby') label_L1 = 'Rinkeby'
 
-  let label_L2 = 'Your Balance on Boba Network'
-  if(network === 'rinkeby') label_L2 = 'Boba Rinkeby L2'
+  let label_L2 = 'Your Balance on Boba'
+  if (network === 'rinkeby') label_L2 = 'Boba'
 
   const L1Column = () => (
     <S.AccountWrapper >
@@ -160,6 +186,12 @@ function Account () {
         })}
       </S.TableHeading>
       <Box>
+        <ListAccountBatch
+          chain={'L1'}
+          networkLayer={networkLayer}
+          disabled={disabled}
+          accountEnabled={accountEnabled}
+        />
         {rootBalance.map((i, index) => {
           return (
             <ListAccount
@@ -205,30 +237,27 @@ function Account () {
         })}
       </Box>
     </S.AccountWrapper>
-  );
+  )
 
   return (
     <>
-      <PageHeader title="Wallet"/>
+      {/*<PageTitle title="Wallet"/>*/}
 
-      <S.CardTag>
-        <S.CardContentTag>
-          <S.CardInfo>Boba Balances</S.CardInfo>
-          {(network === 'mainnet') &&
-          <Typography variant="body2">
-             You are using Mainnet.<br/>
-             WARNING: the mainnet smart contracts are not fully audited and funds may be at risk.<br/>
-             Please be cautious when using Mainnet.
-          </Typography>
-          }
-        </S.CardContentTag>
-        <Box sx={{flex: 3}}>
-          <S.ContentGlass>
-            <img src={Drink} href="#" width={135} alt="Boba Drink"/>
-          </S.ContentGlass>
-        </Box>
-      </S.CardTag>
-      
+      {!accountEnabled &&
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon />
+            <S.AlertText
+              variant="body2"
+              component="p"
+            >
+              You have not connected your wallet. To see your balances, bridge, and transfer, connect to MetaMask
+            </S.AlertText>
+          </S.AlertInfo>
+          <WalletPicker />
+        </S.LayerAlert>
+      }
+
       {disabled &&
         <S.LayerAlert style={{border: 'solid 1px yellow'}}>
           <S.AlertInfo>
@@ -242,13 +271,7 @@ function Account () {
         </S.LayerAlert>
       }
 
-      {pending.length > 0 &&
-        <Grid sx={{margin: '10px 0px'}}>
-          <Grid item xs={12}>
-            <PendingTransaction />
-          </Grid>
-        </Grid>
-      }
+
       {isMobile ? (
         <>
           <Tabs value={activeTab} onChange={handleChange} sx={{color: '#fff', fontWeight: 700, my: 2}}>
@@ -267,7 +290,6 @@ function Account () {
           <Grid item xs={12} md={6} >
             <L1Column />
           </Grid>
-
           <Grid item xs={12} md={6}>
             <L2Column />
           </Grid>
@@ -278,4 +300,4 @@ function Account () {
 
 }
 
-export default React.memo(Account);
+export default React.memo(Account)

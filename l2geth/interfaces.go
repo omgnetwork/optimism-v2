@@ -22,8 +22,8 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
+	"github.com/ethereum-optimism/optimism/l2geth/core/types"
 )
 
 // NotFound is returned by API methods if the requested item does not exist.
@@ -120,9 +120,12 @@ type CallMsg struct {
 	Value    *big.Int        // amount of wei sent along with the call
 	Data     []byte          // input data, usually an ABI-encoded contract method invocation
 
+	AccessList types.AccessList // EIP-2930 access list.
+
 	L1Timestamp   uint64
 	L1BlockNumber *big.Int
 	QueueOrigin   types.QueueOrigin
+	L1Turing      []byte
 }
 
 // A ContractCaller provides contract calls, essentially transactions that are executed by

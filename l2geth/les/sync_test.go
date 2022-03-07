@@ -22,11 +22,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum-optimism/optimism/l2geth/accounts/abi/bind"
+	"github.com/ethereum-optimism/optimism/l2geth/core"
+	"github.com/ethereum-optimism/optimism/l2geth/crypto"
+	"github.com/ethereum-optimism/optimism/l2geth/light"
+	"github.com/ethereum-optimism/optimism/l2geth/params"
 )
 
 // Test light syncing which will download all headers from genesis.
@@ -41,8 +41,6 @@ func TestLegacyCheckpointSyncingLes3(t *testing.T) { testCheckpointSyncing(t, 3,
 func TestCheckpointSyncingLes3(t *testing.T) { testCheckpointSyncing(t, 3, 2) }
 
 func testCheckpointSyncing(t *testing.T, protocol int, syncMode int) {
-	t.Skip("OVM breaks this with `insufficient balance for transfer`, probably because transfers don't work.")
-
 	config := light.TestServerIndexerConfig
 
 	waitIndexers := func(cIndexer, bIndexer, btIndexer *core.ChainIndexer) {
@@ -135,8 +133,6 @@ func TestMissOracleBackend(t *testing.T)             { testMissOracleBackend(t, 
 func TestMissOracleBackendNoCheckpoint(t *testing.T) { testMissOracleBackend(t, false) }
 
 func testMissOracleBackend(t *testing.T, hasCheckpoint bool) {
-	t.Skip("OVM breaks this with `insufficient balance for transfer`, probably because transfers don't work.")
-
 	config := light.TestServerIndexerConfig
 
 	waitIndexers := func(cIndexer, bIndexer, btIndexer *core.ChainIndexer) {
@@ -188,7 +184,7 @@ func testMissOracleBackend(t *testing.T, hasCheckpoint bool) {
 	// that user wants to unlock something which blocks the oracle backend
 	// initialisation. But at the same time syncing starts.
 	//
-	// See https://github.com/ethereum/go-ethereum/issues/20097 for more detail.
+	// See https://github.com/ethereum-optimism/optimism/l2geth/issues/20097 for more detail.
 	//
 	// In this case, client should run light sync or legacy checkpoint sync
 	// if hardcoded checkpoint is configured.

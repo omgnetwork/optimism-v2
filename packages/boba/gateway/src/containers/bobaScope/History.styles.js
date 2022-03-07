@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import {Typography, Box} from '@material-ui/core'
+import {Typography, Box} from '@mui/material'
 
 export const HistoryContainer = styled.div`
     background: ${props => props.theme.palette.background.secondary};
@@ -41,5 +41,28 @@ export const Header = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'flex-start',
     gap: '20px',
+  },
+}));
+
+
+export const ScopePageContainer = styled(Box)(({ theme }) => ({
+  margin: '0px auto',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  padding: '10px',
+  paddingTop: '0px',
+  width: '70%',
+  [ theme.breakpoints.between('md', 'lg') ]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [ theme.breakpoints.between('sm', 'md') ]: {
+    width: '90%',
+    padding: '0px',
+  },
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%',
+    padding: '0px',
   },
 }));

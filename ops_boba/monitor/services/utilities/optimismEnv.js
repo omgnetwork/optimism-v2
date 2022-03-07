@@ -2,20 +2,16 @@
 
 const ethers = require('ethers')
 const core_utils_1 = require('@eth-optimism/core-utils')
+const { Logger } = require('@eth-optimism/common-ts')
 const Mutex = require('async-mutex').Mutex
-const {
-  loadContractFromManager,
-  getContractFactory,
-} = require('@eth-optimism/contracts')
 const fetch = require('node-fetch')
-const { Watcher } = require('../../../../packages/core-utils/dist/watcher')
 
-const addressManagerJSON = require('../../artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
-const L1LiquidityPoolJson = require('../../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
-const L2LiquidityPoolJson = require('../../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
-const L1StandardBridgeJson = require('../../artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
-const L2StandardBridgeJson = require('../../artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
-const StateCommitmentChainJson = require('../../artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
+const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
+const L1LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
+const L2LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
+const L1StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
+const L2StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
+const StateCommitmentChainJson = require('@eth-optimism/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
 
 require('dotenv').config()
 const env = process.env
@@ -87,7 +83,7 @@ const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
 class OptimismEnv {
   constructor() {
-    this.logger = new core_utils_1.Logger({ name: this.name })
+    this.logger = new Logger({ name: this.name })
 
     this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
       L1_NODE_WEB3_URL
@@ -253,7 +249,7 @@ class OptimismEnv {
     )
 
     // watcher
-    this.watcher = new Watcher({
+    this.watcher = new core_utils_1.Watcher({
       l1: {
         provider: this.L1Provider,
         messengerAddress: this.L1CrossDomainMessenger,

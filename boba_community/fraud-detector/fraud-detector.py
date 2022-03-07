@@ -5,7 +5,7 @@
 # Basic fraud checker. Reads state roots from SCC and checks them against
 # actual L2 values, reporting mismatches. Note - code was copied from
 # stress_tester.py and contains a lot of irrelevant cruft to be cleaned up
-# later. 
+# later.
 
 import os,sys
 from web3 import Web3
@@ -15,8 +15,9 @@ import requests,json
 import logging
 from web3.middleware import geth_poa_middleware
 from web3.logs import STRICT, IGNORE, DISCARD, WARN
-import threading
-from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
+from threading import Thread, Lock
+from jsonrpclib.SimpleJSONRPCServer import PooledJSONRPCServer
+from jsonrpclib.threadpool import ThreadPool
 
 logging.basicConfig(format='%(levelname)s %(asctime)s %(message)s', datefmt='%Y%m%dT%H%M%S')
 logger = logging.getLogger('fraud-detector')
@@ -53,20 +54,22 @@ Matched = {
   'Time':time.time(), # Local timestamp
   'is_ok':True # Set false once a mismatch is found. This disables checkpointing
 }
+matchedLock = Lock()
 
 def status(*args):
   global Matched
+  matchedLock.acquire()
   status = {
     'matchedBlock':Matched['Block'],
     'matchedRoot':Matched['Root'],
     'timestamp':Matched['Time'],
     'isOK':Matched['is_ok']
   }
-
+  matchedLock.release()
   return status
 
 try:
-  with open("./checkpoint.dat", "r") as f:
+  with open("./db/checkpoint.dat", "r") as f:
     start_at = json.loads(f.read())
     element_start = start_at[0]
     l1_base = start_at[1]
@@ -77,12 +80,34 @@ except:
 batch_size =1000
 
 rpc = [None]*4
+
 rpc[1] = Web3(Web3.HTTPProvider(os.environ['L1_NODE_WEB3_URL']))
+if 'rinkeby' in os.environ['L1_NODE_WEB3_URL']:
+  rpc[1].middleware_onion.inject(geth_poa_middleware, layer=0)
 assert (rpc[1].isConnected())
 logger.debug ("Connected to L1_NODE_WEB3_URL")
 
-rpc[2] = Web3(Web3.HTTPProvider(os.environ['L2_NODE_WEB3_URL']))
-assert (rpc[2].isConnected())
+while True:
+  try:
+    rpc[1] = Web3(Web3.HTTPProvider(os.environ['L1_NODE_WEB3_URL']))
+    assert (rpc[1].isConnected())
+    break
+  except:
+    logger.info ("Waiting for L1...")
+    time.sleep(10)
+
+rpc[1].middleware_onion.inject(geth_poa_middleware, layer=0)
+logger.debug("Connected to L1_NODE_WEB3_URL")
+
+while True:
+  try:
+    rpc[2] = Web3(Web3.HTTPProvider(os.environ['L2_NODE_WEB3_URL']))
+    assert (rpc[2].isConnected())
+    break
+  except:
+    logger.info ("Waiting for L2...")
+    time.sleep(10)
+
 rpc[2].middleware_onion.inject(geth_poa_middleware, layer=0)
 logger.debug("Connected to L2_NODE_WEB3_URL")
 
@@ -159,6 +184,7 @@ def doEvent(event, force_L2):
     else:
       l2SR_str = "                                --                                "
     log_str = "{} {} {} {} {} {}".format(rCount, event.blockNumber, Web3.toHex(sr), l2SR_str, Web3.toHex(vfSR), match)
+    matchedLock.acquire()
     if match != "":
       Matched['is_ok'] = False
       logger.warning(log_str)
@@ -167,6 +193,7 @@ def doEvent(event, force_L2):
       Matched['Root'] = Web3.toHex(sr)
       Matched['Time'] = time.time()
       logger.info(log_str)
+    matchedLock.release()
 
     if event.blockNumber > checkpoint[1]:
       checkpoint[0] = rCount
@@ -175,13 +202,31 @@ def doEvent(event, force_L2):
 def do_checkpoint():
   global last_saved
   global Matched
-  if Matched['is_ok'] and last_saved != checkpoint[1]:
-    with open("./checkpoint.dat", "w") as f:
+  matchedLock.acquire()
+  isOK = Matched['is_ok']
+  matchedLock.release()
+
+  if isOK and last_saved != checkpoint[1]:
+    with open("./db/checkpoint.dat", "w") as f:
       f.write(json.dumps(checkpoint))
     last_saved = checkpoint[1]
 
-def server_loop(ws):
-  ws.serve_forever()
+def server_loop():
+  notify_pool = ThreadPool(max_threads=10, min_threads=0)
+  request_pool = ThreadPool(max_threads=50, min_threads=10)
+  notify_pool.start()
+  request_pool.start()
+
+  ws = PooledJSONRPCServer(('', 8555), thread_pool=request_pool)
+  ws.set_notification_pool(notify_pool)
+  ws.register_function(status)
+
+  try:
+    ws.serve_forever()
+  finally:
+    request_pool.stop()
+    notify_pool.stop()
+    ws.set_notification_pool(None)
 
 def fpLoop():
   l1_tip = rpc[1].eth.block_number - l1_confirmations
@@ -234,9 +279,7 @@ def fpLoop():
 
   logger.info("Exiting")
 
-ws = SimpleJSONRPCServer(('', 8555))
-ws.register_function(status)
-server_thread = threading.Thread(target=server_loop,args=(ws,))
+server_thread = Thread(target=server_loop,args=())
 server_thread.start()
 
 fpLoop()

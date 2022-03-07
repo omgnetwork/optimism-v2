@@ -4,13 +4,14 @@ import (
   "context"
   "math/big"
 
-  "github.com/ethereum/go-ethereum/common"
-  "github.com/ethereum/go-ethereum/common/hexutil"
-  "github.com/ethereum/go-ethereum/core"
-  "github.com/ethereum/go-ethereum/core/state"
-  "github.com/ethereum/go-ethereum/core/types"
-  "github.com/ethereum/go-ethereum/core/vm"
-  "github.com/ethereum/go-ethereum/rpc"
+  "github.com/ethereum-optimism/optimism/l2geth/common"
+  "github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
+  "github.com/ethereum-optimism/optimism/l2geth/core"
+  "github.com/ethereum-optimism/optimism/l2geth/core/state"
+  "github.com/ethereum-optimism/optimism/l2geth/core/types"
+  "github.com/ethereum-optimism/optimism/l2geth/core/vm"
+  "github.com/ethereum-optimism/optimism/l2geth/rpc"
+  ec "github.com/ethereum/go-ethereum/common"
 
   "github.com/DeBankDeFi/eth/txtrace"
 )
@@ -64,7 +65,7 @@ func (api *PreExecAPI) getBlockAndMsg(origin *PreExecTx, number *big.Int) (*type
     hexutil.MustDecodeUint64(origin.Gas),
     hexutil.MustDecodeBig(origin.GasPrice),
     hexutil.MustDecode(origin.Data),
-    false, number, parentHeader.Time, types.QueueOriginSequencer,
+    false, number, parentHeader.Time, []byte{0}, types.QueueOriginSequencer,
   )
 
   return block, msg
@@ -126,14 +127,15 @@ func (api *PreExecAPI) TraceTransaction(ctx context.Context, origin *PreExecTx) 
   }
   vmctx := core.NewEVMContext(d.msg, d.header, bc, nil)
 
+  to := ec.BytesToAddress(d.msg.To().Bytes())
   // Fill essential info into logger
-  tracer.SetFrom(d.msg.From())
-  tracer.SetTo(d.msg.To())
+  tracer.SetFrom(ec.BytesToAddress(d.msg.From().Bytes()))
+  tracer.SetTo(&to)
   tracer.SetValue(*d.msg.Value())
   tracer.SetGasUsed(d.msg.Gas())
-  tracer.SetBlockHash(d.block.Hash())
+  tracer.SetBlockHash(ec.BytesToHash(d.block.Hash().Bytes()))
   tracer.SetBlockNumber(vmctx.BlockNumber)
-  tracer.SetTx(d.tx.Hash())
+  tracer.SetTx(ec.BytesToHash(d.tx.Hash().Bytes()))
   tracer.SetTxIndex(uint(0))
   // Run the transaction with tracing enabled.
   vmenv := vm.NewEVM(vmctx, d.stateDb, bc.Config(), vm.Config{Debug: true, Tracer: tracer})

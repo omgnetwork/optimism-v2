@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/turing-hybrid-compute/packages/boba/gateway/src/images/logo-boba.svg" width=280></a>
+  <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/images/boba2/logo-boba2.svg" width=400></a>
   <br />
   <h1> The Boba Monorepo</h1>
 </div>
@@ -15,7 +15,6 @@
 - [Community and DAO](#community-and-dao)
 - [Directory Structure](#directory-structure)
 - [Contributing](#contributing)
-- [Development Quick Start](#development-quick-start)
   * [Dependencies](#dependencies)
 - [Spinning up the stack](#spinning-up-the-stack)
   * [Helpful commands](#helpful-commands)
@@ -26,7 +25,13 @@
 
 ## TL;DR
 
-This is the primary place where [Boba](https://boba.network) works on the Boba L2. Boba is based on the amazing work done by [Optimism](https://optimism.io) and uses the same base contracts, but differs from Optimism by:
+This is the primary place where [Boba](https://boba.network) works on the Boba L2, a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md). 
+
+<a href="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing">
+  <img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/images/boba2/turing.png" width=500>
+</a>
+
+ Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
 
   * providing additional cross-chain messaging such as a `message-relayer-fast`
   * using different gas pricing logic
@@ -34,12 +39,12 @@ This is the primary place where [Boba](https://boba.network) works on the Boba L
   * providing a community fraud-detector that allows transactions to be independently verified by anyone
   * interacting with L2 ETH using the normal ETH methods (`msg.value`, `send eth_sendTransaction`, and `provider.getBalance(address)` rather than as WETH
   * being organized as a [DAO](./packages/boba/contracts/contracts/DAO)
-  * (coming on Dec. 20) native [NFT bridging](./packages/boba/contracts/contracts/bridges)
+  * native [NFT bridging](./packages/boba/contracts/contracts/bridges)
   * automatically relaying classical 7-day exit messages to L1 for you, rather than this being a separate step
 
 ## Documentation
 
-Documentation is available [here](http://docs.boba.network/) or in this repo (see `boba_documention`).
+User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [this folder](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_documentation) and within the service and contract directories. 
 
 ## Community and DAO
 
@@ -47,14 +52,14 @@ Documentation is available [here](http://docs.boba.network/) or in this repo (se
 
 ## Directory Structure
 
-**Base Layer (generally similar or identical to Optimistic Ethereum)**
+**Base Layer (generally similar to Optimistic Ethereum)**
 
 * [`packages`](./packages): Contains all the typescript packages and contracts
   * [`contracts`](./packages/contracts): Solidity smart contracts implementing the OVM
   * [`core-utils`](./packages/core-utils): Low-level utilities and encoding packages
   * [`common-ts`](./packages/common-ts): Common tools for TypeScript code that runs in Node
   * [`data-transport-layer`](./packages/data-transport-layer): Event indexer, allowing the `l2geth` node to access L1 data
-  * [`batch-submitter`](./packages/batch-submitter): Daemon for submitting L2 transaction and state root batches to L1
+  * [`batch-submitter`](./go/batch-submitter): Daemon for submitting L2 transaction and state root batches to L1
   * [`message-relayer`](./packages/message-relayer): Service for relaying L2 messages to L1
   * [`replica-healthcheck`](./packages/replica-healthcheck): Service to monitor the health of different replica deployments
 * [`l2geth`](./l2geth): Fork of [go-ethereum v1.9.10](https://github.com/ethereum/go-ethereum/tree/v1.9.10) implementing the [OVM](https://research.paradigm.xyz/optimism#optimistic-geth).
@@ -64,6 +69,7 @@ as well as a docker-compose file for bringing up local testnets easily
 
 **Boba Layer**
 
+* [`packages/boba/turing`](./packages/boba/turing): System for hybrid compute
 * [`boba_community`](./boba_community): Code for running your own Boba node/replica and the fraud detector
 * [`boba_documentation`](./boba_documentation): Boba-specific documentation
 * [`boba_examples`](./boba_examples): Basic examples of deploying contracts on Boba
@@ -76,13 +82,10 @@ as well as a docker-compose file for bringing up local testnets easily
   * [`message-relayer-fast`](./packages/boba/message-relayer-fast): A fast message relayer without a 7 day delay
   * [`register`](./packages/boba/register): Code for registering addresses in the AddressManager
   * [`subgraph`](./packages/boba/subgraph): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
-  * [`turing`](./packages/boba/turing): Experimental branch only - system for hybrid compute
 
 ## Contributing
 
-Follow the [Development Quick Start](#development-quick-start) to set up your local development environment.
-
-## Development Quick Start
+Follow these instructions to set up your local development environment.
 
 ### Dependencies
 
@@ -94,7 +97,7 @@ You'll need the following:
 * [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
-**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying you contracts, it's simpler to use https://rinkeby.boba.network**. 
+**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying you contracts, it's simpler to use https://rinkeby.boba.network**.
 
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
@@ -133,7 +136,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
-* _To (re)build individual Boba services_: `docker-compose -f "docker-compose.yml" build -- boba_message-relayer-fast` Note: You may have to first comment out various dependencies in `docker-compose.yml`.
+* _To (re)build individual Boba ts services_: `docker-compose build -- builder` then `docker-compose build -- dtl`, for example
 
 ### Running unit tests
 
@@ -152,7 +155,8 @@ Make sure you are in the `ops` folder and then run
 docker-compose run integration_tests
 ```
 
-Expect the full test suite with more than 110 tests including load tests to complete in between *30 minutes* to *two hours* depending on your computer hardware. 
+Expect the full test suite with more than 110 tests including load tests to complete in 
+between *30 minutes* to *two hours* depending on your computer hardware.
 
 ### Viewing docker container logs
 

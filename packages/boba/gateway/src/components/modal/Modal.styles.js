@@ -1,6 +1,6 @@
-import { Box, IconButton } from '@material-ui/core';
-import { styled } from '@material-ui/system';
-import ModalUnstyled from '@material-ui/unstyled/ModalUnstyled';
+import { Box, IconButton } from '@mui/material'
+import { styled } from '@mui/system'
+import { ModalUnstyled } from '@mui/base'
 
 export const StyledModal = styled(ModalUnstyled)`
   position: fixed;
@@ -14,7 +14,6 @@ export const StyledModal = styled(ModalUnstyled)`
   align-items: center;
   justify-content: center;
   backdrop-filter: ${(props) => props.ismobile ? 'blur(20px)' : 'none'};
-
 `;
 
 export const Backdrop = styled('div')`
@@ -24,10 +23,11 @@ export const Backdrop = styled('div')`
   bottom: 0;
   top: 0;
   left: 0;
-  background-color: rgba(8, 22, 44, 0.7);
+  background-color: #111315;
+  opacity: 0.8;
   backdrop-filter: blur(10px);
   -webkit-tap-highlight-color: transparent;
-`;
+`; 
 
 export const Style = styled(Box)`
   display: flex;
@@ -35,13 +35,12 @@ export const Style = styled(Box)`
   justify-content: space-between;
   background: ${(props) => props.transparent ? props.theme.palette.background.modalTransparent : props.theme.palette.background.modal};
   backdrop-filter: ${(props) => props.transparent ? 'none' :'blur(66px)'};
-  padding: ${(props) => props.transparent ? '20px' : '40px'};
+  padding: 20px;
   border: 0;
   outline: 0;
   box-sizing: border-box;
   max-width: 100%;
   border-radius: 12px;
-  /* min-height: 450px; */
 `;
 
 export const IconButtonTag = styled(IconButton)(({ theme }) => ({

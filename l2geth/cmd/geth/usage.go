@@ -22,8 +22,8 @@ import (
 	"io"
 	"sort"
 
-	"github.com/ethereum/go-ethereum/cmd/utils"
-	"github.com/ethereum/go-ethereum/internal/debug"
+	"github.com/ethereum-optimism/optimism/l2geth/cmd/utils"
+	"github.com/ethereum-optimism/optimism/l2geth/internal/debug"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -77,6 +77,7 @@ var AppHelpFlagGroups = []flagGroup{
 			utils.RollupEnforceFeesFlag,
 			utils.RollupFeeThresholdDownFlag,
 			utils.RollupFeeThresholdUpFlag,
+			utils.SequencerClientHttpFlag,
 		},
 	},
 	{

@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum-optimism/optimism/l2geth/common"
 )
 
 type Config struct {
@@ -37,4 +37,6 @@ type Config struct {
 	// quoted and the transaction being executed
 	FeeThresholdDown *big.Float
 	FeeThresholdUp   *big.Float
+	// HTTP endpoint of the sequencer
+	SequencerClientHttp string
 }

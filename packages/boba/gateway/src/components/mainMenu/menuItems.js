@@ -1,6 +1,12 @@
 export const menuItems = [
   {
-    key: 'AccountNow',
+    key: 'Ecosystem',
+    icon: "SafeIcon",
+    title: "Ecosystem",
+    url: "/Ecosystem"
+  },
+  {
+    key: 'Wallet',
     icon: "WalletIcon",
     title: "Wallet",
     url: "/"
@@ -8,15 +14,15 @@ export const menuItems = [
   {
     key: 'History',
     icon: "HistoryIcon",
-    title: "Transaction History",
+    title: "History",
     url: "/history"
   },
-  {
-    key: 'BobaScope',
-    icon: "SearchIcon",
-    title: "System Analytics",
-    url: "/bobascope"
-  },
+  // {
+  //   key: 'Bridge',
+  //   icon: "WalletIcon",
+  //   title: "Bridge",
+  //   url: "/"
+  // },
   {
     key: 'Farm',
     icon: "EarnIcon",
@@ -24,10 +30,10 @@ export const menuItems = [
     url: "/earn",
   },
   {
-    key: 'NFT',
-    icon: "NFTIcon",
-    title: "NFT",
-    url: "/nft"
+    key: 'Save',
+    icon: "SaveIcon",
+    title: "Stake",
+    url: "/save",
   },
   {
     key: 'DAO',
@@ -35,16 +41,51 @@ export const menuItems = [
     title: "DAO",
     url: "/dao"
   },
-  {
-    key: 'Airdrop',
-    icon: "SwapIcon",
-    title: "Airdrop",
-    url: "/airdrop"
-  },
-  {
-    key: 'Help',
-    icon: "HelpIcon",
-    title: "Help/FAQ",
-    url: "/help"
-  },
+
+  // {
+  //   key: 'MORE',
+  //   title: "More",
+  //   url: "/more",
+  //   child: [
+  //     {
+  //       key: 'History',
+  //       icon: "HistoryIcon",
+  //       title: "History",
+  //       url: "/history"
+  //     },
+  //     {
+  //       key: 'BobaScope',
+  //       icon: "SearchIcon",
+  //       title: "Analytics",
+  //       url: "/bobascope"
+  //     },
+
+  //     {
+  //       key: 'NFT',
+  //       icon: "NFTIcon",
+  //       title: "NFT",
+  //       url: "/nft"
+  //     },
+
+  //     {
+  //       key: 'Airdrop',
+  //       icon: "SwapIcon",
+  //       title: "Airdrop",
+  //       url: "/airdrop"
+  //     },
+  //     {
+  //       key: 'GnosisSafe',
+  //       icon: "SafeIcon",
+  //       title: "Multisig",
+  //       url: "https://multisig.boba.network/"
+  //     },
+  //     {
+  //       key: 'Help',
+  //       icon: "HelpIcon",
+  //       title: "Help/FAQ",
+  //       url: "/help"
+  //     },
+  //   ]
+  // },
+
 ]

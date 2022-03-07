@@ -1,26 +1,21 @@
-import styled from '@emotion/styled';
-import { Box } from '@material-ui/core';
 
-export const Menu = styled.div`
-  flex: 0 0 320px;
-  width: 260px;
-  padding-top: 40px;
-  padding-left: 40px;
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    margin-left: -40px;
-  }
+import { Box } from '@mui/material'
+import { styled } from '@mui/system'
 
-  > a {
-    margin-bottom: 50px;
-    display: flex;
-  }
-`
+export const Menu = styled('div')({
+  display: 'flex',
+  width: '100%',
+  height: '100px',
+  gap: '20px',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  paddingTop: '20px',
+  paddingLeft: '20px',
+  paddingBottom: '20px',
+})
+
 export const MobileNavTag = styled(Box)`
   width: 100%;
-  padding: 20px 0 40px 0;
   display: flex;
   gap: 20px;
   align-items: center;
@@ -28,7 +23,7 @@ export const MobileNavTag = styled(Box)`
 `;
 
 export const StyleDrawer = styled(Box)`
-  background-color: ${(props) => props.theme.palette.mode === 'light' ? 'white' : '#061122' };
+  background-color: ${(props) => props.theme.palette.mode === 'light' ? 'white' : '#061122'};
   height: 100%;
 `;
 
@@ -44,3 +39,13 @@ export const WrapperCloseIcon = styled(Box)`
   justify-content: space-between;
   align-items: center;
 `;
+
+export const MenuWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+  flexDirection: 'column',
+  borderRight: 'solid white',
+  borderWidth: '1px',
+  paddingRight: '10px',
+}))

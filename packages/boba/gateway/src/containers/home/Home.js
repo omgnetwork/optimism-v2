@@ -15,88 +15,98 @@ limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectWalletMethod } from 'selectors/setupSelector'
-import { selectModalState } from 'selectors/uiSelector'
 
+import { selectModalState } from 'selectors/uiSelector'
+import PageHeader from 'components/pageHeader/PageHeader'
 import useInterval from 'util/useInterval'
+
+import { Grid, Link, Typography } from '@mui/material'
+import * as S from './Home.styles'
+import PageTitle from 'components/pageTitle/PageTitle'
+
+import turing from '../../images/boba2/turing.png'
 
 import {
   fetchBalances,
   fetchGas,
   addTokenList,
-  fetchNFTs,
   fetchExits
 } from 'actions/networkAction'
 
-import { checkVersion } from 'actions/serviceAction';
+import networkService from 'services/networkService'
 
-import { closeAlert, closeError } from 'actions/uiAction';
-import { selectAlert, selectError } from 'selectors/uiSelector';
+import { setBaseState } from 'actions/setupAction'
+import { selectBaseEnabled, selectAccountEnabled, selectNetwork, selectLayer } from 'selectors/setupSelector'
 
-import DepositModal from 'containers/modals/deposit/DepositModal';
-import TransferModal from 'containers/modals/transfer/TransferModal';
-import ExitModal from 'containers/modals/exit/ExitModal';
+/**** ACTIONS and SELECTORS *****/
 
-import LedgerConnect from 'containers/modals/ledger/LedgerConnect';
-import AddTokenModal from 'containers/modals/addtoken/AddTokenModal';
+import { checkVersion } from 'actions/serviceAction'
+import { closeAlert, closeError } from 'actions/uiAction'
+import { selectAlert, selectError } from 'selectors/uiSelector'
 
-//Farm
-import FarmDepositModal from 'containers/modals/farm/FarmDepositModal';
-import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal';
+import DepositModal from 'containers/modals/deposit/DepositModal'
+import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
+import TransferModal from 'containers/modals/transfer/TransferModal'
+import ExitModal from 'containers/modals/exit/ExitModal'
 
-//DAO
-import DAO from 'containers/dao/Dao';
+import AddTokenModal from 'containers/modals/addtoken/AddTokenModal'
+
+import FarmWrapper from 'containers/farm/FarmWrapper'
+import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
+import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
+
+import SaveWrapper from 'containers/save/SaveWrapper'
+import SaveDepositModal from 'containers/modals/save/SaveDepositModal'
+
+import DAO from 'containers/dao/Dao'
 import TransferDaoModal from 'containers/modals/dao/TransferDaoModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
+import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
 
-import { 
-  fetchDaoBalance, 
-  fetchDaoVotes, 
-  fetchDaoProposals, 
-  getProposalThreshold 
+import {
+  fetchDaoBalance,
+  fetchDaoVotes,
+  fetchDaoBalanceX,
+  fetchDaoVotesX,
+  fetchDaoProposals,
+  getProposalThreshold
 } from 'actions/daoAction'
 
+import { fetchAirdropStatusL1, fetchAirdropStatusL2 } from 'actions/airdropAction'
+import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
+import { fetchVerifierStatus } from 'actions/verifierAction'
+
 import Airdrop from 'containers/airdrop/Airdrop'
-
-import { 
-  fetchAirdropStatusL1,
-  fetchAirdropStatusL2,
-} from 'actions/airdropAction'
-
-//Wallet Functions
 import Account from 'containers/account/Account'
-import Transactions from 'containers/transactions/History'
+import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
-
-//Help page
 import Help from 'containers/help/Help'
+import Ecosystem from 'containers/ecosystem/Ecosystem'
+import Wallet from 'containers/wallet/Wallet'
 
-//NFT Example Page
-import NFT from 'containers/nft/Nft'
+import { Box, Container } from '@mui/material'
 
-import { useTheme } from '@material-ui/core/styles'
-import { Box, Container, useMediaQuery } from '@material-ui/core'
-import MainMenu from 'components/mainMenu/MainMenu'
-import FarmWrapper from 'containers/farm/FarmWrapper'
+import PageFooter from 'components/pageFooter/PageFooter'
 
 import Alert from 'components/alert/Alert'
 
 import { POLL_INTERVAL } from 'util/constant'
 
-function Home () {
+require('dotenv').config()
+
+function Home() {
 
   const dispatch = useDispatch()
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
 
-  const [ mobileMenuOpen/*, setMobileMenuOpen*/ ] = useState(false)
+  const [ mobileMenuOpen ] = useState(false)
 
   const pageDisplay = useSelector(selectModalState('page'))
   const depositModalState = useSelector(selectModalState('depositModal'))
+  const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
   const transferModalState = useSelector(selectModalState('transferModal'))
   const exitModalState = useSelector(selectModalState('exitModal'))
 
@@ -104,65 +114,117 @@ function Home () {
   const token = useSelector(selectModalState('token'))
 
   const addTokenModalState = useSelector(selectModalState('addNewTokenModal'))
-  const ledgerConnectModalState = useSelector(selectModalState('ledgerConnectModal'))
+  const saveDepositModalState = useSelector(selectModalState('saveDepositModal'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
 
-  // DAO modal
   const tranferBobaDaoModalState = useSelector(selectModalState('transferDaoModal'))
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
+  const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
 
-  const walletMethod = useSelector(selectWalletMethod())
-  //const transactions = useSelector(selectlayer2Transactions, isEqual);
+  const network = useSelector(selectNetwork())
+  const layer = useSelector(selectLayer())
+  const baseEnabled = useSelector(selectBaseEnabled())
+  const accountEnabled = useSelector(selectAccountEnabled())
 
-  const handleErrorClose=()=>dispatch(closeError())
-  const handleAlertClose=()=>dispatch(closeAlert())
+  const handleErrorClose = () => dispatch(closeError())
+  const handleAlertClose = () => dispatch(closeAlert())
+
+  const maintenance = process.env.REACT_APP_STATUS === 'maintenance' ? true : false
 
   useEffect(() => {
-    const body = document.getElementsByTagName('body')[0];
+    const body = document.getElementsByTagName('body')[ 0 ]
     mobileMenuOpen
       ? body.style.overflow = 'hidden'
-      : body.style.overflow = 'auto';
-  }, [ mobileMenuOpen ]);
+      : body.style.overflow = 'auto'
+  }, [ mobileMenuOpen ])
 
   // calls only on boot
   useEffect(() => {
     window.scrollTo(0, 0)
-    dispatch(addTokenList()) //only need to do this boot
-  }, [ dispatch ])
 
-  //get all account balances
+    if (maintenance) return
+
+    if (!baseEnabled) initializeBase()
+
+    async function initializeBase() {
+      console.log("Calling initializeBase for", network)
+      const initialized = await networkService.initializeBase( network )
+      if (!initialized) {
+        console.log("Failed to boot L1 and L2 base providers for", network)
+        dispatch(setBaseState(false))
+        return false
+      }
+      if (initialized === 'enabled') {
+        console.log("Network Base Providers are up")
+        dispatch(setBaseState(true))
+        // load DAO to speed up the process
+        dispatch(fetchDaoProposals())
+        return true
+      }
+    }
+
+  }, [ dispatch, network, baseEnabled, maintenance ])
+
   useInterval(() => {
-    dispatch(fetchBalances())
-    dispatch(fetchNFTs())
-    dispatch(fetchAirdropStatusL1())
-    dispatch(fetchAirdropStatusL2())
-    dispatch(fetchDaoBalance())
-    dispatch(fetchDaoVotes())
-    dispatch(fetchDaoProposals())
-    dispatch(getProposalThreshold())
-    dispatch(fetchGas())
-    dispatch(fetchExits())
+    if(accountEnabled /*== MetaMask is connected*/) {
+      dispatch(fetchBalances()) // account specific
+      dispatch(fetchAirdropStatusL1()) // account specific
+      dispatch(fetchAirdropStatusL2()) // account specific
+      dispatch(fetchDaoBalance())      // account specific
+      dispatch(fetchDaoVotes())        // account specific
+      dispatch(fetchDaoBalanceX())     // account specific
+      dispatch(fetchDaoVotesX())       // account specific
+      dispatch(fetchExits())           // account specific
+      dispatch(getFS_Saves())          // account specific
+      dispatch(getFS_Info())           // account specific
+    }
+    if(baseEnabled /*== we have Base L1 and L2 providers*/) {
+      dispatch(fetchGas())
+      dispatch(fetchVerifierStatus())
+      dispatch(getProposalThreshold())
+      dispatch(fetchDaoProposals())
+    }
   }, POLL_INTERVAL)
 
   useEffect(() => {
+    if (maintenance) return
+    // load the following functions when the home page is open
     checkVersion()
-  }, [])
+    dispatch(fetchGas())
+    dispatch(fetchVerifierStatus())
+    dispatch(getProposalThreshold())
+  }, [dispatch, maintenance])
+
+  useEffect(() => {
+    if (maintenance) return
+    if (accountEnabled) {
+      dispatch(addTokenList())
+    }
+  }, [ dispatch, accountEnabled, maintenance ])
+
+  console.log("Home - account enabled:", accountEnabled, "layer:", layer, "Base enabled:", baseEnabled)
 
   return (
     <>
       {!!depositModalState && <DepositModal  open={depositModalState}  token={token} fast={fast} />}
-      {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />} 
+      {!!depositBatchModalState && <DepositBatchModal  open={depositBatchModalState} />}
+
+      {!!transferModalState && <TransferModal open={transferModalState} token={token} fast={fast} />}
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
-      {!!addTokenModalState  && <AddTokenModal   open={addTokenModalState} />}
-      {!!farmDepositModalState && <FarmDepositModal  open={farmDepositModalState} />}
+      {!!addTokenModalState && <AddTokenModal open={addTokenModalState} />}
+
+      {!!saveDepositModalState && <SaveDepositModal open={saveDepositModalState} />}
+
+      {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
       {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
 
       {!!tranferBobaDaoModalState && <TransferDaoModal open={tranferBobaDaoModalState} />}
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
+      {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
 
       <Alert
@@ -185,44 +247,103 @@ function Home () {
         {alertMessage}
       </Alert>
 
-      <LedgerConnect
-        open={walletMethod === 'browser'
-          ? ledgerConnectModalState
-          : false
-        }
-      />
+      {!!maintenance &&
+        <Box sx={{ 
+          display: 'flex',
+          height: '100%', 
+          flexDirection: 'column', 
+          width: '100%' 
+        }}>
+          <PageHeader maintenance={maintenance}/>
+          <Container maxWidth={false} sx={{
+            height: 'calc(100% - 150px)',
+            minHeight: '500px',
+            marginLeft: 'unset',
+            width: '100vw',
+            marginRight: 'unset',
+            paddingTop: '50px'
+          }}>
+            <S.HomePageContainer>
+              <PageTitle title="Boba March 4 Maintenance Mode"/>
+              <Grid item xs={12}>
+                <Typography 
+                  variant="body1" 
+                  component="p" sx={{mt: 2, mb: 0, fontWeight: '700', paddingBottom: '20px'}}
+                >
+                  We are upgrading our Sequencer to support Turing Hybrid Compute
+                </Typography>
+                <Typography variant="body2" component="p" sx={{mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7'}}>
+                  As announced on Twitter and Telegram, Boba network is currently being upgraded to support Turing. 
+                </Typography>
+                <Typography variant="body2" component="p" sx={{
+                  mt: 0, mb: 0, lineHeight: '1.0em', opacity: '0.7',
+                  paddingTop: '20px', paddingBottom: '20px'}}
+                >
+                  You can{' '}
+                  <Link variant="body2" 
+                    style={{lineHeight: '1.0em', fontWeight: '700'}} 
+                    href='https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/README.md'
+                  >learn more about Turing here
+                  </Link>. 
+                </Typography>
+                <img
+                  src={turing}
+                  alt="NFT URI"
+                  width={'80%'}
+                />
+              </Grid>
+            </S.HomePageContainer>
+          </Container>
+          <PageFooter maintenance={maintenance}/>
+        </Box>
+      }
 
-      <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', width: '100%' }}>
-        <MainMenu />
-        <Container maxWidth="lg" sx={{marginLeft: 'unset' , marginRight: 'unset'}}>
-          {pageDisplay === "AccountNow" &&
-            <Account/>
-          }
-          {pageDisplay === "History" &&
-            <Transactions/>
-          }
-          {pageDisplay === "BobaScope" &&
-            <BobaScope/>
-          }
-          {pageDisplay === "NFT" &&
-            <NFT/>
-          }
-          {pageDisplay === "Farm" &&
-            <FarmWrapper/>
-          }
-          {pageDisplay === "DAO" &&
-            <DAO/>
-          }
-          {pageDisplay === "Airdrop" &&
-            <Airdrop/>
-          }
-          {pageDisplay === "Help" &&
-            <Help/>
-          }
-        </Container>
-      </Box>
+      {! maintenance && 
+        <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
+          <PageHeader />
+          <Container maxWidth={false} sx={{
+            height: 'calc(100% - 150px)',
+            minHeight: '500px',
+            marginLeft: 'unset',
+            width: '100vw',
+            marginRight: 'unset'
+          }}>
+            {pageDisplay === "AccountNow" &&
+              <Account />
+            }
+            {pageDisplay === "History" &&
+              <Transactions />
+            }
+            {pageDisplay === "BobaScope" &&
+              <BobaScope />
+            }
+            {pageDisplay === "Wallet" &&
+              <Wallet />
+            }
+            {pageDisplay === "Farm" &&
+              <FarmWrapper />
+            }
+            {pageDisplay === "Save" &&
+              <SaveWrapper />
+            }
+            {pageDisplay === "DAO" &&
+              <DAO />
+            }
+            {pageDisplay === "Airdrop" &&
+              <Airdrop />
+            }
+            {pageDisplay === "Help" &&
+              <Help />
+            }
+            {pageDisplay === "Ecosystem" &&
+              <Ecosystem/>
+            }
+          </Container>
+          <PageFooter/>
+        </Box>
+      }
     </>
-  );
+  )
 }
 
 export default React.memo(Home)

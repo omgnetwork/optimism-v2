@@ -119,7 +119,7 @@ describe('Standard Exit burn', async () => {
       )
     })
 
-    it('should not allow updating extraGasRelay for non-owner', async () => {
+    it('{tag:other} should not allow updating extraGasRelay for non-owner', async () => {
       const newExtraGasRelay = 500000
       await expect(
         ExitBurn.connect(env.l2Wallet_2).configureExtraGasRelay(
@@ -128,7 +128,7 @@ describe('Standard Exit burn', async () => {
       ).to.be.revertedWith('caller is not the gasPriceOracle owner')
     })
 
-    it('should allow updating extraGasRelay for owner', async () => {
+    it('{tag:other} should allow updating extraGasRelay for owner', async () => {
       // approximate and set new extra gas to over it for tests
       const approveBobL2TX = await L2ERC20.approve(
         ExitBurn.address,
@@ -144,9 +144,9 @@ describe('Standard Exit burn', async () => {
       )
 
       const newExtraGasRelay = estimatedGas.mul(2)
-      const configureTx = await ExitBurn.configureExtraGasRelay(
-        newExtraGasRelay
-      )
+      const configureTx = await ExitBurn.connect(
+        env.l2Wallet_4
+      ).configureExtraGasRelay(newExtraGasRelay)
       await configureTx.wait()
 
       const updatedExtraGasRelay = await ExitBurn.extraGasRelay()
@@ -176,7 +176,7 @@ describe('Standard Exit burn', async () => {
       )
     })
 
-    it('should burn and withdraw erc20', async () => {
+    it('{tag:other} should burn and withdraw erc20', async () => {
       const preBalanceExitorL1 = await L1ERC20.balanceOf(env.l1Wallet.address)
       const preBalanceExitorL2 = await L2ERC20.balanceOf(env.l2Wallet.address)
 
@@ -208,7 +208,7 @@ describe('Standard Exit burn', async () => {
       expect(ExitBurnContractBalance).to.eq(0)
     })
 
-    it('should fail if not enough erc20 balance', async () => {
+    it('{tag:other} should fail if not enough erc20 balance', async () => {
       const preBalanceExitorL2 = await L2ERC20.balanceOf(env.l2Wallet.address)
 
       expect(preBalanceExitorL2).to.eq(0)
@@ -238,7 +238,7 @@ describe('Standard Exit burn', async () => {
       await env.waitForXDomainTransaction(deposit, Direction.L1ToL2)
     })
 
-    it('should burn and withdraw ovm_eth', async () => {
+    it('{tag:other} should burn and withdraw ovm_eth', async () => {
       const preBalanceExitorL1 = await env.l1Wallet.getBalance()
       const preBalanceExitorL2 = await env.l2Wallet.getBalance()
 
@@ -267,7 +267,9 @@ describe('Standard Exit burn', async () => {
         .sub(exitAmount)
         .sub(postBalanceExitorL2)
 
-      expect(expectedGas).to.lt(BigNumber.from(1000000000))
+      // gas oracle updates the overhead and l1BaseFee,
+      // so it's not correct to expect the expectedGast is small than 1000000000
+      // expect(expectedGas).to.lt(BigNumber.from(1000000000))
       expect(postBalanceExitorL1).to.eq(preBalanceExitorL1.add(exitAmount))
       expect(ExitBurnContractBalance).to.eq(0)
     })

@@ -1,9 +1,8 @@
-import { expect } from '../../../../setup'
-
 /* Imports: External */
 import { ethers, BigNumber } from 'ethers'
 
 /* Imports: Internal */
+import { expect } from '../../../../setup'
 import { handleEventsTransactionEnqueued } from '../../../../../src/services/l1-ingestion/handlers/transaction-enqueued'
 
 const MAX_ITERATIONS = 128
@@ -25,7 +24,7 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
     // but it's probably better to get wider test coverage first.
 
     it('should have a ctcIndex equal to null', () => {
-      const input1: [any, any, number] = [
+      const input1: [any, any, number, number, number] = [
         {
           blockNumber: 0,
           args: {
@@ -35,6 +34,8 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
           },
         },
         null,
+        0,
+        0,
         0,
       ]
 
@@ -51,7 +52,7 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
         i < Number.MAX_SAFE_INTEGER;
         i += Math.floor(Number.MAX_SAFE_INTEGER / MAX_ITERATIONS)
       ) {
-        const input1: [any, any, number] = [
+        const input1: [any, any, number, number, number] = [
           {
             blockNumber: i,
             args: {
@@ -61,6 +62,8 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
             },
           },
           null,
+          0,
+          0,
           0,
         ]
 
@@ -78,7 +81,7 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
         i < Number.MAX_SAFE_INTEGER;
         i += Math.floor(Number.MAX_SAFE_INTEGER / MAX_ITERATIONS)
       ) {
-        const input1: [any, any, number] = [
+        const input1: [any, any, number, number, number] = [
           {
             blockNumber: 0,
             args: {
@@ -88,6 +91,8 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
             },
           },
           null,
+          0,
+          0,
           0,
         ]
 
@@ -105,7 +110,7 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
         i < Number.MAX_SAFE_INTEGER;
         i += Math.floor(Number.MAX_SAFE_INTEGER / MAX_ITERATIONS)
       ) {
-        const input1: [any, any, number] = [
+        const input1: [any, any, number, number, number] = [
           {
             blockNumber: 0,
             args: {
@@ -115,6 +120,8 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
             },
           },
           null,
+          0,
+          0,
           0,
         ]
 
@@ -132,7 +139,7 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
         i < Number.MAX_SAFE_INTEGER;
         i += Math.floor(Number.MAX_SAFE_INTEGER / MAX_ITERATIONS)
       ) {
-        const input1: [any, any, number] = [
+        const input1: [any, any, number, number, number] = [
           {
             blockNumber: 0,
             args: {
@@ -142,6 +149,8 @@ describe('Event Handlers: CanonicalTransactionChain.TransactionEnqueued', () => 
             },
           },
           null,
+          0,
+          0,
           0,
         ]
 

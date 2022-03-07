@@ -66,6 +66,8 @@ interface MessageRelayerOptions {
 
   numConfirmations?: number
 
+  numEventConfirmations?: number
+
   multiRelayLimit?: number
 
   resubmissionTimeout?: number
@@ -203,6 +205,13 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     this.state.nextUnfinalizedTxHeight =
       this.options.fromL2TransactionIndex || 0
     this.state.lastFilterPollingTimestamp = 0
+
+    this.logger.info('Starting at', {
+      lastFinalizedTxHeight: this.state.lastFinalizedTxHeight,
+      nextUnfinalizedTxHeight: this.state.nextUnfinalizedTxHeight,
+      lastQueriedL1Block: this.state.lastQueriedL1Block,
+      numEventConfirmations: this.options.numEventConfirmations,
+    })
 
     //batch system
     this.state.timeOfLastRelayS = Date.now()
@@ -383,16 +392,26 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               this.state.nextUnfinalizedTxHeight
             )
           ) {
-            const size = (
+            const batch = (
               await this._getStateBatchHeader(
                 this.state.nextUnfinalizedTxHeight
               )
-            ).batch.batchSize.toNumber()
+            ).batch
+            const size = batch.batchSize.toNumber()
+            const batchStart = batch.prevTotalElements.toNumber()
+
             this.logger.info(
               'Found a batch of finalized transaction(s), checking for more...',
-              { batchSize: size }
+              {
+                batchSize: size,
+                atHeight: this.state.nextUnfinalizedTxHeight,
+                batchStart,
+              }
             )
-            this.state.nextUnfinalizedTxHeight += size
+            // This must point to the first txHeight within the next batch. If the service starts
+            // with a misaligned fromL2TransactionIndex then this should realign it to avoid
+            // missed messages.
+            this.state.nextUnfinalizedTxHeight = batchStart + size
 
             // Only deal with ~1000 transactions at a time so we can limit the amount of stuff we
             // need to keep in memory. We operate on full batches at a time so the actual amount
@@ -556,17 +575,30 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         return undefined
       }
       // query the new SCC event. event.args._extraData in eventCache might be wrong
-      const SCCEvent: ethers.Event[] =
+      const SCCEvents: ethers.Event[] =
         await this.state.StateCommitmentChain.queryFilter(
           this.state.StateCommitmentChain.filters.StateBatchAppended(),
           selectedEvent.blockNumber,
           selectedEvent.blockNumber
         )
-      return SCCEvent[0]
+      // cover a special case that multiple transactions are in one block
+      for (const SCCEvent of SCCEvents) {
+        const prevTotalElements = SCCEvent.args._prevTotalElements.toNumber()
+        const batchSize = SCCEvent.args._batchSize.toNumber()
+        if (
+          txIndex >= prevTotalElements &&
+          txIndex < prevTotalElements + batchSize
+        ) {
+          return SCCEvent
+        }
+      }
+      return SCCEvents[0]
     }
 
     let startingBlock = this.state.lastQueriedL1Block + 1
-    const maxBlock = await this.options.l1RpcProvider.getBlockNumber()
+    const maxBlock =
+      (await this.options.l1RpcProvider.getBlockNumber()) -
+      this.options.numEventConfirmations
     while (startingBlock <= maxBlock) {
       const endBlock = Math.min(
         startingBlock + this.options.getLogsInterval,
