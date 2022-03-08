@@ -109,8 +109,8 @@ export const handleEventsSequencerBatchAppended: EventHandlerSet<
         )
 
         const indexL2 = extraData.prevTotalElements
-            .add(BigNumber.from(transactionIndex))
-            .toNumber()
+          .add(BigNumber.from(transactionIndex))
+          .toNumber()
 
         console.log('L2 block number for this TX is:', indexL2 + 1)
 
