@@ -1,11 +1,14 @@
 # Welcome to Boba
 
-- [Running the Boba stack locally](#running-the-boba-stack-locally)
+- [Welcome to Boba](#welcome-to-boba)
   * [Basics](#basics)
-  * [Spinning up the stack](#spinning-up-the-stack)
-    + [Helpful commands](#helpful-commands)
-    + [Running unit tests](#running-unit-tests)
-    + [Running integration tests](#running-integration-tests)
+  * [Documentation](#documentation)
+  * [Deploying standard contracts](#deploying-standard-contracts)
+  * [Example contracts ready to deploy](#example-contracts-ready-to-deploy)
+  * [Boba-feature: Using Turing Hybrid Compute](#boba-feature--using-turing-hybrid-compute)
+  * [Boba-feature: Obtaining on-chain price data](#boba-feature--obtaining-on-chain-price-data)
+  * [Boba-feature: Bridging NFTs from L2 to L1](#boba-feature--bridging-nfts-from-l2-to-l1)
+  * [Helping to Develop Boba](#helping-to-develop-boba)
     
 ## Basics
 
@@ -30,7 +33,7 @@ For most contracts, the deploy experience is exactly like deploying on Ethereum.
 
 The [Mainnet blockexplorer](https://blockexplorer.boba.network) and the [Rinkeby blockexplorer](https://blockexplorer.rinkeby.boba.network) are similar to Etherscan. The [mainnet gateway](https://gateway.boba.network) and the [rinkeby gateway](https://gateway.rinkeby.boba.network) allow you to see your balances and bridge funds, among many other functions. 
 
-## Example contract ready to deploy
+## Example contracts ready to deploy
 
 1. [Turing Monsters](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_community/turing-monsters/README.md) NFTs with on-chain svg and using the Turing random number generator
 
