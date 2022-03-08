@@ -1,4 +1,4 @@
-# welcome to Boba
+# Welcome to Boba
 
 - [Running the Boba stack locally](#running-the-boba-stack-locally)
   * [Basics](#basics)
@@ -9,64 +9,61 @@
     
 ## Basics
 
-Boba is a compute-focused L2 built on an Optimistic Rollup 
+Welcome to Boba. Boba is a compute-focused L2 built on an Optimistic Rollup. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md). Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
 
-**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, it's simpler to use https://rinkeby.boba.network**. 
+  * providing additional cross-chain messaging such as a `message-relayer-fast`
+  * using different gas pricing logic
+  * providing a swap-based system for rapid L2->L1 exits (without the 7 day delay)
+  * providing a community fraud-detector that allows transactions to be independently verified by anyone
+  * interacting with L2 ETH using the normal ETH methods (`msg.value`, `send eth_sendTransaction`, and `provider.getBalance(address)` rather than as WETH
+  * being organized as a [DAO](./packages/boba/contracts/contracts/DAO)
+  * native [NFT bridging](./packages/boba/contracts/contracts/bridges)
+  * automatically relaying classical 7-day exit messages to L1 for you, rather than this being a separate step
 
-Clone the repository, open it, and install nodejs packages with `yarn`:
+## Documentation
 
-```bash
-$ git clone git@github.com:omgnetwork/optimism-v2.git
-$ cd optimism-v2
-$ yarn clean
-$ yarn
-$ yarn build
-```
+Developer-focused documentation lives in [this folder](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_documentation) and within the service and contract directories.
 
-Then, make sure you have Docker installed _and make sure Docker is running_. Finally, build and run the entire stack:
+## Deploying standard contracts
 
-```bash
-$ cd ops
-$ BUILD=1 DAEMON=0 ./up_local.sh
-```
+For most contracts, the deploy experience is exactly like deploying on Ethereum. You will need to have some ETH (or Rinkeby ETH) on Boba and you will have to change your RPC endpoint to either `https://mainnet.boba.network` or `https://rinkeby.boba.network`. That's it!
 
-## Spinning up the stack
+The [Mainnet blockexplorer](https://blockexplorer.boba.network) and the [Rinkeby blockexplorer](https://blockexplorer.rinkeby.boba.network) are similar to Etherscan. The [mainnet gateway](https://gateway.boba.network) and the [rinkeby gateway](https://gateway.rinkeby.boba.network) allow you to see your balances and bridge funds, among many other functions. 
 
-Stack spin-up can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialisation. Recommended settings - 10 CPUs, 30 to 40 GB of memory. You can inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be up:
+## Example contract ready to deploy
 
-```bash
-./scripts/wait-for-sequencer.sh
-```
+1. [Turing Monsters](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_community/turing-monsters/README.md) NFTs with on-chain svg and using the Turing random number generator
 
-If the command returns with no log output, the sequencer is up. Once the sequencer is up, you can inspect the Docker `Dashboard>Containers/All>Ops` for the progress of `ops_boba_deployer` _or_ you can run the following script to wait for the Boba contracts (e.g. the fast message relay system) to be deployed:
+2. [Truffle ERC20](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_examples/truffle-erc20/README.md) A basic ERC20 deployment using Truffle
 
-```bash
-./scripts/wait-for-boba.sh
-```
+3. [Bitcoin Price Feeds](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/test/005_lending.ts) A smart contract that pulls price data from an off-chain commercial endpoint
 
-When the command returns with `Pass: Found L2 Liquidity Pool contract address`, the entire Boba stack has come up correctly.
+4. [Stableswap using off-chain compute](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/test/003_stable_swap.ts) A smart contract using an off-chain compute endpoint to do stableswap math
 
-### Helpful commands
+## Boba-feature: Using Turing Hybrid Compute
 
-* _Running out of space on your Docker, or having other having hard to debug issues_? Run `docker system prune -a --volumes` and then rebuild the images.
-* _To (re)build individual base services_: `docker-compose build -- l2geth`
-* _To (re)build individual Boba typescript services_: `docker-compose build -- builder` and then `docker-compose build -- dtl` for example.
+Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as random numbers and real-time financial data, are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block. 
 
-### Running unit tests
+[Turing Getting Started - NFTs](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/README.md#feature-highlight-1-using-turing-to-mint-an-nft-with-256-random-attributes-in-a-single-transaction)
 
-To run unit tests for a specific package:
+[Turing Getting Started - External API](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-real-time-trading-data-from-within-your-solidity-smart-contract)
 
-```bash
-$ cd packages/package-to-test
-$ yarn test
-```
+## Boba-feature: Obtaining on-chain price data
 
-### Running integration tests
+Price Feed oracles are an essential part of Boba, which allow smart contracts to work with external data and open the path to many more use cases. Currently Boba has several options to get real world price data directly into your contracts - each different in the way they operate to procure data for smart contracts to consume. This list will be updated frequently:
 
-Make sure you are in the `ops` folder and then run
+1. Boba-Straw 
+2. Witnet
+3. Turing (see above section)
 
-```bash
-$ docker-compose run integration_tests
-```
+[Full Price Feed documentation](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_documentation/Price_Data_Feeds_Overview.md)
 
-Expect the full test suite to complete in between *30 minutes* to *two hours* depending on your computer hardware.
+## Boba-feature: Bridging NFTs from L2 to L1
+
+NFTs can be minted on Boba and can also be exported to Ethereum, if desired. The minting process is identical to Ethereum. The Boba-specific bridging system and contracts are [documented here](https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/contracts/contracts/bridges/README.md).
+
+## Helping to Develop Boba
+
+**Note: this is only relevant to developers who wish to develop Boba core services. For most test uses, it's simpler to use https://rinkeby.boba.network**. 
+
+[Running Boba locally](https://github.com/omgnetwork/optimism-v2/blob/develop/boba_documentation/Quickstart_Local_Boba.md)
