@@ -110,7 +110,7 @@ const PageFooter = ({maintenance}) => {
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Boba Websites
+          >Boba Website
           </S.FooterLink>
         </S.SocialWrapper>
       </S.FooterLinkWrapper>

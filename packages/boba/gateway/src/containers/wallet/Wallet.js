@@ -18,7 +18,7 @@ function Wallet() {
   const [ page, setPage ] = useState('Token')
   const [ chain, setChain ] = useState('')
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   const layer = useSelector(selectLayer());
   const accountEnabled = useSelector(selectAccountEnabled())
