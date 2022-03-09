@@ -40,7 +40,10 @@ function TokenPage() {
         return 'ethereum'
       } else if (i.symbolL1 === 'OMG') {
         return 'omg'
-      } else {
+      } else if(i.symbolL1 === 'BOBA') {
+        return 'boba-network'
+      }
+      else {
         return i.symbolL1.toLowerCase()
       }
     })
