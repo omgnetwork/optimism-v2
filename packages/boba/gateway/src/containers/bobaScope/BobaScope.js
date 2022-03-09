@@ -47,7 +47,7 @@ function BobaScope() {
 
   const dispatch = useDispatch()
 
-  const [searchData, setSearchData] = useState('')
+  const [ searchData, setSearchData ] = useState('')
 
   const activeTab = useSelector(selectActiveDataTab, isEqual)
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -61,30 +61,37 @@ function BobaScope() {
   const fastExits = orderedFastExits
 
   useInterval(() => {
-    batch(()=>{
-      dispatch(fetchSevens())
-      dispatch(fetchFastExits())
-    })
+    if (accountEnabled) {
+      batch(() => {
+        dispatch(fetchSevens())
+        dispatch(fetchFastExits())
+      })
+    }
   }, POLL_INTERVAL)
+
+  if (!accountEnabled) {
+
+    return <S.ScopePageContainer>
+      <PageTitle title="Boba Scope" />
+      <S.LayerAlert>
+        <S.AlertInfo>
+          <AlertIcon />
+          <S.AlertText
+            variant="body2"
+            component="p"
+          >
+            Connect to MetaMask to access Boba Scope
+          </S.AlertText>
+        </S.AlertInfo>
+        <WalletPicker />
+      </S.LayerAlert>
+    </S.ScopePageContainer>
+  }
+
 
   return (
     <S.ScopePageContainer>
       <PageTitle title="Boba Scope" />
-
-      {!accountEnabled &&
-        <S.LayerAlert>
-          <S.AlertInfo>
-            <AlertIcon />
-            <S.AlertText
-              variant="body2"
-              component="p"
-            >
-              Connect to MetaMask
-            </S.AlertText>
-          </S.AlertInfo>
-          <WalletPicker />
-        </S.LayerAlert>
-      }
 
       <S.Header>
         <div className={styles.searchInput}>
@@ -92,7 +99,7 @@ function BobaScope() {
             size='small'
             placeholder='Search by hash'
             value={searchData}
-            onChange={i=>{setSearchData(i.target.value)}}
+            onChange={i => { setSearchData(i.target.value) }}
             className={styles.searchBar}
           />
         </div>
@@ -100,9 +107,9 @@ function BobaScope() {
       <div className={styles.data}>
         <div className={styles.section}>
           <Tabs
-            onClick={tab => {dispatch(setActiveDataTab(tab))}}
+            onClick={tab => { dispatch(setActiveDataTab(tab)) }}
             activeTab={activeTab}
-            tabs={['Seven Day Queue', 'Fast Exits']}
+            tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
           />
 
           {activeTab === 'Seven Day Queue' && (
