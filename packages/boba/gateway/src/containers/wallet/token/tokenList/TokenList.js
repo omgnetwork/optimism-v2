@@ -349,7 +349,32 @@ function TokenList({
                 fullWidth
               >
                 Transfer
-              </Button> </>}
+              </Button> 
+            </>
+          }
+          {enabled && chain === 'L2' && token.symbol === 'OLO' &&
+            <>
+              <Link
+                color="inherit"
+                variant="body2"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={'https://cbridge.celer.network/#/transfer'}
+              >
+                CELER BRIDGE
+              </Link>
+              <Button
+                onClick={() => { handleModalClick('transferModal', token, false) }}
+                variant="contained"
+                color="primary"
+                disabled={disabled}
+                tooltip="Transfer funds from one L2 account to another L2 account."
+                fullWidth
+              >
+                Transfer
+              </Button>
+            </>
+          }
           {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
             <div style={{
               display: 'flex',
