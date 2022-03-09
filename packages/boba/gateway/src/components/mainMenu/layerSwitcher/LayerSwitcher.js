@@ -28,7 +28,6 @@ import networkService from 'services/networkService'
 import truncate from 'truncate-middle'
 import WalletPicker from 'components/walletpicker/WalletPicker.js'
 import Button from 'components/button/Button.js'
-import { openError } from 'actions/uiAction.js'
 
 function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = false }) {
 
