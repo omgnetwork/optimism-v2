@@ -39,6 +39,9 @@ import useInterval from 'util/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
 import PageTitle from 'components/pageTitle/PageTitle'
+import AlertIcon from 'components/icons/AlertIcon'
+import WalletPicker from 'components/walletpicker/WalletPicker'
+import { selectAccountEnabled } from 'selectors/setupSelector'
 
 function BobaScope() {
 
@@ -47,6 +50,7 @@ function BobaScope() {
   const [searchData, setSearchData] = useState('')
 
   const activeTab = useSelector(selectActiveDataTab, isEqual)
+  const accountEnabled = useSelector(selectAccountEnabled())
 
   const unorderedSevens = useSelector(selectSevens, isEqual)
   const orderedSevens = orderBy(unorderedSevens, i => i.timeStamp, 'desc')
@@ -66,6 +70,21 @@ function BobaScope() {
   return (
     <S.ScopePageContainer>
       <PageTitle title="Boba Scope" />
+
+      {!accountEnabled &&
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon />
+            <S.AlertText
+              variant="body2"
+              component="p"
+            >
+              Connect to MetaMask
+            </S.AlertText>
+          </S.AlertInfo>
+          <WalletPicker />
+        </S.LayerAlert>
+      }
 
       <S.Header>
         <div className={styles.searchInput}>

@@ -21,19 +21,20 @@ import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccountEnabled, selectJustSwitchedChain, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'
 import truncate from 'truncate-middle'
 import WalletPicker from 'components/walletpicker/WalletPicker.js'
 import Button from 'components/button/Button.js'
+import { openError } from 'actions/uiAction.js'
 
 function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = false }) {
 
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
-  const justSwitchedChain = useSelector(selectJustSwitchedChain())
+
   let layer = useSelector(selectLayer())
 
   const theme = useTheme()
@@ -41,16 +42,8 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
 
   const wAddress = networkService.account ? truncate(networkService.account, 6, 4, '...') : ''
 
-  console.log("LS: Layer:", layer)
-  console.log("LS: accountEnabled:", accountEnabled)
-  console.log("LS: justSwitchedChain:", justSwitchedChain)
-
   const dispatchSwitchLayer = useCallback((targetLayer) => {
-    console.log("LS: switchLayer accountEnabled:", accountEnabled)
-    console.log("LS: targetLayer:", targetLayer)
-    console.log("LS: justSwitchedChain:", justSwitchedChain)
-    //if (!accountEnabled) return
-    //dispatch(setLayer(layer))
+    dispatch(setLayer(layer))
     if (!layer && targetLayer === 'L1') {
       dispatch(switchChain('L1'))
     }
@@ -68,7 +61,12 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
     else {
       // do nothing - we are on the correct chain
     }
-  }, [ dispatch, accountEnabled, layer, justSwitchedChain ])
+  }, [ dispatch, layer ])
+
+
+  if (!accountEnabled) {
+    return null
+  }
 
   if (isButton) {
     return (
@@ -197,7 +195,7 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
   return (
     <S.LayerSwitcherWrapper>
       <IconButton
-        sx={{ 
+        sx={{
           gap: '5px',
           opacity: !layer || layer === 'L2' ? '0.5' :'1',
           border: layer === 'L1' ? 'solid white 3px' : '',
@@ -208,7 +206,7 @@ function LayerSwitcher({ isIcon= false, isButton = false, size, fullWidth = fals
         <EthereumIcon />
       </IconButton>
       <IconButton
-        sx={{ 
+        sx={{
           gap: '5px',
           opacity: !layer || layer === 'L1' ? '0.5' :'1',
           border: layer === 'L2' ? 'solid white 3px' : '',
