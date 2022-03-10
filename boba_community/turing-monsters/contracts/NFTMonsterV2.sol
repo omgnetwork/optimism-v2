@@ -24,7 +24,6 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
     constructor(string memory name_, string memory symbol_, uint256 maxNFTs_,
         address[] memory creatorAddresses_, address turingHelperAddress_)
     ERC721(name_, symbol_)
-    WithOnChainMetaData(turingHelperAddress_)
     RandomlyAssigned(maxNFTs_, 0, turingHelperAddress_) // Max. x NFTs available; Start counting from 0
     {
         _pause();
