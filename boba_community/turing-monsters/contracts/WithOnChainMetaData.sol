@@ -79,10 +79,6 @@ abstract contract WithOnChainMetaData is ERC721 {
         return string(abi.encodePacked('data:application/json;base64,', json));
     }
 
-    function baseURI() public view returns (string memory) {
-        return _baseURI();
-    }
-
     function exists(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
     }

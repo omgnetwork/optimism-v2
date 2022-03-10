@@ -99,11 +99,11 @@ contract NFTMonsterV2 is IERC2981, ERC721Burnable, ERC721Pausable, RandomlyAssig
 
         uint creatorCount = projectOwners.length;
         for (uint i = 0; i < projectOwners.length; i++) {
-            _widthdraw(projectOwners[i], balance / creatorCount);
+            _withdraw(projectOwners[i], balance / creatorCount);
         }
     }
 
-    function _widthdraw(address _address, uint256 _amount) private {
+    function _withdraw(address _address, uint256 _amount) private {
         (bool success,) = _address.call{value : _amount}("");
         require(success, "Transfer failed.");
     }
