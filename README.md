@@ -6,7 +6,7 @@
 
 <div align="center">
   <h1>
-    The Boba monorepo has moved to <a href="https://forum.boba.network">https://github.com/bobanetwork/boba</a>.
+    The Boba monorepo has moved to <a href="https://github.com/bobanetwork/boba">https://github.com/bobanetwork/boba</a>.
   </h1>
 </div>
 
