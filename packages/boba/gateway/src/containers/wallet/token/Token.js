@@ -35,6 +35,8 @@ function TokenPage() {
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
+    // only run once all the tokens have been added to the tokenList
+    if (Object.keys(tokenList).length < 27) return
     const symbolList = Object.values(tokenList).map((i) => {
       if (i.symbolL1 === 'ETH') {
         return 'ethereum'
