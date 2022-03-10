@@ -1,14 +1,14 @@
 <div align="center">
   <a href="https://forum.boba.network"><img alt="Boba" src="https://github.com/omgnetwork/optimism-v2/blob/develop/packages/boba/gateway/src/images/boba2/logo-boba2.svg" width=400></a>
   <br />
-  <h1> The Boba Monorepo</h1>
+  <h1> ARCHIVE of The Boba Monorepo</h1>
 </div>
 
-<p align="center">
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/ts-packages.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/ts-packages.yml/badge.svg?branch%3Adevelop" /></a>
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/integration.yml/badge.svg?branch%3Adevelop" /></a>
-  <a href="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth.yml?query=branch%3Adevelop"><img src="https://github.com/omgnetwork/optimism-v2/actions/workflows/geth.yml/badge.svg?branch%3Adevelop" /></a>
-</p>
+<div align="center">
+  <h1>
+    The Boba monorepo has moved to <a href="https://forum.boba.network">https://github.com/bobanetwork/boba</a>.
+  </h1>
+</div>
 
 - [TL;DR](#tl-dr)
 - [Documentation](#documentation)
